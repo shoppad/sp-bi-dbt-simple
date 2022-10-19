@@ -1,0 +1,183 @@
+
+version: 2
+
+models:
+
+###########################################
+### Mart Models ###########################
+###########################################
+  - name: shops
+    description: "Formatted, production-ready Shops."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 4000
+
+    columns:
+      - name: shop_id
+        tests:
+          - not_null
+          - unique
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - unique
+      - name: first_installed_at
+        tests:
+          - not_null
+      - name: currency
+        tests:
+          - not_null
+
+  - name: workflows
+    columns:
+      - name: workflow_id
+        tests:
+          - unique
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+
+  - name: step_runs
+    description: "Individual mesa workflow step executions."
+
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10
+          row_condition: "is_free_workflow"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "is_billable"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "NOT(is_billable)"
+
+    columns:
+      - name: step_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('workflows')
+              field: workflow_id
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: unbillable_reason
+        tests:
+          - not_null:
+              where: "trigger_type='input' AND NOT(is_billable)"
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+
+
+  - name: workflow_runs
+    description: "Individual mesa workflow executions."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+    columns:
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+      - name: run_status
+        test:
+          - not_null
+
+    columns:
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+
+###########################################
+### Staging Models ########################
+###########################################
+  - name: stg_shops
+    description: '{{ doc("staging_shops") }}'
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 4000
+
+    columns:
+      - name: shop_id
+        tests:
+          - not_null
+          - unique
+
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - unique
+
+      - name: currency
+        tests:
+          - not_null
+
+      - name: shopify_plan_name
+        tests:
+          - not_null
+
+      - name: install_status
+        tests:
+          - not_null
+
+  - name: stg_step_runs
+    columns:
+      - name: step_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: child_failure_count
+        tests:
+          - not_null
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('workflows')
+              field: workflow_id
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+      - name: run_at_utc
+        tests:
+          - not_null
+      - name: run_at_pt
+        tests:
+          - not_null

@@ -1,0 +1,56 @@
+version: 2
+
+sources:
+  - name: mesa_mongo
+    description: Imports of Mongo DB into Snowflake JSON objects
+    database: MONGO
+    schema: PUBLIC
+    loader: HEVO
+    loaded_at_field: __HEVO__LOADED_AT
+
+
+    freshness:
+      warn_after:
+        count: 36
+        period: hour
+      error_after:
+        count: 48
+        period: hour
+      # filter: <where-condition>
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: tasks
+        # description:
+
+        identifier: M3_MESA_TASKS
+        tests:
+          # - <test>
+          # - ... # declare additional tests
+
+        # columns:
+          # - name: <column_name> # required
+          #   description: <markdown_string>
+          #   meta: {<dictionary>}
+          #   quote: true | false
+          #   tests:
+          #     - <test>
+          #     - ... # declare additional tests
+          #   tags: [<string>]
+          # - name: ... # declare properties of additional columns
+
+      - name: workflow_runs
+        identifier: M3_MESA_AUTOMATIONS
+
+      - name: mesa_shop_accounts
+        identifier: M3_MESA
+
+      - name: mesa_triggers
+        identifier: M3_MESA_TRIGGERS
+
+      - name: mesa_charges
+        identifier: M3_MESA_CHARGES
