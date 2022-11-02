@@ -49,7 +49,17 @@
     "sqlfluff.executablePath": "",
     "dbt-formatter.lowerWords": false,
     "sqlfluff.format.enabled": true,
-    "sqlfluff.suppressNotifications": false
+    "sqlfluff.suppressNotifications": false,
+    "cSpell.words": [
+      "AUTOMATIONS",
+      "builtins",
+      "hevo",
+      "LISTAGG",
+      "shoppad",
+      "templater"
+    ],
+    "dbt.queryLimit": 250,
+    "dbt.queryPreview.queryLimit": 250
   },
   "extensions": {
     "recommendations": [

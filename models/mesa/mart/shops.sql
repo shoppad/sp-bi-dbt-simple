@@ -2,7 +2,7 @@
 
 WITH trimmed_shops AS (
     SELECT
-        {{ groomed_column_list(ref('stg_shops'), columns_to_skip=columns_to_skip) }}
+        {{ groomed_column_list(ref('stg_shops'), except=columns_to_skip) | join(",\n        ") }}
     FROM {{ ref('stg_shops') }}
 ),
 
@@ -24,17 +24,17 @@ workflow_counts AS (
         COUNT(*) AS workflow_count
     FROM {{ ref('workflows') }}
     GROUP BY
-        1
+        shop_id
 ),
 
 workflow_run_counts AS (
     SELECT
         shop_id,
-        SUM(run_start_count) AS total_workflow_run_starts_count,
+        SUM(run_start_count) AS total_trigger_runs_count,
         SUM(run_success_count) AS total_workflow_run_success_count
     FROM {{ ref('workflows') }}
     GROUP BY
-        1
+        shop_id
 )
 
 SELECT *
@@ -44,4 +44,4 @@ LEFT JOIN price_per_actions USING (shop_id)
 LEFT JOIN workflow_counts USING (shop_id)
 LEFT JOIN workflow_run_counts USING (shop_id)
 WHERE billing_accounts.billing_plan_name IS NOT NULL
-ORDER BY first_installed_at ASC
+ORDER BY trimmed_shops.first_installed_at ASC

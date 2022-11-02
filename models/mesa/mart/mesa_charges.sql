@@ -4,9 +4,9 @@ WITH shops AS (
 
 charges AS (
     SELECT
+        *,
         _id AS charge_id,
-        merchant_id AS shop_id,
-        *
+        merchant_id AS shop_id
     FROM {{ source('mesa_mongo', 'mesa_charges') }}
 ),
 
@@ -17,7 +17,7 @@ final AS (
         subscription_id,
         billed_count,
         billed_amount,
-        {{ pacific_timestamp('_CREATED_AT') }} AS charged_at_pt,
+        {{ pacific_timestamp('CREATED_AT') }} AS charged_at_pt,
         DATE_TRUNC('day', charged_at_pt)::date AS charged_on_pt
     FROM charges
     INNER JOIN shops ON (array_contains(charges.shop_id::variant, shops.all_shop_ids))

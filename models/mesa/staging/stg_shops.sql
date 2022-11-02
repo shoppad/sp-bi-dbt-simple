@@ -11,13 +11,13 @@ grouped_shop_ids AS (
 ),
 
 decorated_shops AS (
-{% set columns_to_skip = ['_id', '_created_at', 'group'] %}
+{% set columns_to_skip = ['_id', 'group'] %}
     SELECT
         _id AS shop_id,
         shopify:"plan_name"::string AS shopify_plan_name,
         shopify:"currency"::string AS currency,
         status AS install_status,
-        {{ groomed_column_list(source('mesa_mongo','mesa_shop_accounts'), columns_to_skip=columns_to_skip) }}
+        {{ groomed_column_list(source('mesa_mongo','mesa_shop_accounts'), except=columns_to_skip)  | join(",\n      ") }}
     FROM {{ source('mesa_mongo','mesa_shop_accounts') }}
     WHERE NOT(__hevo__marked_deleted)
         {# TODO: I'd consider including "affiliate" #}

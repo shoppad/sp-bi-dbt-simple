@@ -147,7 +147,7 @@ CREATE OR REPLACE VIEW "M3_MESA_RUNS_VW" AS SELECT *,
     metadata:"unbillable_reason"::string as unbillable_reason,
     metadata:automation:"_id"::string as WORKFLOW_ID,
     metadata:"child_fails"::string as FAILURES
-    FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE 
+    FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE
         metadata:"trigger":"trigger_type"::string = 'input' AND
         UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
     

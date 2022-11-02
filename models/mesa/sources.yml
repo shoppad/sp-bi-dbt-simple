@@ -24,11 +24,63 @@ sources:
       identifier: false
 
     tables:
+      - name: workflows
+        identifier: M3_MESA_AUTOMATIONS
+        description: Individual workflow records with user-input name, description, starting time and more.
+
+      - name: mesa_workflow_steps
+        identifier: M3_MESA_TRIGGERS
+        description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
+
       - name: tasks
-        # description:
+        description: Individual step execution records with integration app, execution time, payload server response and more.
 
         identifier: M3_MESA_TASKS
-        tests:
+
+        columns:
+          - name: _id
+            description: Unique identifier for the task.
+            tests:
+              - unique
+              - not_null
+          - name: created_at
+            description: DO NOT USE. This column is sometimes NULL.
+          - name: _created_at
+            description: The time the task was created.
+            tests:
+              - not_null
+
+      - name: mesa_shop_accounts
+        identifier: M3_MESA
+        description: Each installation record of a Mesa merchant application install.
+
+        columns:
+          - name: _id
+            description: Unique identifier for the shop account.
+            tests:
+              - unique
+              - not_null
+          - name: _created_at
+            description: The time the shop account was created by installing the app.
+            tests:
+              - not_null
+          - name: uuid
+            description: The shopify subdomain of the shop account.
+            tests:
+              - not_null
+
+      - name: mesa_charges
+        identifier: M3_MESA_CHARGES
+        columns:
+          - name: _id
+            description: Unique identifier for the charge.
+            tests:
+              - unique
+              - not_null
+          - name: created_at
+            tests:
+              - not_null
+
           # - <test>
           # - ... # declare additional tests
 
@@ -42,15 +94,3 @@ sources:
           #     - ... # declare additional tests
           #   tags: [<string>]
           # - name: ... # declare properties of additional columns
-
-      - name: workflow_runs
-        identifier: M3_MESA_AUTOMATIONS
-
-      - name: mesa_shop_accounts
-        identifier: M3_MESA
-
-      - name: mesa_triggers
-        identifier: M3_MESA_TRIGGERS
-
-      - name: mesa_charges
-        identifier: M3_MESA_CHARGES

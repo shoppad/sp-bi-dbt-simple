@@ -1,48 +1,49 @@
 {{ config(materialized = 'table') }}
 
-WITH triggers AS (
+WITH workflows AS (
     SELECT
-        *,
-        triggers."TYPE" AS integration_app,
-        automation AS workflow_id
-    FROM {{ source('mesa_mongo', 'mesa_triggers') }} AS triggers
+        *
+    FROM {{ ref('stg_workflows') }}
 ),
 
-first_steps as (
+workflow_steps AS (
     SELECT *
-    FROM triggers
-    WHERE trigger_type = 'input' AND weight = 0
-    ORDER BY type ASC
+    FROM {{ ref('stg_workflow_steps') }}
 ),
 
-last_steps as (
+workflow_runs AS (
     SELECT *
-    FROM triggers
-    WHERE trigger_type = 'output'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY weight DESC) = 1
-    ORDER BY type ASC
+    FROM {{ ref('workflow_runs') }}
+),
+
+workflow_counts AS (
+    SELECT
+        {# TODO: Make a new ID key that combines the workflow_id & the current first/last steps? #}
+        workflow_id,
+        COUNT(*) AS step_count,
+        MIN(
+            IFF(workflow_runs.is_billable, workflow_runs.run_at_pt, NULL)
+        ) AS first_run_at_pt,
+        MIN(
+            IFF((workflow_runs.is_billable AND workflow_runs.run_status = 'success'), workflow_runs.run_at_pt, NULL)
+        ) AS first_successful_run_at_pt,
+        COUNT(
+            IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
+        ) AS run_start_count,
+        COUNT(
+            IFF((workflow_runs.is_billable AND workflow_runs.run_status = 'success'), workflow_runs.workflow_run_id, NULL)
+        ) AS run_success_count
+    FROM workflows
+    LEFT JOIN workflow_steps USING (workflow_id)
+    LEFT JOIN workflow_runs USING (workflow_id)
+    GROUP BY
+        1
 ),
 
 final AS (
-    {# TODO: Missing workflows that have never been run before. Will need to join on the table that houses raw workflows. #}
-    SELECT
-        workflow_id,
-        workflow_runs.shop_id,
-		MIN(IFF(workflow_runs.is_billable, workflow_runs.run_at_pt, NULL)) AS first_run_at_pt,
-		LISTAGG(DISTINCT first_steps.integration_app, ', ') AS first_step_app, {# TODO: Add ` WITHIN GROUP (ORDER BY integration_app ASC)::varchar` to alphabetize items. #}
-		LISTAGG(DISTINCT last_steps.integration_app, ', ') AS last_step_app,
-        COUNT(triggers.*) AS step_count,
-        MIN(IFF((workflow_runs.is_billable AND workflow_runs.run_status = 'success'), workflow_runs.run_at_pt, NULL)) AS first_successful_run_at_pt,
-        COUNT(IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)) AS run_start_count,
-        COUNT(IFF((workflow_runs.is_billable AND workflow_runs.run_status = 'success'), workflow_runs.workflow_run_id, NULL)) AS run_success_count
-    FROM {{ ref('workflow_runs') }} AS workflow_runs
-    LEFT JOIN first_steps USING (workflow_id)
-    LEFT JOIN last_steps USING (workflow_id)
-    LEFT JOIN triggers USING (workflow_id)
-    GROUP BY
-        1,
-        2
-    ORDER BY 1 DESC
+    SELECT *
+    FROM workflows
+    INNER JOIN workflow_counts USING (workflow_id)
 )
 
 SELECT * FROM final

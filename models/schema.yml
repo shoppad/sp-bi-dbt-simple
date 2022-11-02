@@ -37,6 +37,11 @@ models:
       - name: shop_id
         tests:
           - not_null
+          - relationships:
+              field: shop_id
+              to: ref('shops')
+      - name: template_name
+        description: The name of the template the workflow originated from.
 
   - name: step_runs
     description: "Individual mesa workflow step executions."
@@ -53,7 +58,6 @@ models:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000
           row_condition: "NOT(is_billable)"
-
     columns:
       - name: step_run_id
         tests:
@@ -62,6 +66,10 @@ models:
       - name: workflow_run_id
         tests:
           - not_null
+          - relationships:
+              field: workflow_run_id
+              to: ref('workflow_runs')
+              where: trigger_type='input'
       - name: workflow_id
         tests:
           - not_null
@@ -85,7 +93,7 @@ models:
 
 
   - name: workflow_runs
-    description: "Individual mesa workflow executions."
+    description: Individual mesa workflow executions.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
@@ -147,6 +155,20 @@ models:
         tests:
           - not_null
 
+  - name: stg_workflows
+    columns:
+      - name: workflow_id
+        tests:
+          - unique
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              field: shop_id
+              to: ref('stg_shops')
+      - name: template_name
+        description: The name of the template the workflow originated from.
   - name: stg_step_runs
     columns:
       - name: step_run_id
@@ -163,7 +185,7 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('workflows')
+              to: ref('stg_workflows')
               field: workflow_id
       - name: is_billable
         description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
@@ -173,11 +195,39 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('shops')
+              to: ref('stg_shops')
               field: shop_id
       - name: run_at_utc
         tests:
           - not_null
       - name: run_at_pt
         tests:
+          - not_null
+  - name: stg_trigger_runs
+    description: A intermediate model that isolates the very first step executed of each workflow run.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+    columns:
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_id
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_subdomain
+      - name: run_status
+        test:
           - not_null

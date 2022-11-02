@@ -1,14 +1,14 @@
 [sqlfluff]
 templater = dbt
 dialect = snowflake
-exclude_rules = L010, L030, L032
+exclude_rules = L010, L027, L030, L032
 verbose = 1
 
 [sqlfluff:templater:dbt]
-project_dir="./"
-profiles_dir = "~/.dbt/"
-profile = "shoppad"
-target = "dev"
+project_dir = /Users/jon/Projects/mesa_dbt
+profiles_dir = ~/.dbt/
+profile = shoppad
+target = dev
 
 [sqlfluff:rules]
 tab_space_size = 4
