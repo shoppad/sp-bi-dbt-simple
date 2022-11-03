@@ -19,6 +19,14 @@ charges AS (
     WHERE charged_on_pt < current_date()
 ),
 
+charges_by_day AS (
+    SELECT
+        charges.*
+    FROM dates
+    INNER JOIN shops ON dt >= shops.first_installed_at
+    LEFT JOIN charges USING (dt, shop_id)
+),
+
 billing_accounts AS (
     SELECT
         shop_id,
@@ -56,7 +64,7 @@ daily_workflow_run_counts AS (
         dt,
         COALESCE(COUNT(*), 0) AS trigger_runs_count,
         COUNT_IF(is_successful) AS successful_workflow_runs_count,
-        (successful_workflow_runs_count / NULLIF(trigger_runs_count, 0)) AS success_percent
+        (successful_workflow_runs_count / NULLIF(trigger_runs_count, 0)) AS workflow_success_percent
     FROM dates
     INNER JOIN shops ON dt >= shops.first_installed_at
     INNER JOIN workflow_runs USING (shop_id, dt)
@@ -85,9 +93,9 @@ final AS (
         *,
         (daily_plan_revenue + daily_usage_revenue) as inc_amount
     FROM daily_workflow_run_counts
-    LEFT JOIN charges USING (shop_id, dt) {# TODO: Making this a FULL OUTER JOIN yields charges without workflow days. #}
+    FULL OUTER JOIN charges_by_day USING (shop_id, dt)
     INNER JOIN shops USING (shop_id)
-    INNER JOIN daily_active_status USING (shop_id, dt)
+    LEFT JOIN daily_active_status USING (shop_id, dt)
     LEFT JOIN billing_accounts USING (shop_id)
 
     -- Don't create rows for zero amounts.
