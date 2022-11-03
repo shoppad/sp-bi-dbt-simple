@@ -1,28 +1,34 @@
 WITH run_starts AS (
-    SELECT *
+    SELECT
+        {{ groomed_column_list(ref('stg_trigger_runs')) | join(',\n       ') }}
     FROM {{ ref('stg_trigger_runs') }}
 ),
 
+step_runs AS (
+    SELECT *
+    FROM {{ ref('step_runs') }}
+    ORDER BY
+        workflow_run_id ASC,
+        run_at_pt ASC
+),
 action_run_stats AS (
+    {# TODO: Currently doesn't include all the Step Runs because they are missing the proper Parent. #}
     SELECT
         workflow_run_id,
+        COUNT(*) AS executed_step_count,
         SUM(child_failure_count) AS child_failure_count, {# TODO: Does this only get set on the first step? #}
-        COUNT(*) AS executed_step_count
-    FROM {{ ref('step_runs') }}
-    WHERE trigger_type = 'input' {# TODO: Would prefer to remove this and include all steps in workflow run. But it currently returns a lot of step runs without true "Parent" associations. #}
-    GROUP BY 1
-),
-
-shops AS (
-    SELECT shop_id
-    FROM {{ ref('stg_shops') }}
+        LISTAGG(DISTINCT run_status) = 'success' AS is_successful,
+        SPLIT_PART(LISTAGG(integration_app, ','), ',', -1) AS destination_app {# Hack to get the step's app. #}
+    FROM step_runs
+    GROUP BY
+        workflow_run_id
 ),
 
 final AS (
     SELECT
-        *
+        *,
+        CONCAT(source_app, '-', destination_app) AS source_destination_pair
     FROM run_starts
-    INNER JOIN shops USING (shop_id) -- Filter out workflow runs that don't have a Shop.
     LEFT JOIN action_run_stats USING (workflow_run_id)
 )
 

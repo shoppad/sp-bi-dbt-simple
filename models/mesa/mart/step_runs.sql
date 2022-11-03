@@ -16,21 +16,7 @@ workflows AS (
 
 final AS (
     SELECT
-        step_run_id,
-        workflow_run_id,
-        workflows.workflow_id,
-        shop_id,
-        shop_subdomain,
-        run_at_utc,
-        run_at_pt,
-        DATE_TRUNC('day', run_at_pt)::date AS run_on_pt,
-        trigger_type,
-        status AS step_run_status,
-        is_billable,
-        is_free_workflow,
-        unbillable_reason,
-        child_failure_count,
-        integration_app,
+        step_runs.*,
         ROW_NUMBER() OVER (PARTITION BY workflow_run_id ORDER BY run_at_pt) AS position_in_workflow_run
     FROM step_runs
     INNER JOIN workflows USING (workflow_id)

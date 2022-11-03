@@ -7,9 +7,11 @@ first_step_runs AS (
         shop_subdomain,
         run_at_utc,
         run_at_pt,
+        run_on_pt,
         is_billable,
         unbillable_reason,
-        status AS run_status,
+        integration_app AS source_app,
+        run_status AS run_status,
         updated_at
     FROM {{ ref('stg_step_runs') }}
     WHERE

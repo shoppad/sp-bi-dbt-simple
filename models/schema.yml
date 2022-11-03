@@ -105,6 +105,7 @@ models:
         description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
         tests:
           - not_null
+
       - name: shop_id
         tests:
           - not_null
@@ -169,6 +170,7 @@ models:
               to: ref('stg_shops')
       - name: template_name
         description: The name of the template the workflow originated from.
+
   - name: stg_step_runs
     columns:
       - name: step_run_id
@@ -184,7 +186,7 @@ models:
       - name: workflow_id
         tests:
           - not_null
-          - relationships:
+          - relationships: # FIXME: This test is failing because the workflow_id is missing from some "tasks".
               to: ref('stg_workflows')
               field: workflow_id
       - name: is_billable
@@ -203,6 +205,14 @@ models:
       - name: run_at_pt
         tests:
           - not_null
+      - name: workflow_step_name
+        tests:
+          - not_null
+      - name: workflow_step_key
+        # tests:
+          # - not_null:
+            # where: trigger_type = 'output'
+
   - name: stg_trigger_runs
     description: A intermediate model that isolates the very first step executed of each workflow run.
     tests:
@@ -230,4 +240,18 @@ models:
               field: shop_subdomain
       - name: run_status
         test:
+          - not_null
+
+
+###########################################
+### Rollup Models #########################
+###########################################
+
+  - name: mesa_shop_days
+    columns:
+      - name: shop_id
+        tests:
+          - not_null
+      - name: dt
+        tests:
           - not_null

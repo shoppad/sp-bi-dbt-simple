@@ -11,7 +11,7 @@ grouped_shop_ids AS (
 ),
 
 decorated_shops AS (
-{% set columns_to_skip = ['_id', 'group'] %}
+{% set columns_to_skip = ['_id', 'group', 'uuid', 'shopify', 'usage', 'config', 'webhooks', 'messages', 'analytics', '_created_at', 'schema', 'account', 'wizard'] %}
     SELECT
         _id AS shop_id,
         shopify:"plan_name"::string AS shopify_plan_name,
