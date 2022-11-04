@@ -12,7 +12,6 @@ step_runs AS (
         run_at_pt ASC
 ),
 action_run_stats AS (
-    {# TODO: Currently doesn't include all the Step Runs because they are missing the proper Parent. #}
     SELECT
         workflow_run_id,
         COUNT(*) AS executed_step_count,

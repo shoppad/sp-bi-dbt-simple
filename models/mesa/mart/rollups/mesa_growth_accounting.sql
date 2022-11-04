@@ -20,7 +20,7 @@ WITH dau AS (
     -- tutorial.
     SELECT
         shop_id AS shop_id,
-        to_date(charged_on_pt) AS dt,
+        dt,
         SUM(inc_amount) AS inc_amt
     FROM {{ ref('mesa_shop_days') }}
     GROUP by
@@ -89,5 +89,5 @@ mau_growth_accounting AS (
     ORDER BY 1
 )
 
--- For MAU growth accuonting use this
+-- For MAU growth accounting use this
 SELECT * FROM mau_growth_accounting

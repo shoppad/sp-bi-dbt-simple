@@ -69,7 +69,7 @@ models:
           - relationships:
               field: workflow_run_id
               to: ref('workflow_runs')
-              where: trigger_type='input'
+              # where: trigger_type='input' 
       - name: workflow_id
         tests:
           - not_null
@@ -249,9 +249,16 @@ models:
 
   - name: mesa_shop_days
     columns:
+      - name: mesa_shop_days
+        tests:
+          - not_null
+          - unique
       - name: shop_id
         tests:
           - not_null
       - name: dt
         tests:
           - not_null
+    tests:
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list: ["dt", "shop_id"]

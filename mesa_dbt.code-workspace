@@ -62,12 +62,14 @@
     "dbt.queryPreview.queryLimit": 250
   },
   "extensions": {
-    "recommendations": [
-      "dorzey.vscode-sqlfluff",
-      "mtxr.sqltools",
-      "koszti.snowflake-driver-for-sqltools"
-    ]
+      "recommendations": [
+          "dorzey.vscode-sqlfluff",
+          "mtxr.sqltools",
+          "koszti.snowflake-driver-for-sqltools"
+      ],
+      "todo-tree.excludeGlobs": ["target/"]
   },
+  
 
   "editor.quickSuggestions": {
     "strings": true

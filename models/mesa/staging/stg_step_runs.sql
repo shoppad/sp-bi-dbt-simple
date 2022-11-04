@@ -31,7 +31,11 @@ decorated_step_runs AS (
     ] %}
     SELECT
         _id AS step_run_id,
-        IFF(IS_NULL_VALUE(metadata:parents[0]:task_id) OR metadata:parents[0]:task_id IS NULL, step_run_id, metadata:parents[0]:task_id) AS workflow_run_id,
+        IFF(
+            IS_NULL_VALUE(metadata:parents[0]:task_id) OR metadata:parents[0]:task_id IS NULL,
+            step_run_id,
+            metadata:parents[0]:task_id
+        ) AS workflow_run_id,
         metadata:automation:_id::varchar AS workflow_id,
         metadata:trigger:_id::varchar AS workflow_step_id,
         _created_at AS run_at_utc,

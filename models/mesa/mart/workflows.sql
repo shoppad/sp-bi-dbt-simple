@@ -18,7 +18,6 @@ workflow_runs AS (
 
 workflow_counts AS (
     SELECT
-        {# TODO: Make a new ID key that combines the workflow_id & the current first/last steps? #}
         workflow_id,
         COUNT(*) AS step_count,
         MIN(
