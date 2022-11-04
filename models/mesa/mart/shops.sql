@@ -41,7 +41,7 @@ workflow_run_counts AS (
 activation_dates AS (
     SELECT
         shop_id,
-        MIN(dt) AS activation_date
+        MIN(dt) AS activation_date_pt
     FROM mesa_shop_days
     WHERE is_active
     GROUP BY
@@ -51,8 +51,7 @@ activation_dates AS (
 final AS (
     SELECT
         *,
-        activation_date AS activation_date_pt,
-        NOT(activation_date IS NULL) AS is_activated
+        NOT(activation_date_pt IS NULL) AS is_activated
     FROM trimmed_shops
     LEFT JOIN billing_accounts USING (shop_id)
     LEFT JOIN price_per_actions USING (shop_id)

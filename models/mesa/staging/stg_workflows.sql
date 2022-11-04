@@ -17,8 +17,14 @@ workflows AS (
 final AS (
     SELECT
         _id AS workflow_id,
+        {{ pacific_timestamp('created_at') }} AS created_at,
         shop_id,
         shop_subdomain,
+        name AS title,
+        is_premium,
+        description,
+        key,
+        tags,
         {# source AS first_step_app, #}
         {# destination AS last_step_app, TODO: Change to use Steps https://shoppad.slack.com/archives/D01UTNZKM6D/p1667343343556039 #}
         template AS template_name
