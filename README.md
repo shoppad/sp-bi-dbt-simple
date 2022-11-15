@@ -1,15 +1,18 @@
-Welcome to your new dbt project!
+# Mesa / ShopPad Analytics (dbt)
 
-### Using the starter project
+## Installation
+
+0. Clone the repo.
+1. `pip install virtualenv`
+2. `cd` into repo folder.
+3. `virtualenv venv` to create a new virtual env for this folder.
+4. Activate the virtual env.
+5. `pip install -r requirements.txt`
+6. `dbt deps`
+7. Create a [`profiles.yml` file](https://docs.getdbt.com/docs/get-started/connection-profiles) inside `~/.dbt/`
 
 Try running the following commands:
-- dbt run
-- dbt test
 
-
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+- `dbt build` (runs the 2 below)
+- `dbt run`
+- `dbt test`

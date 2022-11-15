@@ -65,11 +65,18 @@
   },
   "extensions": {
       "recommendations": [
-          "dorzey.vscode-sqlfluff",
-          "mtxr.sqltools",
-          "koszti.snowflake-driver-for-sqltools"
+        "dorzey.vscode-sqlfluff",
+        "mtxr.sqltools",
+        "koszti.snowflake-driver-for-sqltools",
+        "wayou.vscode-todo-highlight",
+        "gruntfuggly.todo-tree",
+        "z3z1ma.vscode-dbt-power-user-osmosis",
+        "henriblancke.vscode-dbt-formatter",
+        "bastienboutonnet.vscode-dbt",
+        "dorzey.vscode-dbt-language",
+        "fivetran.dbt-language-server"
       ],
-      "todo-tree.excludeGlobs": ["target/"]
+      "todo-tree.excludeGlobs": ["target/", "logs/"]
   },
 
   "editor.quickSuggestions": {
