@@ -1,0 +1,10 @@
+version: 2
+models:
+  - name: mesa_growth_accounting
+    columns:
+      - name: MONTH
+      - name: MAU
+      - name: RETAINED
+      - name: NEW
+      - name: RESURRECTED
+      - name: CHURNED

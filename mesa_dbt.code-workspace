@@ -59,7 +59,8 @@
       "templater"
     ],
     "dbt.queryLimit": 250,
-    "dbt.queryPreview.queryLimit": 250
+    "dbt.queryPreview.queryLimit": 250,
+    "sqlfluff.osmosis.enabled": true
   },
   "extensions": {
       "recommendations": [

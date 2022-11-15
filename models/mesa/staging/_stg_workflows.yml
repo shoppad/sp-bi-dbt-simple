@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: stg_workflows
+    columns:
+      - name: workflow_id
+        tests:
+          - unique
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              field: shop_id
+              to: ref('stg_shops')
+      - name: template_name
+        description: The name of the template the workflow originated from.
+
+      - name: CREATED_AT
+      - name: SHOP_SUBDOMAIN
+      - name: TITLE
+      - name: IS_PREMIUM
+      - name: DESCRIPTION
+      - name: KEY
+      - name: TAGS

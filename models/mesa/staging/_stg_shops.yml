@@ -1,0 +1,47 @@
+version: 2
+models:
+  - name: stg_shops
+    description: '{{ doc("staging_shops") }}'
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 4000
+
+    columns:
+      - name: shop_id
+        tests:
+          - not_null
+          - unique
+
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - unique
+
+      - name: currency
+        tests:
+          - not_null
+
+      - name: shopify_plan_name
+        tests:
+          - not_null
+
+      - name: install_status
+        tests:
+          - not_null
+
+      - name: AUTHTOKEN
+      - name: STATUS
+      - name: BILLING
+      - name: SCOPES
+      - name: THEMES
+      - name: ENTITLEMENTS
+      - name: REFERRAL
+      - name: METHOD
+      - name: META
+      - name: HANDLE
+      - name: MONGOID
+      - name: TIMESTAMP
+      - name: METABASE
+      - name: ALL_SHOP_IDS
+      - name: FIRST_INSTALLED_AT
+      - name: LATEST_INSTALLED_AT

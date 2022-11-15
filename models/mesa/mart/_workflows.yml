@@ -1,0 +1,29 @@
+version: 2
+models:
+  - name: workflows
+    columns:
+      - name: workflow_id
+        tests:
+          - unique
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              field: shop_id
+              to: ref('shops')
+      - name: template_name
+        description: The name of the template the workflow originated from.
+
+      - name: CREATED_AT
+      - name: SHOP_SUBDOMAIN
+      - name: TITLE
+      - name: IS_PREMIUM
+      - name: DESCRIPTION
+      - name: KEY
+      - name: TAGS
+      - name: STEP_COUNT
+      - name: FIRST_RUN_AT_PT
+      - name: FIRST_SUCCESSFUL_RUN_AT_PT
+      - name: RUN_START_COUNT
+      - name: RUN_SUCCESS_COUNT

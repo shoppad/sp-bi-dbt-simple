@@ -1,0 +1,70 @@
+version: 2
+models:
+  - name: step_runs
+    description: "Individual mesa workflow step executions."
+
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10
+          row_condition: "is_free_workflow"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "is_billable"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "NOT(is_billable)"
+    columns:
+      - name: step_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_run_id
+        tests:
+          - not_null
+          - relationships:
+              field: workflow_run_id
+              to: ref('workflow_runs')
+              # where: trigger_type='input' 
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('workflows')
+              field: workflow_id
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: unbillable_reason
+        tests:
+          - not_null:
+              where: "trigger_type='input' AND NOT(is_billable)"
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+
+
+      - name: WORKFLOW_STEP_ID
+      - name: RUN_AT_UTC
+      - name: RUN_AT_PT
+      - name: RUN_ON_PT
+      - name: TRIGGER_TYPE
+      - name: RUN_STATUS
+      - name: IS_FREE_WORKFLOW
+      - name: CHILD_FAILURE_COUNT
+      - name: PRIORITY
+      - name: TRIES
+      - name: UPDATED_AT
+      - name: METADATA_PARENTS
+      - name: METADATA_TRIGGER
+      - name: METADATA_AUTOMATION
+      - name: WORKFLOW_STEP_NAME
+      - name: WORKFLOW_STEP_KEY
+      - name: SHOP_SUBDOMAIN
+      - name: INTEGRATION_APP
+      - name: POSITION_IN_WORKFLOW_RUN

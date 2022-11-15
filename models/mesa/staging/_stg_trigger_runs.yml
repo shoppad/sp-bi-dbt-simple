@@ -1,0 +1,43 @@
+version: 2
+models:
+  - name: stg_trigger_runs
+    description: A intermediate model that isolates the very first step executed of each workflow run.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+    columns:
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_id
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_subdomain
+      - name: run_status
+        test:
+          - not_null
+
+
+###########################################
+### Rollup Models #########################
+###########################################
+
+      - name: WORKFLOW_ID
+      - name: RUN_AT_UTC
+      - name: RUN_AT_PT
+      - name: RUN_ON_PT
+      - name: UNBILLABLE_REASON
+      - name: SOURCE_APP
+      - name: UPDATED_AT

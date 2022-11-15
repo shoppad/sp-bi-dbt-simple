@@ -1,0 +1,58 @@
+version: 2
+models:
+  - name: stg_step_runs
+    columns:
+      - name: step_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: child_failure_count
+        tests:
+          - not_null
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships: # FIXME: This test is failing because the workflow_id is missing from some "tasks".
+              to: ref('stg_workflows')
+              field: workflow_id
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_id
+      - name: run_at_utc
+        tests:
+          - not_null
+      - name: run_at_pt
+        tests:
+          - not_null
+      - name: workflow_step_name
+        tests:
+          - not_null
+      - name: workflow_step_key
+        # tests:
+          # - not_null:
+            # where: trigger_type = 'output'
+
+      - name: WORKFLOW_STEP_ID
+      - name: RUN_ON_PT
+      - name: TRIGGER_TYPE
+      - name: RUN_STATUS
+      - name: UNBILLABLE_REASON
+      - name: IS_FREE_WORKFLOW
+      - name: PRIORITY
+      - name: TRIES
+      - name: UPDATED_AT
+      - name: METADATA_PARENTS
+      - name: METADATA_TRIGGER
+      - name: METADATA_AUTOMATION
+      - name: SHOP_SUBDOMAIN
+      - name: INTEGRATION_APP

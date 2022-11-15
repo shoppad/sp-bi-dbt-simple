@@ -1,0 +1,42 @@
+version: 2
+models:
+  - name: workflow_runs
+    description: Individual mesa workflow executions.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+    columns:
+      - name: workflow_run_id
+        tests:
+          - not_null
+      - name: is_billable
+        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        tests:
+          - not_null
+
+      - name: shop_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_id
+      - name: run_status
+        test:
+          - not_null
+
+###########################################
+### Staging Models ########################
+###########################################
+      - name: WORKFLOW_ID
+      - name: SHOP_SUBDOMAIN
+      - name: RUN_AT_UTC
+      - name: RUN_AT_PT
+      - name: RUN_ON_PT
+      - name: UNBILLABLE_REASON
+      - name: SOURCE_APP
+      - name: UPDATED_AT
+      - name: EXECUTED_STEP_COUNT
+      - name: CHILD_FAILURE_COUNT
+      - name: IS_SUCCESSFUL
+      - name: DESTINATION_APP
+      - name: SOURCE_DESTINATION_PAIR
