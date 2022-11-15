@@ -30,8 +30,8 @@ WITH dau AS (
 
 mau AS (
     SELECT
-        date_trunc('month', dt) AS month,
         shop_id,
+        date_trunc('month', dt) AS month,
         sum(inc_amt) AS inc_amt
     FROM dau
     GROUP BY
@@ -69,25 +69,26 @@ mau_decorated AS (
 -- MAU(t - 1 month) = retained(t) + churned(t)
 mau_growth_accounting AS (
     SELECT
-        coalesce(tm.month, dateadd(month, 1, lm.month)) AS month,
-        count(distinct tm.shop_id) AS mau,
-        count(distinct CASE WHEN lm.shop_id is not NULL THEN tm.shop_id
-            ELSE NULL end) AS retained,
-        count(distinct CASE WHEN tm.first_month = tm.month THEN tm.shop_id
-            ELSE NULL end) AS new,
-        count(distinct CASE WHEN tm.first_month != tm.month
-                and lm.shop_id is NULL THEN tm.shop_id ELSE NULL END
+        coalesce(mau_decorated.month, dateadd(month, 1, last_month.month)) AS month,
+        count(distinct mau_decorated.shop_id) AS mau,
+        count(distinct CASE WHEN last_month.shop_id is not NULL THEN mau_decorated.shop_id END) AS retained,
+        count(distinct CASE WHEN mau_decorated.first_month = mau_decorated.month THEN mau_decorated.shop_id END) AS new,
+        count(distinct CASE WHEN mau_decorated.first_month != mau_decorated.month
+                AND last_month.shop_id IS NULL THEN mau_decorated.shop_id END
         ) AS resurrected,
-        -1 * count(distinct CASE WHEN tm.shop_id is NULL THEN lm.shop_id ELSE NULL end) AS churned
+        -1 * count(distinct CASE WHEN mau_decorated.shop_id is NULL THEN last_month.shop_id END) AS churned
     FROM
-        mau_decorated AS tm
-    FULL OUTER JOIN mau_decorated AS lm ON (
-        tm.shop_id = lm.shop_id
-        and tm.month = dateadd(month, 1, lm.month)
+        mau_decorated
+    FULL OUTER JOIN mau_decorated AS last_month ON (
+        mau_decorated.shop_id = last_month.shop_id
+        and mau_decorated.month = dateadd(month, 1, last_month.month)
         )
     GROUP BY 1
     ORDER BY 1
 )
 
 -- For MAU growth accounting use this
-SELECT * FROM mau_growth_accounting
+SELECT *
+FROM mau_growth_accounting
+WHERE month <= date_trunc('month', CURRENT_DATE())
+ORDER BY 1 ASC
