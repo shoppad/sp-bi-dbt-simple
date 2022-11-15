@@ -18,29 +18,6 @@
     "[sql]": {
         "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
     },
-    "sqltools.connections": [
-      {
-        "authenticator": "SNOWFLAKE",
-        "ocspOptions": {
-          "ocspFailOpen": true
-        },
-        "snowflakeOptions": {
-          "clientSessionKeepAlive": true,
-          "clientSessionKeepAliveHeartbeatFrequency": 3600,
-          "schema": "DBT_JCRAW",
-          "role": "PIPELINE"
-        },
-        "previewLimit": 50,
-        "driver": "Snowflake",
-        "name": "Mesa Data Warehouse",
-        "account": "dccnrvg-zaa52567",
-        "username": "DBT_CRAWFORD",
-        "password": "qt@nFb9bLc_!WKdnxkj_c9nW",
-        "database": "MONGO",
-        "warehouse": "MONGO_WAREHOUSE",
-        "group": "Mesa"
-      }
-    ],
     "dbt.previewPanel.displayLocation": "vertical",
     "files.associations": {
       "*.sql": "jinja-sql",
