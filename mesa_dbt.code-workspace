@@ -69,7 +69,6 @@
       ],
       "todo-tree.excludeGlobs": ["target/"]
   },
-  
 
   "editor.quickSuggestions": {
     "strings": true

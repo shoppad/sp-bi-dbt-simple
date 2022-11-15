@@ -1,4 +1,5 @@
 dbt-snowflake==1.3.0
+dbt-rpc
 dbt-osmosis>=0.9.7
 sqlfluff
 # sqlfluff-templater-dbt==1.3.2
