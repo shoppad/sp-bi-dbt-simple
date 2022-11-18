@@ -8,3 +8,4 @@ models:
       - name: BILLED_AMOUNT
       - name: CHARGED_AT_PT
       - name: CHARGED_ON_PT
+      - name: CHARGE_ID

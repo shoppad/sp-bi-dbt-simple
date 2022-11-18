@@ -51,20 +51,18 @@ models:
       - name: RUN_STATUS
         tESTS:
           - not_null
-      - name: UNBILLABLE_REASON
       - name: PRIORITY
       - name: TRIES
       - name: UPDATED_AT
-      - name: METADATA_PARENTS
-      - name: METADATA_TRIGGER
-      - name: METADATA_AUTOMATION
       - name: SHOP_SUBDOMAIN
         tests:
           - not_null
           - relationships:
               to: ref('stg_shops')
               field: shop_subdomain
-      - name: INTEGRATION_APP
       - name: is_workflow_hard_deleted
         tests:
           - not_null
+      - name: INTEGRATION_NAME
+      - name: WORKFLOW_NAME
+      - name: INTEGRATION_KEY

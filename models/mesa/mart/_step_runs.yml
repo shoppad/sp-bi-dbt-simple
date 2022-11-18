@@ -68,5 +68,8 @@ models:
           - relationships:
               to: ref('shops')
               field: shop_subdomain
-      - name: INTEGRATION_APP
       - name: POSITION_IN_WORKFLOW_RUN
+      - name: IS_WORKFLOW_HARD_DELETED
+      - name: INTEGRATION_NAME
+      - name: WORKFLOW_NAME
+      - name: INTEGRATION_KEY

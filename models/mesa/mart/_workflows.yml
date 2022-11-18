@@ -27,3 +27,4 @@ models:
       - name: FIRST_SUCCESSFUL_RUN_AT_PT
       - name: RUN_START_COUNT
       - name: RUN_SUCCESS_COUNT
+      - name: IS_ENABLED

@@ -11,7 +11,6 @@ models:
       - name: TRIGGER_RUNS_COUNT
       - name: SUCCESSFUL_WORKFLOW_RUNS_COUNT
       - name: WORKFLOW_SUCCESS_PERCENT
-      - name: SUBSCRIPTION_ID
       - name: BILLED_COUNT
       - name: DAILY_USAGE_REVENUE
       - name: FIRST_INSTALLED_AT

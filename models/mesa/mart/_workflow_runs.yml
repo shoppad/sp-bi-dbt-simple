@@ -59,3 +59,6 @@ models:
       - name: is_free_workflow
         tests:
           - not_null
+      - name: IS_WORKFLOW_HARD_DELETED
+      - name: WORKFLOW_NAME
+      - name: INTEGRATION_KEY

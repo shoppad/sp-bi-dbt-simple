@@ -71,8 +71,8 @@ models:
       - name: BILLING_PLAN_TYPE
       - name: DAILY_PLAN_REVENUE
       - name: PRICE_PER_ACTION
-      - name: WORKFLOW_COUNT
       - name: TOTAL_TRIGGER_RUNS_COUNT
       - name: TOTAL_SUCCESSFUL_WORKFLOW_RUN_COUNT
       - name: ACTIVATION_DATE_PT
       - name: IS_ACTIVATED
+      - name: TEMPLATES_INSTALLED_COUNT

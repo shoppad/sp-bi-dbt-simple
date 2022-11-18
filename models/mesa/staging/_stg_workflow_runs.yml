@@ -47,3 +47,7 @@ models:
       - name: is_workflow_hard_deleted
         tests:
           - not_null
+      - name: CHILD_FAILURE_COUNT
+      - name: IS_FREE_WORKFLOW
+      - name: INTEGRATION_KEY
+      - name: WORKFLOW_NAME
