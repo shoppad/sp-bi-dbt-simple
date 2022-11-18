@@ -1,6 +1,6 @@
 WITH final AS (
     SELECT
-        shop_id,
+        shop_subdomain,
         billing:method.name::STRING AS billing_method_name,
         {{ pacific_timestamp('to_timestamp(billing:overage.bucket_start::INT, 3)') }} AS billing_overage_bucket_start_date_pt,
         {{ pacific_timestamp('to_timestamp(billing:overage.bucket_end::INT, 3)') }} AS billing_overage_bucket_end_date_pt,

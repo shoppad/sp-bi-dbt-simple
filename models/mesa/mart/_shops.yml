@@ -7,10 +7,6 @@ models:
           min_value: 4000
 
     columns:
-      - name: shop_id
-        tests:
-          - not_null
-          - unique
       - name: shop_subdomain
         tests:
           - not_null
@@ -19,6 +15,15 @@ models:
         tests:
           - not_null
       - name: currency
+        tests:
+          - not_null
+      - name: workflows_successfully_run_count
+        tests:
+          - not_null
+      - name: workflows_created_count
+        tests:
+          - not_null
+      - name: workflows_enabled_count
         tests:
           - not_null
 

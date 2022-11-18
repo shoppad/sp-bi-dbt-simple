@@ -6,11 +6,11 @@ models:
         tests:
           - unique
           - not_null
-      - name: shop_id
+      - name: shop_subdomain
         tests:
           - not_null
           - relationships:
-              field: shop_id
+              field: shop_subdomain
               to: ref('shops')
       - name: template_name
         description: The name of the template the workflow originated from.

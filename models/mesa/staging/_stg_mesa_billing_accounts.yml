@@ -2,7 +2,7 @@ version: 2
 models:
   - name: stg_mesa_billing_accounts
     columns:
-      - name: SHOP_ID
+      - name: SHOP_subdomain
       - name: BILLING_METHOD_NAME
       - name: BILLING_OVERAGE_BUCKET_START_DATE_PT
       - name: BILLING_OVERAGE_BUCKET_END_DATE_PT

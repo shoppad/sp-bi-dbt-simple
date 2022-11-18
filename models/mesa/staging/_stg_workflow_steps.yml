@@ -3,10 +3,9 @@ models:
   - name: stg_workflow_steps
     columns:
       - name: WORKFLOW_STEP_ID
-      - name: SHOP_ID
       - name: SHOP_SUBDOMAIN
       - name: INTEGRATION_APP
       - name: WORKFLOW_ID
-      - name: TRIGGER_TYPE
+      - name: step_type
       - name: STEP_WEIGHT
       - name: POSITION_IN_WORKFLOW

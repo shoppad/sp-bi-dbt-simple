@@ -1,17 +1,12 @@
 WITH
-workflows AS (
+workflow_runs AS (
     SELECT
+        workflow_run_id,
         workflow_id,
-        shop_id,
-        shop_subdomain
-    FROM {{ ref('stg_workflows') }}
-),
-
-workflow_steps AS (
-    SELECT
-        workflow_step_id,
-        integration_app
-    FROM {{ ref('stg_workflow_steps') }}
+        workflow_name,
+        shop_subdomain,
+        is_workflow_hard_deleted
+    FROM {{ ref('stg_workflow_runs') }}
 ),
 
 decorated_step_runs AS (
@@ -36,33 +31,24 @@ decorated_step_runs AS (
             step_run_id,
             metadata:parents[0]:task_id
         ) AS workflow_run_id,
-        metadata:automation:_id::varchar AS workflow_id,
-        metadata:trigger:_id::varchar AS workflow_step_id,
-        _created_at AS run_at_utc,
-        {{ pacific_timestamp("_created_at") }} AS run_at_pt,
-        DATE_TRUNC('day', run_at_pt)::date AS run_on_pt,
-        metadata:trigger:trigger_type::string AS trigger_type,
+        metadata:trigger:_id::VARCHAR AS workflow_step_id,
+        _created_at AS step_run_at_utc,
+        {{ pacific_timestamp("_created_at") }} AS step_run_at_pt,
+        DATE_TRUNC('day', step_run_at_pt)::DATE AS step_run_on_pt,
+        metadata:trigger:trigger_type::STRING AS step_type,
+        metadata:trigger:trigger_name::STRING AS integration_name,
+        metadata:trigger:trigger_key::STRING AS integration_key,
         status AS run_status,
-        NULLIF(metadata:unbillable_reason::string, '') AS unbillable_reason,
-        unbillable_reason IS NOT NULL AS is_free_workflow,
-        (
-            trigger_type = 'input'
-            AND unbillable_reason IS NULL
-        ) AS is_billable,
-        COALESCE(metadata:child_fails, 0) AS child_failure_count,
-        {{ groomed_column_list(source('mesa_mongo', 'tasks'), except=columns_to_skip)  | join(",\n      ") }},
-        metadata:parents AS metadata_parents,
-        metadata:trigger AS metadata_trigger,
-        metadata:automation AS metadata_automation,
-        metadata_trigger:trigger_name::varchar AS workflow_step_name,
-        metadata_trigger:trigger_key::varchar AS workflow_step_key
+        metadata:trigger:trigger_name::VARCHAR AS workflow_step_name,
+        metadata:trigger:trigger_key::VARCHAR AS workflow_step_key,
+        {{ groomed_column_list(source('mesa_mongo', 'tasks'), except=columns_to_skip)  | join(",\n      ") }}
     FROM
         {{ source('mesa_mongo', 'tasks') }}
     WHERE
-        workflow_id IS NOT NULL -- Eliminates about ~1,700 records without a workflow ID
-        AND NOT(__hevo__marked_deleted)
+        NOT(__hevo__marked_deleted)
         AND status NOT IN ('ready', 'skip', 'skip-ignore', 'skip-retry')
         AND NOT(COALESCE(metadata:is_test, FALSE))
+        AND NOT(metadata:parents[0].trigger_key ILIKE '%delay%' OR metadata:parents[0].trigger_key ILIKE '%-vo%')
 
     {% if is_incremental() %}
     -- this filter will only be applied on an incremental run
@@ -73,8 +59,7 @@ decorated_step_runs AS (
 final AS (
     SELECT *
     FROM decorated_step_runs
-    INNER JOIN workflows USING (workflow_id)
-    LEFT JOIN workflow_steps USING (workflow_step_id)
+    INNER JOIN workflow_runs USING (workflow_run_id)
 )
 
 SELECT * FROM final

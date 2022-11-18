@@ -38,7 +38,13 @@
     ],
     "dbt.queryLimit": 250,
     "dbt.queryPreview.queryLimit": 250,
-    "sqlfluff.osmosis.enabled": true
+    "sqlfluff.osmosis.enabled": true,
+    "files.trimTrailingWhitespace": true,
+    "blockman.n04ColorComboPreset": "Oxygen Dark (Gradients)",
+    "blockman.n02EachCharFrameWidth": 0,
+    "blockman.n04Sub01ColorComboPresetForDarkTheme": "Classic Dark Oppo (Gradients)",
+    "blockman.n04Sub04RightSideBaseOfBlocks": "Rightmost Edge Of Inner Content",
+    "blockman.n17CustomColorOfFocusedBlock": ""
   },
   "extensions": {
       "recommendations": [

@@ -6,15 +6,6 @@ models:
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 10
-          row_condition: "is_free_workflow"
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1000
-          row_condition: "is_billable"
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1000
-          row_condition: "NOT(is_billable)"
     columns:
       - name: step_run_id
         tests:
@@ -26,45 +17,56 @@ models:
           - relationships:
               field: workflow_run_id
               to: ref('workflow_runs')
-              # where: trigger_type='input' 
+              # where: step_type='input'
       - name: workflow_id
         tests:
           - not_null
           - relationships:
               to: ref('workflows')
               field: workflow_id
-      - name: is_billable
-        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
-        tests:
-          - not_null
-      - name: unbillable_reason
-        tests:
-          - not_null:
-              where: "trigger_type='input' AND NOT(is_billable)"
-      - name: shop_id
+      - name: shop_subdomain
         tests:
           - not_null
           - relationships:
               to: ref('shops')
-              field: shop_id
-
-
+              field: shop_subdomain
       - name: WORKFLOW_STEP_ID
-      - name: RUN_AT_UTC
-      - name: RUN_AT_PT
-      - name: RUN_ON_PT
-      - name: TRIGGER_TYPE
+        tests:
+          - not_null
+          - relationships:
+              to: ref('workflow_steps')
+              field: workflow_step_id
+      - name: step_RUN_AT_UTC
+        tests:
+          - not_null
+      - name: step_RUN_AT_PT
+        tests:
+          - not_null
+      - name: step_RUN_ON_PT
+        tests:
+          - not_null
+      - name: step_type
+        tests:
+          - not_null
       - name: RUN_STATUS
-      - name: IS_FREE_WORKFLOW
-      - name: CHILD_FAILURE_COUNT
+        tests:
+          - not_null
       - name: PRIORITY
       - name: TRIES
       - name: UPDATED_AT
-      - name: METADATA_PARENTS
-      - name: METADATA_TRIGGER
-      - name: METADATA_AUTOMATION
+        tests:
+          - not_null
       - name: WORKFLOW_STEP_NAME
+        tests:
+          - not_null
       - name: WORKFLOW_STEP_KEY
+        tests:
+          - not_null
       - name: SHOP_SUBDOMAIN
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_subdomain
       - name: INTEGRATION_APP
       - name: POSITION_IN_WORKFLOW_RUN

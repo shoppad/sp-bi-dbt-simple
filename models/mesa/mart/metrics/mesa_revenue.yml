@@ -1,0 +1,15 @@
+version: 2
+metrics:
+  - name: total_mesa_revenue
+    label: The revenue of our business
+    model: ref('mesa_charges')
+    description: "The Mesa-attributed revenue."
+
+    calculation_method: sum
+    expression: billed_amount
+
+    timestamp: charged_on_pt
+    time_grains: [day, week, month, all_time]
+
+    dimensions:
+      - shop_subdomain

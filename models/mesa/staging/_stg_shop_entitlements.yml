@@ -2,7 +2,7 @@ version: 2
 models:
   - name: stg_shop_entitlements
     columns:
-      - name: SHOP_ID
+      - name: SHOP_subdomain
       - name: name
       - name: value
       - name: status

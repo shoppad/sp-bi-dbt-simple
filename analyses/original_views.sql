@@ -135,7 +135,7 @@ CREATE OR REPLACE VIEW "M3_MESA_LAUNCH_SESSIONS_VW" AS SELECT "PUBLIC"."M3_MESA_
 CREATE OR REPLACE VIEW "M3_MESA_TASKS_VW" AS SELECT *,
     CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT,
     (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID,
-    (metadata:"trigger":"trigger_type"::string = 'input' AND (metadata:"unbillable_reason"::string IS NULL OR metadata:"unbillable_reason"::string != 'unbilled_automation_entitlement')  AND STATUS NOT IN ('ready', 'skip')) as is_billable,
+    (metadata:"trigger":"step_type"::string = 'input' AND (metadata:"unbillable_reason"::string IS NULL OR metadata:"unbillable_reason"::string != 'unbilled_automation_entitlement')  AND STATUS NOT IN ('ready', 'skip')) as is_billable,
     IFNULL(metadata:parents[0]:"task_id"::string, _ID) as AUTOMATION_ID,
     metadata:automation:"_id"::string as WORKFLOW_ID,
     metadata:"child_fails"::string as CHILD_FAILS
@@ -148,7 +148,7 @@ CREATE OR REPLACE VIEW "M3_MESA_RUNS_VW" AS SELECT *,
     metadata:automation:"_id"::string as WORKFLOW_ID,
     metadata:"child_fails"::string as FAILURES
     FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE
-        metadata:"trigger":"trigger_type"::string = 'input' AND
+        metadata:"trigger":"step_type"::string = 'input' AND
         UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
     
 
@@ -190,10 +190,10 @@ CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS
 
 CREATE OR REPLACE VIEW "SP_MESA_WORKFLOWS_FACTS_VW" AS
 with inputs as (
-    select * from M3_MESA_TRIGGERS_VW t2 where t2.trigger_type = 'input' and weight = 0
+    select * from M3_MESA_TRIGGERS_VW t2 where t2.step_type = 'input' and weight = 0
     ),
     outputs as (
-        select * from M3_MESA_TRIGGERS_VW t2 where t2.trigger_type = 'output'
+        select * from M3_MESA_TRIGGERS_VW t2 where t2.step_type = 'output'
     )
     SELECT workflows._ID as WORKFLOW_ID,
         workflows.MESA_ID as MESA_MERCHANT_ID,
@@ -206,7 +206,7 @@ with inputs as (
         (select count(*) from M3_MESA_TASKS_VW t2 where t2.metadata:automation:_id::varchar = workflows._ID and is_billable = true and t2.status = 'success') as AUTOMATIONS_NUM_RUN_SUCCESSFUL
     FROM "MONGO"."PUBLIC"."M3_MESA_AUTOMATIONS_VW" workflows
     left join inputs on inputs.automation = workflows._ID
-    left join outputs on outputs.automation = workflows._ID and outputs.weight = (select max(weight) from M3_MESA_TRIGGERS_VW t3 where t3.automation = workflows._ID and t3.trigger_type = 'output')
+    left join outputs on outputs.automation = workflows._ID and outputs.weight = (select max(weight) from M3_MESA_TRIGGERS_VW t3 where t3.automation = workflows._ID and t3.step_type = 'output')
     WHERE workflows.UUID NOT IN (select UUID from SP_STAFF)
     order by WORKFLOW_ID desc;
 
@@ -457,7 +457,7 @@ METADATA:"is_test"::STRING as "is_test",
 METADATA:"trigger"."_id"::STRING as "trigger__id", 
 METADATA:"trigger"."trigger_name"::STRING as "trigger_trigger_name",
 METADATA:"trigger"."trigger_key"::STRING as "trigger_trigger_key", 
-METADATA:"trigger"."trigger_type"::STRING as "trigger_trigger_type", 
+METADATA:"trigger"."step_type"::STRING as "trigger_step_type", 
 METADATA:"active"::STRING as "active", 
 METADATA:"automation"."_id"::STRING as "automation__id",
 METADATA:"automation"."automation_name"::STRING as "automation_automation_name", 

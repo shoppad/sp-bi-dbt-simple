@@ -7,11 +7,6 @@ models:
           min_value: 4000
 
     columns:
-      - name: shop_id
-        tests:
-          - not_null
-          - unique
-
       - name: shop_subdomain
         tests:
           - not_null
@@ -42,6 +37,5 @@ models:
       - name: MONGOID
       - name: TIMESTAMP
       - name: METABASE
-      - name: ALL_SHOP_IDS
       - name: FIRST_INSTALLED_AT
       - name: LATEST_INSTALLED_AT

@@ -1,33 +1,38 @@
 WITH
-grouped_shop_ids AS (
+staff_subdomains AS (
+    SELECT shop_subdomain::string AS uuid
+    FROM {{ ref('staff_subdomains') }}
+),
+
+grouped_shops AS (
     SELECT
-        UUID AS shop_subdomain,
-        MAX(_id) AS shop_id,
-        ARRAY_AGG(_id::VARCHAR) AS all_shop_ids,
+        uuid::string AS shop_subdomain,
         {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at,
         {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at
     FROM {{ source('mesa_mongo', 'mesa_shop_accounts') }}
+    WHERE uuid NOT IN (SELECT * FROM staff_subdomains)
     GROUP BY 1
 ),
 
 decorated_shops AS (
 {% set columns_to_skip = ['_id', 'group', 'uuid', 'shopify', 'usage', 'config', 'webhooks', 'messages', 'analytics', '_created_at', 'schema', 'account', 'wizard'] %}
     SELECT
-        _id AS shop_id,
-        shopify:"plan_name"::string AS shopify_plan_name,
-        shopify:"currency"::string AS currency,
+        uuid AS shop_subdomain,
+        shopify:plan_name::string AS shopify_plan_name,
+        shopify:currency::string AS currency,
         status AS install_status,
         {{ groomed_column_list(source('mesa_mongo','mesa_shop_accounts'), except=columns_to_skip)  | join(",\n      ") }}
     FROM {{ source('mesa_mongo','mesa_shop_accounts') }}
     WHERE NOT(__hevo__marked_deleted)
         {# TODO: I'd consider including "affiliate" #}
         AND shopify_plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY _created_at DESC) = 1
 ),
 
 final AS (
     SELECT *
-    FROM decorated_shops
-    INNER JOIN grouped_shop_ids USING (shop_id)
+    FROM grouped_shops
+    INNER JOIN decorated_shops USING (shop_subdomain)
 )
 
 SELECT * FROM final

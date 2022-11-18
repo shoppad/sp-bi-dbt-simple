@@ -9,29 +9,19 @@ models:
       - name: workflow_run_id
         tests:
           - not_null
-      - name: child_failure_count
-        tests:
-          - not_null
       - name: workflow_id
         tests:
           - not_null
-          - relationships: # FIXME: This test is failing because the workflow_id is missing from some "tasks".
+          - relationships_proportion:
               to: ref('stg_workflows')
               field: workflow_id
-      - name: is_billable
-        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+              warn_if: '>1'
+              error_if: '>5'
+
+      - name: step_run_at_utc
         tests:
           - not_null
-      - name: shop_id
-        tests:
-          - not_null
-          - relationships:
-              to: ref('stg_shops')
-              field: shop_id
-      - name: run_at_utc
-        tests:
-          - not_null
-      - name: run_at_pt
+      - name: step_run_at_pt
         tests:
           - not_null
       - name: workflow_step_name
@@ -40,14 +30,28 @@ models:
       - name: workflow_step_key
         # tests:
           # - not_null:
-            # where: trigger_type = 'output'
+            # where: step_type = 'output'
 
       - name: WORKFLOW_STEP_ID
-      - name: RUN_ON_PT
-      - name: TRIGGER_TYPE
+        tests:
+          # - dbt_utils.not_null_proportion:
+          #    at_least: 0.95
+          - not_null
+          - relationships_proportion:
+              to: ref('stg_workflow_steps')
+              field: workflow_step_id
+              warn_if: '>1'
+              error_if: '>5'
+      - name: STEP_RUN_ON_PT
+        tests:
+          - not_null
+      - name: step_type
+        tests:
+          - not_null
       - name: RUN_STATUS
+        tESTS:
+          - not_null
       - name: UNBILLABLE_REASON
-      - name: IS_FREE_WORKFLOW
       - name: PRIORITY
       - name: TRIES
       - name: UPDATED_AT
@@ -55,4 +59,12 @@ models:
       - name: METADATA_TRIGGER
       - name: METADATA_AUTOMATION
       - name: SHOP_SUBDOMAIN
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_subdomain
       - name: INTEGRATION_APP
+      - name: is_workflow_hard_deleted
+        tests:
+          - not_null

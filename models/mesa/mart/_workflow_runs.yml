@@ -5,6 +5,15 @@ models:
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "is_billable"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+          row_condition: "NOT(is_billable)"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10
+          row_condition: "is_free_workflow"
     columns:
       - name: workflow_run_id
         tests:
@@ -14,29 +23,39 @@ models:
         tests:
           - not_null
 
-      - name: shop_id
+      - name: shop_subdomain
         tests:
           - not_null
           - relationships:
               to: ref('shops')
-              field: shop_id
+              field: shop_subdomain
       - name: run_status
         test:
           - not_null
-
-###########################################
-### Staging Models ########################
-###########################################
       - name: WORKFLOW_ID
       - name: SHOP_SUBDOMAIN
-      - name: RUN_AT_UTC
-      - name: RUN_AT_PT
-      - name: RUN_ON_PT
-      - name: UNBILLABLE_REASON
+      - name: workflow_RUN_AT_UTC
+        tests:
+          - not_null
+      - name: workflow_RUN_AT_PT
+        tests:
+          - not_null
+      - name: workflow_RUN_ON_PT
+        tests:
+          - not_null
+      - name: unbillable_reason
+        tests:
+          - not_null:
+              where: "NOT(is_billable)"
       - name: SOURCE_APP
       - name: UPDATED_AT
       - name: EXECUTED_STEP_COUNT
       - name: CHILD_FAILURE_COUNT
+        tests:
+          - not_null
       - name: IS_SUCCESSFUL
       - name: DESTINATION_APP
       - name: SOURCE_DESTINATION_PAIR
+      - name: is_free_workflow
+        tests:
+          - not_null

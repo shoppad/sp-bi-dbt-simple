@@ -3,11 +3,10 @@ version: 2
 sources:
   - name: mesa_mongo
     description: Imports of Mongo DB into Snowflake JSON objects
-    database: MONGO
-    schema: PUBLIC
+    database: mongo
+    schema: public
     loader: HEVO
-    loaded_at_field: __HEVO__LOADED_AT
-
+    loaded_at_field: __hevo__loaded_at
 
     freshness:
       warn_after:
@@ -25,17 +24,17 @@ sources:
 
     tables:
       - name: workflows
-        identifier: M3_MESA_AUTOMATIONS
+        identifier: m3_mesa_automations
         description: Individual workflow records with user-input name, description, starting time and more.
 
-      - name: mesa_workflow_steps
-        identifier: M3_MESA_TRIGGERS
+      - name: workflow_steps
+        identifier: m3_mesa_triggers
         description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
 
       - name: tasks
         description: Individual step execution records with integration app, execution time, payload server response and more.
 
-        identifier: M3_MESA_TASKS
+        identifier: m3_mesa_tasks
 
         columns:
           - name: _id
@@ -51,7 +50,7 @@ sources:
               - not_null
 
       - name: mesa_shop_accounts
-        identifier: M3_MESA
+        identifier: m3_mesa
         description: Each installation record of a Mesa merchant application install.
 
         columns:
@@ -70,7 +69,7 @@ sources:
               - not_null
 
       - name: mesa_charges
-        identifier: M3_MESA_CHARGES
+        identifier: m3_mesa_charges
         columns:
           - name: _id
             description: Unique identifier for the charge.

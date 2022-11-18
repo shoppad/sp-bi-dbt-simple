@@ -2,7 +2,6 @@ version: 2
 models:
   - name: mesa_charges
     columns:
-      - name: SHOP_ID
       - name: SHOP_SUBDOMAIN
       - name: SUBSCRIPTION_ID
       - name: BILLED_COUNT

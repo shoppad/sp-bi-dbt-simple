@@ -50,10 +50,10 @@ models:
         mesa:
             mart:
                 step_runs:
-                    +cluster_by: ['shop_id', 'shop_subdomain']
+                    +cluster_by: ['shop_subdomain']
 
                 workflow_runs:
-                    +cluster_by: ['shop_id', 'shop_subdomain', 'workflow_id']
+                    +cluster_by: ['shop_subdomain', 'workflow_id']
 
                 shops:
                     +cluster_by: ["date_trunc('day', first_installed_at)"]
@@ -62,13 +62,11 @@ models:
                 +schema: staging
 
                 stg_step_runs:
-                    +materialized: incremental
                     +on_schema_change: "sync_all_columns"
                     +unique_key: step_run_id
                     +cluster_by: ['workflow_run_id']
                 stg_workflows:
-                stg_trigger_runs:
-                    +materialized: incremental
+                stg_workflow_runs:
                     +on_schema_change: "sync_all_columns"
                     +unique_key: workflow_run_id
-                    +cluster_by: ['shop_id']
+                    +cluster_by: ['shop_subdomain']

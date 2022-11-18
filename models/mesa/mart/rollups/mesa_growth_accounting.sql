@@ -1,13 +1,13 @@
--- This is a translated query which can be run ON Snowflake. Originally written BY Jonathan Hsu (Tribe Capital), 
+-- This is a translated query which can be run ON Snowflake. Originally written BY Jonathan Hsu (Tribe Capital),
 -- who shared the same analytical pattern to run in PostgreSQL, linked ON this blog post:
 -- https://tribecap.co/a-quantitative-approach-to-product-market-fit/
 
 WITH dau AS (
     -- This part of the query can be pretty much anything.
     -- The only requirement is that it have three columns:
-    --   dt, shop_id, inc_amt
-    -- Where dt is a date and shop_id is some unique identifier for a user.
-    -- Each dt-shop_id pair should be unique in this table.
+    --   dt, shop_subdomain, inc_amt
+    -- Where dt is a date and shop_subdomain is some unique identifier for a user.
+    -- Each dt-shop_subdomain pair should be unique in this table.
     -- inc_amt represents the amount of value that this user created ON dt.
     -- The most common CASE is
     --   inc_amt = incremental revenue FROM the user ON dt
@@ -19,7 +19,7 @@ WITH dau AS (
     -- The query here is a sample that works in the public Mode Analytics
     -- tutorial.
     SELECT
-        shop_id AS shop_id,
+        shop_subdomain,
         dt,
         SUM(inc_amount) AS inc_amt
     FROM {{ ref('mesa_shop_days') }}
@@ -30,7 +30,7 @@ WITH dau AS (
 
 mau AS (
     SELECT
-        shop_id,
+        shop_subdomain,
         date_trunc('month', dt) AS month,
         sum(inc_amt) AS inc_amt
     FROM dau
@@ -44,7 +44,7 @@ mau AS (
 -- registration date if that's more appropriate.
 first_dt AS (
     SELECT
-        shop_id,
+        shop_subdomain,
         min(dt) AS first_dt,
         date_trunc('week', min(dt)) AS first_week,
         date_trunc('month', min(dt)) AS first_month
@@ -55,11 +55,11 @@ first_dt AS (
 mau_decorated AS (
     SELECT
         mau.month,
-        mau.shop_id,
+        mau.shop_subdomain,
         mau.inc_amt,
         first_dt.first_month
     FROM mau
-    INNER JOIN first_dt ON (mau.shop_id = first_dt.shop_id) and mau.inc_amt > 0
+    INNER JOIN first_dt ON (mau.shop_subdomain = first_dt.shop_subdomain) and mau.inc_amt > 0
 ),
 
 -- This is MAU growth accounting. Note that this does not require any
@@ -70,17 +70,17 @@ mau_decorated AS (
 mau_growth_accounting AS (
     SELECT
         coalesce(mau_decorated.month, dateadd(month, 1, last_month.month)) AS month,
-        count(distinct mau_decorated.shop_id) AS mau,
-        count(distinct CASE WHEN last_month.shop_id is not NULL THEN mau_decorated.shop_id END) AS retained,
-        count(distinct CASE WHEN mau_decorated.first_month = mau_decorated.month THEN mau_decorated.shop_id END) AS new,
+        count(distinct mau_decorated.shop_subdomain) AS mau,
+        count(distinct CASE WHEN last_month.shop_subdomain is not NULL THEN mau_decorated.shop_subdomain END) AS retained,
+        count(distinct CASE WHEN mau_decorated.first_month = mau_decorated.month THEN mau_decorated.shop_subdomain END) AS new,
         count(distinct CASE WHEN mau_decorated.first_month != mau_decorated.month
-                AND last_month.shop_id IS NULL THEN mau_decorated.shop_id END
+                AND last_month.shop_subdomain IS NULL THEN mau_decorated.shop_subdomain END
         ) AS resurrected,
-        -1 * count(distinct CASE WHEN mau_decorated.shop_id is NULL THEN last_month.shop_id END) AS churned
+        -1 * count(distinct CASE WHEN mau_decorated.shop_subdomain is NULL THEN last_month.shop_subdomain END) AS churned
     FROM
         mau_decorated
     FULL OUTER JOIN mau_decorated AS last_month ON (
-        mau_decorated.shop_id = last_month.shop_id
+        mau_decorated.shop_subdomain = last_month.shop_subdomain
         and mau_decorated.month = dateadd(month, 1, last_month.month)
         )
     GROUP BY 1

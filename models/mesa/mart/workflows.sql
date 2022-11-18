@@ -1,8 +1,7 @@
 {{ config(materialized = 'table') }}
 
 WITH workflows AS (
-    SELECT
-        *
+    SELECT *
     FROM {{ ref('stg_workflows') }}
 ),
 
@@ -21,10 +20,10 @@ workflow_counts AS (
         workflow_id,
         COUNT(*) AS step_count,
         MIN(
-            IFF(workflow_runs.is_billable, workflow_runs.run_at_pt, NULL)
+            IFF(workflow_runs.is_billable, workflow_runs.workflow_run_at_pt, NULL)
         ) AS first_run_at_pt,
         MIN(
-            IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.run_at_pt, NULL)
+            IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_at_pt, NULL)
         ) AS first_successful_run_at_pt,
         COUNT(
             IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
