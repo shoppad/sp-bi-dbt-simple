@@ -15,16 +15,26 @@ models:
       - name: template_name
         description: The name of the template the workflow originated from.
 
-      - name: CREATED_AT
-      - name: SHOP_SUBDOMAIN
-      - name: TITLE
-      - name: IS_PREMIUM
-      - name: DESCRIPTION
-      - name: KEY
-      - name: TAGS
-      - name: STEP_COUNT
-      - name: FIRST_RUN_AT_PT
-      - name: FIRST_SUCCESSFUL_RUN_AT_PT
-      - name: RUN_START_COUNT
-      - name: RUN_SUCCESS_COUNT
-      - name: IS_ENABLED
+      - name: created_at
+      - name: shop_subdomain
+      - name: title
+      - name: is_premium
+      - name: description
+      - name: key
+      - name: tags
+      - name: step_count
+      - name: first_run_at_pt
+      - name: first_successful_run_at_pt
+      - name: run_start_count
+      - name: run_success_count
+      - name: is_enabled
+      - name: first_test_at_pt
+      - name: first_successful_test_at_pt
+      - name: test_start_count
+        tests:
+          - not_null
+      - name: test_success_count
+        tests:
+          - not_null
+
+      - name: TEST_COUNT

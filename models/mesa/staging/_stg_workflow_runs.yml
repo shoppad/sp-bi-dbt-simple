@@ -51,3 +51,4 @@ models:
       - name: IS_FREE_WORKFLOW
       - name: INTEGRATION_KEY
       - name: WORKFLOW_NAME
+      - name: IS_TEST_RUN

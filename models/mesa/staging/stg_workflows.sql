@@ -18,7 +18,7 @@ final AS (
         {{ pacific_timestamp('created_at') }} AS created_at,
         shop_subdomain,
         name AS title,
-        is_premium,
+        COALESCE(is_premium = True, FALSE) AS is_premium,
         description,
         key,
         tags,

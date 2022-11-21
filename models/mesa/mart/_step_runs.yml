@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: step_runs
-    description: "Individual mesa workflow step executions."
+    description: "individual mesa workflow step executions."
 
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
@@ -30,46 +30,43 @@ models:
           - relationships:
               to: ref('shops')
               field: shop_subdomain
-      - name: WORKFLOW_STEP_ID
+      - name: workflow_step_id
         tests:
           - not_null
-          - relationships:
+          - relationships_proportion:
               to: ref('workflow_steps')
               field: workflow_step_id
-      - name: step_RUN_AT_UTC
+              warn_if: '>1'
+              error_if: '>5'
+      - name: step_run_at_utc
         tests:
           - not_null
-      - name: step_RUN_AT_PT
+      - name: step_run_at_pt
         tests:
           - not_null
-      - name: step_RUN_ON_PT
+      - name: step_run_on_pt
         tests:
           - not_null
       - name: step_type
         tests:
           - not_null
-      - name: RUN_STATUS
+      - name: run_status
         tests:
           - not_null
-      - name: PRIORITY
-      - name: TRIES
-      - name: UPDATED_AT
+      - name: priority
+      - name: tries
+      - name: updated_at
         tests:
           - not_null
-      - name: WORKFLOW_STEP_NAME
+      - name: workflow_step_name
         tests:
           - not_null
-      - name: WORKFLOW_STEP_KEY
+      - name: workflow_step_key
         tests:
           - not_null
-      - name: SHOP_SUBDOMAIN
-        tests:
-          - not_null
-          - relationships:
-              to: ref('shops')
-              field: shop_subdomain
-      - name: POSITION_IN_WORKFLOW_RUN
-      - name: IS_WORKFLOW_HARD_DELETED
-      - name: INTEGRATION_NAME
-      - name: WORKFLOW_NAME
-      - name: INTEGRATION_KEY
+      - name: position_in_workflow_run
+      - name: is_workflow_hard_deleted
+      - name: integration_name
+      - name: workflow_name
+      - name: integration_key
+      - name: IS_TEST_RUN

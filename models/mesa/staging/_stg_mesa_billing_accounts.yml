@@ -1,12 +1,25 @@
 version: 2
 models:
   - name: stg_mesa_billing_accounts
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_shops')
     columns:
       - name: SHOP_subdomain
+        tests:
+          - unique
+          - not_null
       - name: BILLING_METHOD_NAME
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['shopify', 'chargebee']
       - name: BILLING_OVERAGE_BUCKET_START_DATE_PT
       - name: BILLING_OVERAGE_BUCKET_END_DATE_PT
       - name: BILLING_OVERAGE_BYPASS_UNTIL
+        tests:
+          - dbt_utils.not_accepted_values:
+              values: ['null']
       - name: BILLING_OVERAGE_LAST_COUNT
       - name: BILLING_PLAN_DAYS_COMPLETE
       - name: BILLING_PLAN_ID

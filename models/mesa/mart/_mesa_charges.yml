@@ -2,10 +2,10 @@ version: 2
 models:
   - name: mesa_charges
     columns:
-      - name: SHOP_SUBDOMAIN
-      - name: SUBSCRIPTION_ID
-      - name: BILLED_COUNT
-      - name: BILLED_AMOUNT
-      - name: CHARGED_AT_PT
-      - name: CHARGED_ON_PT
-      - name: CHARGE_ID
+      - name: shop_subdomain
+      - name: subscription_id
+      - name: billed_count
+      - name: billed_amount
+      - name: charged_at_pt
+      - name: charged_on_pt
+      - name: charge_id

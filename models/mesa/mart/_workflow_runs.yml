@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: workflow_runs
-    description: Individual mesa workflow executions.
+    description: individual mesa workflow executions.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
@@ -10,7 +10,7 @@ models:
           row_condition: "is_billable"
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000
-          row_condition: "NOT(is_billable)"
+          row_condition: "not(is_billable)"
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10
           row_condition: "is_free_workflow"
@@ -19,7 +19,7 @@ models:
         tests:
           - not_null
       - name: is_billable
-        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        description: a step/workflow is only billed once -- not for each step. so only true for the first trigger.
         tests:
           - not_null
 
@@ -32,33 +32,34 @@ models:
       - name: run_status
         test:
           - not_null
-      - name: WORKFLOW_ID
-      - name: SHOP_SUBDOMAIN
-      - name: workflow_RUN_AT_UTC
+      - name: workflow_id
+      - name: shop_subdomain
+      - name: workflow_run_at_utc
         tests:
           - not_null
-      - name: workflow_RUN_AT_PT
+      - name: workflow_run_at_pt
         tests:
           - not_null
-      - name: workflow_RUN_ON_PT
+      - name: workflow_run_on_pt
         tests:
           - not_null
       - name: unbillable_reason
         tests:
           - not_null:
-              where: "NOT(is_billable)"
-      - name: SOURCE_APP
-      - name: UPDATED_AT
-      - name: EXECUTED_STEP_COUNT
-      - name: CHILD_FAILURE_COUNT
+              where: "not(is_billable)"
+      - name: source_app
+      - name: updated_at
+      - name: executed_step_count
+      - name: child_failure_count
         tests:
           - not_null
-      - name: IS_SUCCESSFUL
-      - name: DESTINATION_APP
-      - name: SOURCE_DESTINATION_PAIR
+      - name: is_successful
+      - name: destination_app
+      - name: source_destination_pair
       - name: is_free_workflow
         tests:
           - not_null
-      - name: IS_WORKFLOW_HARD_DELETED
-      - name: WORKFLOW_NAME
-      - name: INTEGRATION_KEY
+      - name: is_workflow_hard_deleted
+      - name: workflow_name
+      - name: integration_key
+      - name: IS_TEST_RUN

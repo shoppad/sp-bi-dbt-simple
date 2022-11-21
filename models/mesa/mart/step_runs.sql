@@ -1,7 +1,7 @@
 WITH
 step_runs AS (
     SELECT *
-    FROM {{ ref('stg_step_runs') }}
+    FROM {{ ref('int_step_runs') }}
 ),
 
 workflow_steps AS (

@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: int_step_runs
+    columns:
+      - name: WORKFLOW_RUN_ID
+      - name: STEP_RUN_ID
+      - name: WORKFLOW_STEP_ID
+      - name: STEP_RUN_AT_UTC
+      - name: STEP_RUN_AT_PT
+      - name: STEP_RUN_ON_PT
+      - name: STEP_TYPE
+      - name: INTEGRATION_NAME
+      - name: INTEGRATION_KEY
+      - name: RUN_STATUS
+      - name: WORKFLOW_STEP_NAME
+      - name: WORKFLOW_STEP_KEY
+      - name: IS_TEST_RUN
+      - name: PRIORITY
+      - name: TRIES
+      - name: UPDATED_AT
+      - name: WORKFLOW_ID
+      - name: WORKFLOW_NAME
+      - name: SHOP_SUBDOMAIN
+      - name: IS_WORKFLOW_HARD_DELETED

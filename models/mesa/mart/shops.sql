@@ -1,7 +1,7 @@
 {% set shop_columns_to_skip = ['billing', 'entitlements'] %}
 
 WITH
-trimmed_shops AS (
+shops AS (
     SELECT
         {{ groomed_column_list(ref('stg_shops'), except=shop_columns_to_skip) | join(",\n        ") }}
     FROM {{ ref('stg_shops') }}
@@ -26,7 +26,7 @@ workflow_counts AS (
         COUNT_IF(is_enabled) AS workflows_enabled_count,
         COUNT_IF(first_successful_run_at_pt IS NOT NULL) AS workflows_successfully_run_count,
         COUNT(DISTINCT template_name) AS templates_installed_count
-    FROM trimmed_shops
+    FROM shops
     LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
     GROUP BY
         1
@@ -56,13 +56,13 @@ final AS (
     SELECT
         *,
         NOT(activation_date_pt IS NULL) AS is_activated
-    FROM trimmed_shops
+    FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
     LEFT JOIN workflow_counts USING (shop_subdomain)
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
     LEFT JOIN activation_dates USING (shop_subdomain)
-    WHERE billing_accounts.billing_plan_name IS NOT NULL
+    WHERE billing_accounts.plan_name IS NOT NULL
 )
 
 SELECT * FROM final

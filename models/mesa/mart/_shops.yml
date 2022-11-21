@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: shops
-    description: "Formatted, production-ready Shops."
+    description: "formatted, production-ready shops."
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
@@ -27,52 +27,52 @@ models:
         tests:
           - not_null
 
-      - name: SHOPIFY_PLAN_NAME
-      - name: INSTALL_STATUS
-      - name: AUTHTOKEN
-      - name: STATUS
-      - name: SCOPES
-      - name: THEMES
-      - name: REFERRAL
-      - name: METHOD
-      - name: META
-      - name: HANDLE
-      - name: MONGOID
-      - name: TIMESTAMP
-      - name: METABASE
-      - name: LATEST_INSTALLED_AT
-      - name: BILLING_METHOD_NAME
-      - name: BILLING_OVERAGE_BUCKET_START_DATE_PT
-      - name: BILLING_OVERAGE_BUCKET_END_DATE_PT
-      - name: BILLING_OVERAGE_BYPASS_UNTIL
-      - name: BILLING_OVERAGE_LAST_COUNT
-      - name: BILLING_PLAN_DAYS_COMPLETE
-      - name: BILLING_PLAN_ID
-      - name: BILLING_PLAN_PERCENT_COMPLETE
-      - name: BILLING_PLAN_PERCENT_USED
-      - name: BILLING_PLAN_START_DATE_PT
-      - name: BILLING_PLAN_END_DATE_PT
-      - name: BILLING_PLAN_STATUS
-      - name: BILLING_PLAN_USED
-      - name: BILLING_PLAN_NAME
-      - name: BILLING_METHOD_SHOPIFY_ID
-      - name: BILLING_PLAN_TRIAL_DAYS
-      - name: BILLING_PLAN_TRIAL_ENDS_PT
-      - name: BILLING_PLAN_UPDATED_AT_PT
-      - name: BILLING_PLAN_BILLING_ON_PT
-      - name: BILLING_PLAN_OVERLIMIT_DATE_PT
-      - name: BILLING_PLAN_BALANCE_REMAINING
-      - name: BILLING_METHOD_CHARGEBEE_ID
-      - name: BILLING_PLAN_VOLUME
-      - name: BILLING_PLAN_INTERVAL
-      - name: BILLING_PLAN_PRICE
-      - name: BILLING_PLAN_CREATED_AT_PT
-      - name: BILLING_PLAN_BALANCE_USED
-      - name: BILLING_PLAN_TYPE
-      - name: DAILY_PLAN_REVENUE
-      - name: PRICE_PER_ACTION
-      - name: TOTAL_TRIGGER_RUNS_COUNT
-      - name: TOTAL_SUCCESSFUL_WORKFLOW_RUN_COUNT
-      - name: ACTIVATION_DATE_PT
-      - name: IS_ACTIVATED
-      - name: TEMPLATES_INSTALLED_COUNT
+      - name: shopify_plan_name
+      - name: install_status
+      - name: authtoken
+      - name: status
+      - name: scopes
+      - name: themes
+      - name: referral
+      - name: method
+      - name: meta
+      - name: handle
+      - name: mongoid
+      - name: timestamp
+      - name: metabase
+      - name: latest_installed_at
+      - name: billing_method_name
+      - name: billing_overage_bucket_start_date_pt
+      - name: billing_overage_bucket_end_date_pt
+      - name: billing_overage_bypass_until
+      - name: billing_overage_last_count
+      - name: billing_plan_days_complete
+      - name: billing_plan_id
+      - name: billing_plan_percent_complete
+      - name: billing_plan_percent_used
+      - name: billing_plan_start_date_pt
+      - name: billing_plan_end_date_pt
+      - name: billing_plan_status
+      - name: billing_plan_used
+      - name: billing_plan_name
+      - name: billing_method_shopify_id
+      - name: billing_plan_trial_days
+      - name: billing_plan_trial_ends_pt
+      - name: billing_plan_updated_at_pt
+      - name: billing_plan_billing_on_pt
+      - name: billing_plan_overlimit_date_pt
+      - name: billing_plan_balance_remaining
+      - name: billing_method_chargebee_id
+      - name: billing_plan_volume
+      - name: billing_plan_interval
+      - name: billing_plan_price
+      - name: billing_plan_created_at_pt
+      - name: billing_plan_balance_used
+      - name: billing_plan_type
+      - name: daily_plan_revenue
+      - name: price_per_action
+      - name: total_trigger_runs_count
+      - name: total_successful_workflow_run_count
+      - name: activation_date_pt
+      - name: is_activated
+      - name: templates_installed_count

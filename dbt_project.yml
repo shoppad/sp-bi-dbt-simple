@@ -41,6 +41,9 @@ seeds:
 # using the `{{ config(...) }}` macro.
 models:
     shoppad:
+        +persist_docs:
+            relation: true
+            columns: true
         +transient: true
         +materialized: table
         +dbt-osmosis: "_model.yml"

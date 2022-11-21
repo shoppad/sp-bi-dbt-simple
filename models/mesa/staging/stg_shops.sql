@@ -15,12 +15,17 @@ grouped_shops AS (
 ),
 
 decorated_shops AS (
-{% set columns_to_skip = ['_id', 'group', 'uuid', 'shopify', 'usage', 'config', 'webhooks', 'messages', 'analytics', '_created_at', 'schema', 'account', 'wizard'] %}
+{% set columns_to_skip = ['_id', 'group', 'uuid', 'shopify', 'usage', 'config', 'webhooks', 'messages', 'analytics', '_created_at', 'schema', 'account', 'wizard', 'mongoid', 'authtoken', 'metabase'] %}
     SELECT
         uuid AS shop_subdomain,
         shopify:plan_name::string AS shopify_plan_name,
         shopify:currency::string AS currency,
         status AS install_status,
+        analytics:initial:orders_count AS orders_initial_count,
+        analytics:initial:orders_gmv AS revenue_initial_total,
+        analytics:orders:count AS orders_count,
+        analytics:orders:gmv AS revenue_total,
+
         {{ groomed_column_list(source('mesa_mongo','mesa_shop_accounts'), except=columns_to_skip)  | join(",\n      ") }}
     FROM {{ source('mesa_mongo','mesa_shop_accounts') }}
     WHERE NOT(__hevo__marked_deleted)

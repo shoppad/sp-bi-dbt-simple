@@ -24,7 +24,6 @@ models:
         tests:
           - not_null
 
-      - name: AUTHTOKEN
       - name: STATUS
       - name: BILLING
       - name: SCOPES
@@ -34,8 +33,10 @@ models:
       - name: METHOD
       - name: META
       - name: HANDLE
-      - name: MONGOID
       - name: TIMESTAMP
-      - name: METABASE
       - name: FIRST_INSTALLED_AT
       - name: LATEST_INSTALLED_AT
+      - name: ORDERS_COUNT
+      - name: REVENUE_TOTAL
+      - name: ORDERS_INITIAL_COUNT
+      - name: REVENUE_INITIAL_TOTAL
