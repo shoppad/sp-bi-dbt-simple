@@ -15,7 +15,6 @@ workflow_runs AS (
     FROM {{ ref('workflow_runs') }}
 ),
 
-
 workflow_counts AS (
     SELECT
         workflow_id,
