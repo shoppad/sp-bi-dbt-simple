@@ -6,7 +6,7 @@ sources:
     database: mongo
     schema: public
     loader: HEVO
-    loaded_at_field: __hevo__loaded_at
+    loaded_at_field: __hevo__loaded_at::varchar::timestamp_ntz
 
     freshness:
       warn_after:
