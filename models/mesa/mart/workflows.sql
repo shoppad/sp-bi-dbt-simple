@@ -48,7 +48,6 @@ test_runs AS (
 test_counts AS (
     SELECT
         workflow_id,
-        COUNT(test_runs.*) AS test_count,
         MIN(workflow_run_at_pt) AS first_test_at_pt,
         MIN(
             IFF(is_successful, workflow_run_at_pt, NULL)
