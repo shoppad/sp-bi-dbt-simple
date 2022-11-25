@@ -16,3 +16,15 @@ models:
       - name: shopify_plan_name
         tests:
           - not_null
+      - name: SHOP_SUBDOMAIN
+      - name: REVENUE_INITIAL_TOTAL
+      - name: METHOD
+      - name: ORDERS_CURRENT_COUNT
+      - name: ORDERS_INITIAL_COUNT
+      - name: HANDLE
+      - name: FIRST_INSTALLED_AT
+      - name: REFERRAL
+      - name: TIMESTAMP
+      - name: LATEST_INSTALLED_AT
+      - name: REVENUE_CURRENT_TOTAL
+      - name: META

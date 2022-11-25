@@ -24,7 +24,24 @@ models:
       - name: TIMESTAMP
       - name: FIRST_INSTALLED_AT
       - name: LATEST_INSTALLED_AT
-      - name: ORDERS_COUNT
-      - name: REVENUE_TOTAL
-      - name: ORDERS_INITIAL_COUNT
-      - name: REVENUE_INITIAL_TOTAL
+      - name: MONGOID
+      - name: UUID
+      - name: __HEVO__MARKED_DELETED
+      - name: ANALYTICS
+      - name: WEBHOOKS
+      - name: _CREATED_AT
+      - name: AUTHTOKEN
+      - name: USAGE
+      - name: __HEVO__INGESTED_AT
+      - name: __HEVO__LOADED_AT
+      - name: WIZARD
+      - name: CONFIG
+      - name: SHOPIFY
+      - name: MESSAGES
+      - name: ACCOUNT
+      - name: METABASE
+      - name: SCHEMA
+      - name: GROUP
+      - name: __HEVO__DATABASE_NAME
+      - name: _ID
+      - name: __HEVO_ID

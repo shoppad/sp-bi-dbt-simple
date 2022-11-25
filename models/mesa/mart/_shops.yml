@@ -29,46 +29,18 @@ models:
 
       - name: shopify_plan_name
       - name: install_status
-      - name: authtoken
       - name: status
-      - name: scopes
-      - name: themes
       - name: referral
       - name: method
       - name: meta
       - name: handle
-      - name: mongoid
       - name: timestamp
-      - name: metabase
       - name: latest_installed_at
       - name: billing_method_name
       - name: billing_overage_bucket_start_date_pt
       - name: billing_overage_bucket_end_date_pt
       - name: billing_overage_bypass_until
       - name: billing_overage_last_count
-      - name: billing_plan_days_complete
-      - name: billing_plan_id
-      - name: billing_plan_percent_complete
-      - name: billing_plan_percent_used
-      - name: billing_plan_start_date_pt
-      - name: billing_plan_end_date_pt
-      - name: billing_plan_status
-      - name: billing_plan_used
-      - name: billing_plan_name
-      - name: billing_method_shopify_id
-      - name: billing_plan_trial_days
-      - name: billing_plan_trial_ends_pt
-      - name: billing_plan_updated_at_pt
-      - name: billing_plan_billing_on_pt
-      - name: billing_plan_overlimit_date_pt
-      - name: billing_plan_balance_remaining
-      - name: billing_method_chargebee_id
-      - name: billing_plan_volume
-      - name: billing_plan_interval
-      - name: billing_plan_price
-      - name: billing_plan_created_at_pt
-      - name: billing_plan_balance_used
-      - name: billing_plan_type
       - name: daily_plan_revenue
       - name: price_per_action
       - name: total_trigger_runs_count
@@ -76,3 +48,28 @@ models:
       - name: activation_date_pt
       - name: is_activated
       - name: templates_installed_count
+      - name: BALANCE_USED
+      - name: SHOPIFY_ID
+      - name: ORDERS_CURRENT_COUNT
+      - name: PLAN_PRICE
+      - name: PLAN_USED
+      - name: PERCENT_COMPLETE
+      - name: BILLING_ON_PT
+      - name: PLAN_NAME
+      - name: PERCENT_USED
+      - name: OVERLIMIT_DATE_PT
+      - name: BALANCE_REMAINING
+      - name: ORDERS_INITIAL_COUNT
+      - name: START_DATE_PT
+      - name: END_DATE_PT
+      - name: REVENUE_INITIAL_TOTAL
+      - name: CREATED_AT_PT
+      - name: TRIAL_ENDS_PT
+      - name: CHARGEBEE_ID
+      - name: UPDATED_AT_PT
+      - name: PLAN_TYPE
+      - name: DAYS_COMPLETE
+      - name: PLAN_ID
+      - name: REVENUE_CURRENT_TOTAL
+      - name: PLAN_INTERVAL
+      - name: TRIAL_DAYS

@@ -21,27 +21,26 @@ models:
           - dbt_utils.not_accepted_values:
               values: ['null']
       - name: BILLING_OVERAGE_LAST_COUNT
-      - name: BILLING_PLAN_DAYS_COMPLETE
-      - name: BILLING_PLAN_ID
-      - name: BILLING_PLAN_PERCENT_COMPLETE
-      - name: BILLING_PLAN_PERCENT_USED
-      - name: BILLING_PLAN_START_DATE_PT
-      - name: BILLING_PLAN_END_DATE_PT
-      - name: BILLING_PLAN_STATUS
-      - name: BILLING_PLAN_USED
-      - name: BILLING_PLAN_NAME
-      - name: BILLING_METHOD_SHOPIFY_ID
-      - name: BILLING_PLAN_TRIAL_DAYS
-      - name: BILLING_PLAN_TRIAL_ENDS_PT
-      - name: BILLING_PLAN_UPDATED_AT_PT
-      - name: BILLING_PLAN_BILLING_ON_PT
-      - name: BILLING_PLAN_OVERLIMIT_DATE_PT
-      - name: BILLING_PLAN_BALANCE_REMAINING
-      - name: BILLING_METHOD_CHARGEBEE_ID
-      - name: BILLING_PLAN_VOLUME
-      - name: BILLING_PLAN_INTERVAL
-      - name: BILLING_PLAN_PRICE
-      - name: BILLING_PLAN_CREATED_AT_PT
-      - name: BILLING_PLAN_BALANCE_USED
-      - name: BILLING_PLAN_TYPE
       - name: DAILY_PLAN_REVENUE
+      - name: BALANCE_USED
+      - name: SHOPIFY_ID
+      - name: PLAN_PRICE
+      - name: PLAN_USED
+      - name: STATUS
+      - name: PERCENT_COMPLETE
+      - name: BILLING_ON_PT
+      - name: PLAN_NAME
+      - name: PERCENT_USED
+      - name: OVERLIMIT_DATE_PT
+      - name: BALANCE_REMAINING
+      - name: START_DATE_PT
+      - name: END_DATE_PT
+      - name: CREATED_AT_PT
+      - name: TRIAL_ENDS_PT
+      - name: CHARGEBEE_ID
+      - name: UPDATED_AT_PT
+      - name: PLAN_TYPE
+      - name: DAYS_COMPLETE
+      - name: PLAN_ID
+      - name: PLAN_INTERVAL
+      - name: TRIAL_DAYS

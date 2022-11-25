@@ -37,4 +37,3 @@ models:
         tests:
           - not_null
 
-      - name: TEST_COUNT
