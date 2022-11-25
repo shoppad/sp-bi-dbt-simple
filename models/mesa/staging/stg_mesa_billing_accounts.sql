@@ -54,7 +54,7 @@ final AS (
             WHEN IS_NULL_VALUE(billing:plan:interval) OR billing:plan:interval IS NULL
                 THEN billing:plan_interval
             ELSE billing:plan:interval
-        END AS plan_interval,
+        END::STRING AS plan_interval,
         billing:plan_price::STRING AS plan_price,
         {{ pacific_timestamp('billing:plan:created_at::STRING') }} AS created_at_pt,
         billing:plan:balance_used::STRING AS balance_used,

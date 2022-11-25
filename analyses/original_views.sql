@@ -18,7 +18,7 @@ CREATE OR REPLACE VIEW "M3_TRACKTOR_WEEKLY_COUNTS_VW" AS SELECT * from "M3_TRACK
 CREATE OR REPLACE VIEW "M3_STORES_VW" AS SELECT *,'fablet' as APP_HANDLE, CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT, PLAN_NAME as SHOPIFY_PLAN_NAME FROM MONGO.PUBLIC.M3_STORES;
 
 -- Segment events
-CREATE OR REPLACE VIEW "MONGO"."GETMESA"."AUTOMATION_VW" AS SELECT * FROM "MONGO"."GETMESA"."AUTOMATION" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
+-- CREATE OR REPLACE VIEW "MONGO"."GETMESA"."AUTOMATION_VW" AS SELECT * FROM "MONGO"."GETMESA"."AUTOMATION" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
 CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_DASHBOARD_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_DASHBOARD" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
 CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_TEST_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_TEST" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
 
@@ -46,8 +46,8 @@ WHERE "MESA_FLOW"."USER_ID" NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"
 GRANT SELECT on all views in schema "MONGO"."GETMESA" to role PIPELINE;
 
 
-CREATE OR REPLACE VIEW "SP_CONSTELLATION_FACTS_VW" AS 
-    SELECT 
+CREATE OR REPLACE VIEW "SP_CONSTELLATION_FACTS_VW" AS
+    SELECT
         t1.UUID,
         CREATEDAT as FIRST_SEEN_AT,
         SHOPIFY_PLANNAME as SHOPIFY_PLAN_NAME,
@@ -55,15 +55,15 @@ CREATE OR REPLACE VIEW "SP_CONSTELLATION_FACTS_VW" AS
         IFNULL(SP_CONSTELLATION_LTV.last_30, 0) as SHOPIFY_BILLING_LTV_LAST_30,
         IFNULL(SP_CONSTELLATION_LTV.last_90, 0) as SHOPIFY_BILLING_LTV_LAST_90,
         IFNULL(apps_tracktor_isactive, false) as TRACKTOR_IS_LIVE,
-        IFNULL(apps_coin_isactive, false) as COIN_IS_LIVE, 
-        IFNULL(apps_customizery_isactive, false) as CUSTOMIZERY_IS_LIVE, 
-        IFNULL(apps_kitkarts_isactive, false) as KITKARTS_IS_LIVE, 
-        IFNULL(apps_pagestudio_isactive, false) as PAGESTUDIO_IS_LIVE, 
-        IFNULL(apps_blogstudio_isactive, false) as BLOGSTUDIO_IS_LIVE, 
-        IFNULL(apps_mesa_isactive, false) as MESA_IS_LIVE, 
-        IFNULL(apps_bouncer_isactive, false) as BOUNCER_IS_LIVE, 
-        IFNULL(apps_smile_isactive, false) as SMILE_IS_LIVE, 
-        IFNULL(apps_uploadery_isactive, false) as UPLOADERY_IS_LIVE, 
+        IFNULL(apps_coin_isactive, false) as COIN_IS_LIVE,
+        IFNULL(apps_customizery_isactive, false) as CUSTOMIZERY_IS_LIVE,
+        IFNULL(apps_kitkarts_isactive, false) as KITKARTS_IS_LIVE,
+        IFNULL(apps_pagestudio_isactive, false) as PAGESTUDIO_IS_LIVE,
+        IFNULL(apps_blogstudio_isactive, false) as BLOGSTUDIO_IS_LIVE,
+        IFNULL(apps_mesa_isactive, false) as MESA_IS_LIVE,
+        IFNULL(apps_bouncer_isactive, false) as BOUNCER_IS_LIVE,
+        IFNULL(apps_smile_isactive, false) as SMILE_IS_LIVE,
+        IFNULL(apps_uploadery_isactive, false) as UPLOADERY_IS_LIVE,
         IFNULL(apps_fablet_isactive, false) as FABLET_IS_LIVE,
         iff(TRACKTOR_IS_LIVE, 1, 0) + iff(COIN_IS_LIVE,1,0) + iff(CUSTOMIZERY_IS_LIVE,1,0) + iff(KITKARTS_IS_LIVE,1,0) + iff(PAGESTUDIO_IS_LIVE,1,0) + iff(BLOGSTUDIO_IS_LIVE,1,0) + iff(MESA_IS_LIVE,1,0) + iff(BOUNCER_IS_LIVE,1,0) + iff(SMILE_IS_LIVE,1,0) + iff(UPLOADERY_IS_LIVE,1,0) + iff(FABLET_IS_LIVE,1,0) as NUM_APPS_LIVE,
         SUPPORT_LASTREPLYAT,
@@ -85,30 +85,30 @@ create or replace table SP_PARTNER_EXPORT (
     PARTNER_SALE FLOAT
 );
 copy into SP_PARTNER_EXPORT(SHOP, CHARGE_CREATION_TIME, PARTNER_SALE) from (select t.$3, replace(t.$5, ' UTC', ''), t.$8 from @partner_stage t) file_format = (format_name = 'partner_format');
-create or replace table "SP_CONSTELLATION_LTV" as 
+create or replace table "SP_CONSTELLATION_LTV" as
     with last_30 as (
         select shop,
         sum(partner_sale) as sales
-        from SP_PARTNER_EXPORT 
+        from SP_PARTNER_EXPORT
         where CHARGE_CREATION_TIME > dateadd(day, -30, current_date())
         group by shop
     ),
     last_90 as (
         select shop,
         sum(partner_sale) as sales
-        from SP_PARTNER_EXPORT 
+        from SP_PARTNER_EXPORT
         where CHARGE_CREATION_TIME > dateadd(day, -90, current_date())
         group by shop
     ),
     all_time as (
         select shop,
         sum(partner_sale) as sales
-        from SP_PARTNER_EXPORT 
+        from SP_PARTNER_EXPORT
         group by shop
     ),
     shops as (
         select shop
-        from SP_PARTNER_EXPORT 
+        from SP_PARTNER_EXPORT
         group by shop
     )
     select replace(shops.shop, '.myshopify.com', '') as uuid,
@@ -124,7 +124,7 @@ DROP TABLE SP_PARTNER_EXPORT;
 -- Mesa-specific
 CREATE OR REPLACE VIEW "SP_MESA_LOOKUP-TABLE_VW" AS SELECT t1.UUID as UUID, max(t2._ID) as MESA_ID from "MONGO"."PUBLIC"."M3_MESA_AUTOMATIONS" t1 right join "MONGO"."PUBLIC"."M3_MESA" t2 on t1.uuid = t2.uuid group by t1.uuid;
 CREATE OR REPLACE VIEW "M3_MESA_TRIGGERS_VW" AS
-    SELECT *, 
+    SELECT *,
     (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_TRIGGERS t1
 -- CREATE OR REPLACE VIEW "M3_MESA_AUTOMATIONS_VW" AS SELECT *, CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT, (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_AUTOMATIONS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
 CREATE OR REPLACE VIEW "M3_MESA_ENTITLEMENTS_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name as NAME, lv.value:status as STATUS, lv.value:value as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.entitlements) lv
@@ -150,39 +150,39 @@ CREATE OR REPLACE VIEW "M3_MESA_RUNS_VW" AS SELECT *,
     FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE
         metadata:"trigger":"step_type"::string = 'input' AND
         UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
-    
 
-CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS 
-    SELECT 
-        ROW_NUMBER() over (order by _ID DESC) as _ID, 
-        _id as PARENT_ID, 
-        billing:"method"."name"::STRING as method_name, 
-        to_timestamp(billing:"overage"."bucket_end"::INT, 3) as overage_bucket_end, 
-        to_timestamp(billing:"overage"."bucket_start"::INT, 3) as overage_bucket_start, 
-        billing:"overage"."bypass_until"::STRING as overage_bypass_until, 
-        billing:"overage"."last_count"::FLOAT as overage_last_count, 
-        billing:"plan"."days_complete"::FLOAT as plan_days_complete, 
-        billing:"plan"."id"::STRING as plan_id, 
-        billing:"plan"."percent_complete"::FLOAT as plan_percent_complete, 
-        billing:"plan"."percent_used"::FLOAT as plan_percent_used, 
-        to_timestamp(IFNULL(billing:"plan"."start"::INT, billing:"plan_start"::INT), 3) as plan_start, 
-        billing:"plan"."status"::STRING as plan_status, 
-        billing:"plan"."used"::FLOAT as plan_used, 
-        billing:"plan_name"::STRING as plan_name, 
-        billing:"method"."shopify_id"::FLOAT as method_shopify_id, 
-        billing:"plan"."trial_days"::FLOAT as plan_trial_days, 
-        to_timestamp(billing:"plan"."trial_ends"::INT, 3) as plan_trial_ends, 
-        billing:"plan"."updated_at"::STRING as plan_updated_at, 
-        billing:"plan"."billing_on"::STRING as plan_billing_on, 
-        to_timestamp(IFNULL(billing:"plan"."end"::INT, billing:"plan_end"::INT), 3) as plan_end, 
-        billing:"plan"."overlimit_date"::STRING as plan_overlimit_date, 
-        billing:"plan"."balance_remaining"::STRING as plan_balance_remaining, 
-        billing:"method"."chargebee_id"::STRING as method_chargebee_id, 
-        billing:"plan_volume"::FLOAT as plan_volume, 
-        IFNULL(billing:"plan"."interval"::STRING, billing:"plan_interval"::STRING) as plan_interval, 
-        billing:"plan_price"::STRING as plan_price, 
-        billing:"plan"."created_at"::STRING as plan_created_at, 
-        billing:"plan"."balance_used"::STRING as plan_balance_used, 
+
+CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS
+    SELECT
+        ROW_NUMBER() over (order by _ID DESC) as _ID,
+        _id as PARENT_ID,
+        billing:"method"."name"::STRING as method_name,
+        to_timestamp(billing:"overage"."bucket_end"::INT, 3) as overage_bucket_end,
+        to_timestamp(billing:"overage"."bucket_start"::INT, 3) as overage_bucket_start,
+        billing:"overage"."bypass_until"::STRING as overage_bypass_until,
+        billing:"overage"."last_count"::FLOAT as overage_last_count,
+        billing:"plan"."days_complete"::FLOAT as plan_days_complete,
+        billing:"plan"."id"::STRING as plan_id,
+        billing:"plan"."percent_complete"::FLOAT as plan_percent_complete,
+        billing:"plan"."percent_used"::FLOAT as plan_percent_used,
+        to_timestamp(IFNULL(billing:"plan"."start"::INT, billing:"plan_start"::INT), 3) as plan_start,
+        billing:"plan"."status"::STRING as plan_status,
+        billing:"plan"."used"::FLOAT as plan_used,
+        billing:"plan_name"::STRING as plan_name,
+        billing:"method"."shopify_id"::FLOAT as method_shopify_id,
+        billing:"plan"."trial_days"::FLOAT as plan_trial_days,
+        to_timestamp(billing:"plan"."trial_ends"::INT, 3) as plan_trial_ends,
+        billing:"plan"."updated_at"::STRING as plan_updated_at,
+        billing:"plan"."billing_on"::STRING as plan_billing_on,
+        to_timestamp(IFNULL(billing:"plan"."end"::INT, billing:"plan_end"::INT), 3) as plan_end,
+        billing:"plan"."overlimit_date"::STRING as plan_overlimit_date,
+        billing:"plan"."balance_remaining"::STRING as plan_balance_remaining,
+        billing:"method"."chargebee_id"::STRING as method_chargebee_id,
+        billing:"plan_volume"::FLOAT as plan_volume,
+        IFNULL(billing:"plan"."interval"::STRING, billing:"plan_interval"::STRING) as plan_interval,
+        billing:"plan_price"::STRING as plan_price,
+        billing:"plan"."created_at"::STRING as plan_created_at,
+        billing:"plan"."balance_used"::STRING as plan_balance_used,
         billing:"plan_type"::STRING as plan_type
     FROM mongo.public.m3_mesa
     WHERE UUID NOT IN (select UUID from SP_STAFF);
@@ -221,7 +221,7 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY col1, col2 ORDER BY col1, col2) = 1
 
 
 
-CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS 
+CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS
   SELECT
     "install"."USER_ID" as uuid,
     coalesce("page"."CONTEXT_CAMPAIGN_SOURCE", REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("page"."CONTEXT_PAGE_REFERRER", '(.*)apps\.shopify\.com(.*)', 'shopify'), '(.*)www\.google\.com(.*)', 'google'), '(.*)www\.getmesa\.com(.*)?', 'getmesa')) as combined_source,
@@ -233,22 +233,22 @@ CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS
     "page"."ANONYMOUS_ID" as anonymous_id,
     REGEXP_REPLACE("page"."CONTEXT_PAGE_URL", '(.*)app\.getmesa\.com(.*)', '') as getmesa_page_url
     FROM "MONGO"."GETMESA"."PAGES" "page"
-    LEFT JOIN "MONGO"."GETMESA"."PAGES" "install"  
+    LEFT JOIN "MONGO"."GETMESA"."PAGES" "install"
       ON "page"."ANONYMOUS_ID" = "install"."ANONYMOUS_ID"
       AND "page"."TIMESTAMP" <= "install"."TIMESTAMP"
     WHERE "page"."TIMESTAMP" IN (
-      SELECT MIN("TIMESTAMP") FROM "MONGO"."GETMESA"."PAGES" WHERE ("CONTEXT_CAMPAIGN_SOURCE" != '' 
+      SELECT MIN("TIMESTAMP") FROM "MONGO"."GETMESA"."PAGES" WHERE ("CONTEXT_CAMPAIGN_SOURCE" != ''
         OR "CONTEXT_PAGE_REFERRER" like '%apps.shopify.com%'
         OR "CONTEXT_PAGE_REFERRER" like '%www.google.com%'
       )
-      GROUP BY "ANONYMOUS_ID" 
+      GROUP BY "ANONYMOUS_ID"
     )
     AND (lower("install"."CONTEXT_PAGE_URL") like '%/apps/mesa/install%')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "install"."USER_ID" ORDER BY "install"."TIMESTAMP" DESC) = 1
     ORDER BY "install"."TIMESTAMP" DESC;
 
 
-CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" AS 
+CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" AS
   SELECT
     "server"."UUID" as uuid,
     "server"."CREATED_AT" as created_at,
@@ -268,7 +268,7 @@ CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" AS
   ORDER BY "server"."CREATED_AT" DESC;
 
 
-CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" AS 
+CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" AS
   SELECT * FROM SP_MESA_MERCHANTS_FACTS_VW
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "UUID" ORDER BY "INSTALLED_AT_PT" DESC) = 1
     ORDER BY INSTALLED_AT_PT DESC;
@@ -279,17 +279,17 @@ CREATE OR REPLACE TASK mesa_merchants_fact_table
   WAREHOUSE = MONGO_WAREHOUSE
   SCHEDULE = 'USING CRON 0 * * * * UTC'
 AS
-  CREATE OR REPLACE TABLE "SP_MESA_MERCHANTS_FACTS_VW" AS 
+  CREATE OR REPLACE TABLE "SP_MESA_MERCHANTS_FACTS_VW" AS
     WITH TASK_TBL AS (
-        SELECT 
-            _created_at, 
-            MESA_ID, 
+        SELECT
+            _created_at,
+            MESA_ID,
             IS_BILLABLE,
             ROW_NUMBER() OVER (PARTITION BY M3_MESA_TASKS_VW.MESA_ID ORDER BY _created_at asc) as POS
         FROM M3_MESA_TASKS_VW
         WHERE IS_BILLABLE = TRUE
     )
-    SELECT 
+    SELECT
         M3_MESA_VW.UUID as uuid,
         M3_MESA_VW._ID as mesa_merchant_id,
         _CREATED_AT_PT as INSTALLED_AT_PT,
@@ -319,7 +319,7 @@ AS
     LEFT JOIN "MONGO"."PUBLIC"."SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" ON "MONGO"."PUBLIC"."SP_MESA_MERCHANTS_INSTALL_SOURCES_VW"."UUID" = "M3_MESA_VW"."UUID"
     WHERE shopify_plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
     AND "M3_MESA_BILLING_VW"."PLAN_NAME" IS NOT NULL;
-    
+
 ALTER TASK mesa_merchants_fact_table RESUME;
 
 -- Mesa DAU task
@@ -328,10 +328,10 @@ CREATE OR REPLACE TABLE "PUBLIC"."SP_MESA_DAU" ("ID" INT IDENTITY(1,1), "DT" TIM
 CREATE OR REPLACE TASK MESA_DAU
   WAREHOUSE = MONGO_WAREHOUSE
   schedule = 'USING CRON 0 21 * * * America/Los_Angeles'
-AS 
-  INSERT INTO SP_MESA_DAU (DT, USER_ID, UUID, DAILY_PLAN_REVENUE, DAILY_USAGE_REVENUE, INC_AMOUNT) 
+AS
+  INSERT INTO SP_MESA_DAU (DT, USER_ID, UUID, DAILY_PLAN_REVENUE, DAILY_USAGE_REVENUE, INC_AMOUNT)
     WITH CHARGES AS (
-        SELECT 
+        SELECT
             "PUBLIC"."M3_MESA_CHARGES_VW"."MERCHANT_ID" as "MERCHANT_ID",
             sum("PUBLIC"."M3_MESA_CHARGES_VW"."BILLED_AMOUNT") AS "BILLED_AMOUNT"
         FROM "MONGO"."PUBLIC"."M3_MESA_CHARGES_VW"
@@ -339,42 +339,42 @@ AS
             datediff(day, CREATED_AT, current_date()) = 0
         GROUP BY "PUBLIC"."M3_MESA_CHARGES_VW"."MERCHANT_ID"
     )
-    SELECT 
-        current_date() as dt, 
-        "Mesa Merchants"._ID as user_id, 
-        UUID, 
-        IFF(PLAN_PRICE = '', '0', IFF(PLAN_INTERVAL = 'annual', PLAN_PRICE/365, PLAN_PRICE/30)) as DAILY_PLAN_REVENUE, 
+    SELECT
+        current_date() as dt,
+        "Mesa Merchants"._ID as user_id,
+        UUID,
+        IFF(PLAN_PRICE = '', '0', IFF(PLAN_INTERVAL = 'annual', PLAN_PRICE/365, PLAN_PRICE/30)) as DAILY_PLAN_REVENUE,
         IFNULL(CHARGES."BILLED_AMOUNT", 0) as DAILY_USAGE_REVENUE,
         (DAILY_PLAN_REVENUE + DAILY_USAGE_REVENUE) as inc_amount
     FROM "MONGO"."PUBLIC"."M3_MESA_BILLING_VW"
-    LEFT JOIN "MONGO"."PUBLIC"."M3_MESA_VW" "Mesa Merchants" 
+    LEFT JOIN "MONGO"."PUBLIC"."M3_MESA_VW" "Mesa Merchants"
         ON "MONGO"."PUBLIC"."M3_MESA_BILLING_VW"."PARENT_ID" = "Mesa Merchants"."_ID"
-    LEFT JOIN M3_MESA_ENTITLEMENTS_VW 
-        ON M3_MESA_ENTITLEMENTS_VW.parent_ID = "Mesa Merchants"."_ID" 
+    LEFT JOIN M3_MESA_ENTITLEMENTS_VW
+        ON M3_MESA_ENTITLEMENTS_VW.parent_ID = "Mesa Merchants"."_ID"
         AND M3_MESA_ENTITLEMENTS_VW.name = 'price_per_action'
     LEFT JOIN CHARGES
         ON CHARGES.MERCHANT_ID = "Mesa Merchants"."_ID"
-    WHERE 
+    WHERE
         (
             "MONGO"."PUBLIC"."M3_MESA_BILLING_VW"."PLAN_TRIAL_ENDS" < current_date()
             OR "MONGO"."PUBLIC"."M3_MESA_BILLING_VW"."PLAN_TRIAL_ENDS" IS NULL
-        ) 
-        AND "Mesa Merchants".STATUS = 'active' 
-        AND SHOPIFY_PLAN_NAME NOT IN ('frozen', 'cancelled', 'fraudulent') 
+        )
+        AND "Mesa Merchants".STATUS = 'active'
+        AND SHOPIFY_PLAN_NAME NOT IN ('frozen', 'cancelled', 'fraudulent')
         AND inc_amount > 0;
 
 ALTER TASK MESA_DAU set timezone = 'America/Los_Angeles';
 ALTER TASK MESA_DAU RESUME;
 
 -- Daily task to record custom Mesa applications into DAU table
--- Since these values are hardcoded, they must be changed manually 
+-- Since these values are hardcoded, they must be changed manually
 -- if plan price changes or merchant ends their subscription
 CREATE OR REPLACE TASK MESA_DAU_CUSTOM_APP
   WAREHOUSE = MONGO_WAREHOUSE
   schedule = 'USING CRON 0 21 * * * America/Los_Angeles'
-AS 
+AS
     INSERT INTO SP_MESA_DAU (DT, USER_ID, UUID, DAILY_PLAN_REVENUE, DAILY_USAGE_REVENUE, INC_AMOUNT)
-    VALUES 
+    VALUES
         (current_date(),'custom-app-ideou-dev', 'ideou-dev', 11.66, 0, 11.66),
         (current_date(), 'custom-app-dev-culturefly', 'dev-culturefly', 78.33, 0, 78.33),
         (current_date(), 'custom-app-dev-emson', 'dev-emson', 125.66, 0, 125.66),
@@ -393,12 +393,12 @@ ALTER TABLE "PUBLIC"."SP_MESA_FUNNEL_SNAPSHOTS" RENAME COLUMN "HAS_LTV" TO "ACTI
 CREATE OR REPLACE TASK MESA_FUNNEL_SNAPSHOTS
     WAREHOUSE = MONGO_WAREHOUSE
     schedule = 'USING CRON 0 21 * * 0 America/Los_Angeles'
-AS 
-    INSERT INTO SP_MESA_FUNNEL_SNAPSHOTS ("DT", "ACTIVATED", "50_PLUS_AUTOMATIONS", "HAS_ENABLED_WORKFLOW", "ACTIVE_CUSTOMERS", "ACTIVE_USERS", "ACTIVE_WORKFLOWS", "CHURNED_CUSTOMERS", "CHURNED_USERS", "ARR") 
+AS
+    INSERT INTO SP_MESA_FUNNEL_SNAPSHOTS ("DT", "ACTIVATED", "50_PLUS_AUTOMATIONS", "HAS_ENABLED_WORKFLOW", "ACTIVE_CUSTOMERS", "ACTIVE_USERS", "ACTIVE_WORKFLOWS", "CHURNED_CUSTOMERS", "CHURNED_USERS", "ARR")
        SELECT
             current_date(),
-            sum(CASE WHEN "PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW"."IS_ACTIVATED" = 1 THEN 1 ELSE 0.0 END) AS "ACTIVATED", 
-            sum(CASE WHEN "PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW"."NUM_AUTOMATIONS_LAST_30" >= 50 THEN 1 ELSE 0.0 END) AS "50_PLUS_AUTOMATIONS", 
+            sum(CASE WHEN "PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW"."IS_ACTIVATED" = 1 THEN 1 ELSE 0.0 END) AS "ACTIVATED",
+            sum(CASE WHEN "PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW"."NUM_AUTOMATIONS_LAST_30" >= 50 THEN 1 ELSE 0.0 END) AS "50_PLUS_AUTOMATIONS",
             sum(CASE WHEN "PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW"."NUM_WORKFLOWS_ENABLED" > 0 THEN 1 ELSE 0.0 END) AS "HAS_ENABLED_WORKFLOW",
             (SELECT count(distinct "PUBLIC"."SP_MESA_DAU"."UUID") AS "count"
                 FROM "MONGO"."PUBLIC"."SP_MESA_DAU"
@@ -442,56 +442,56 @@ call create_view_over_json('MONGO.PUBLIC.M3_MESA', 'ANALYTICS', 'M3_MESA_ANALYTI
 
 -- Rebuild M3_MESA_TASKS_METADATA_VW.  We customize the data generated by the call quite a bit to limit data transfer + match column names to legacy values
 -- call create_view_over_json('MONGO.PUBLIC.M3_MESA_TASKS', 'METADATA', 'MONGO.PUBLIC.M3_MESA_TASKS_METADATA_VW', 'match col case', 'string');
-CREATE OR REPLACE VIEW MONGO.PUBLIC.M3_MESA_TASKS_METADATA_VW AS 
-SELECT 
-ROW_NUMBER() over (order by _ID DESC) as _ID, 
-_id as PARENT_ID, 
-METADATA:"memory"::STRING as "memory", 
-METADATA:"enqueued"::STRING as "enqueued", 
-METADATA:"updated_at"::STRING as "updated_at", 
-METADATA:"replayed_by"::STRING as "replayed_by", 
-METADATA:"source"::STRING as "source", 
-METADATA:"unbillable_reason"::STRING as "unbillable_reason", 
-METADATA:"depth_parent_id"::STRING as "depth_parent_id", 
-METADATA:"is_test"::STRING as "is_test", 
-METADATA:"trigger"."_id"::STRING as "trigger__id", 
+CREATE OR REPLACE VIEW MONGO.PUBLIC.M3_MESA_TASKS_METADATA_VW AS
+SELECT
+ROW_NUMBER() over (order by _ID DESC) as _ID,
+_id as PARENT_ID,
+METADATA:"memory"::STRING as "memory",
+METADATA:"enqueued"::STRING as "enqueued",
+METADATA:"updated_at"::STRING as "updated_at",
+METADATA:"replayed_by"::STRING as "replayed_by",
+METADATA:"source"::STRING as "source",
+METADATA:"unbillable_reason"::STRING as "unbillable_reason",
+METADATA:"depth_parent_id"::STRING as "depth_parent_id",
+METADATA:"is_test"::STRING as "is_test",
+METADATA:"trigger"."_id"::STRING as "trigger__id",
 METADATA:"trigger"."trigger_name"::STRING as "trigger_trigger_name",
-METADATA:"trigger"."trigger_key"::STRING as "trigger_trigger_key", 
-METADATA:"trigger"."step_type"::STRING as "trigger_step_type", 
-METADATA:"active"::STRING as "active", 
+METADATA:"trigger"."trigger_key"::STRING as "trigger_trigger_key",
+METADATA:"trigger"."step_type"::STRING as "trigger_step_type",
+METADATA:"active"::STRING as "active",
 METADATA:"automation"."_id"::STRING as "automation__id",
-METADATA:"automation"."automation_name"::STRING as "automation_automation_name", 
-METADATA:"automation"."automation_key"::STRING as "automation_automation_key", 
-METADATA:"child_fails"::STRING as "child_fails", 
-METADATA:"parents"::STRING as "parents", 
-METADATA:"billable"::STRING as "billable", 
-METADATA:"execution_time"::STRING as "execution_time", 
-METADATA:"replay_of"::STRING as "replay_of", 
-METADATA:"created_at"::STRING as "created_at", 
-METADATA:"payload_hash"::STRING as "payload_hash", 
-METADATA:"is_premium"::STRING as "is_premium", 
+METADATA:"automation"."automation_name"::STRING as "automation_automation_name",
+METADATA:"automation"."automation_key"::STRING as "automation_automation_key",
+METADATA:"child_fails"::STRING as "child_fails",
+METADATA:"parents"::STRING as "parents",
+METADATA:"billable"::STRING as "billable",
+METADATA:"execution_time"::STRING as "execution_time",
+METADATA:"replay_of"::STRING as "replay_of",
+METADATA:"created_at"::STRING as "created_at",
+METADATA:"payload_hash"::STRING as "payload_hash",
+METADATA:"is_premium"::STRING as "is_premium",
 METADATA:"_id"::STRING as "_id",
-METADATA:"external_id"::STRING as "external_id", 
-METADATA:"external_label"::STRING as "external_label", 
+METADATA:"external_id"::STRING as "external_id",
+METADATA:"external_label"::STRING as "external_label",
 METADATA:"replay_count"::STRING as "replay_count"
 FROM MONGO.PUBLIC.M3_MESA_TASKS;
 
 -- Create view with Mesa merchant install/uninstall events
-CREATE OR REPLACE VIEW MONGO.PUBLIC.SP_MESA_INSTALL_UNINSTALL_EVENT_VW AS 
-    SELECT 
+CREATE OR REPLACE VIEW MONGO.PUBLIC.SP_MESA_INSTALL_UNINSTALL_EVENT_VW AS
+    SELECT
         SHOPPAD_INSTALL.USER_ID AS "UUID",
         SHOPPAD_INSTALL.TIMESTAMP as "INSTALLED_ON",
         SHOPPAD_UNINSTALL.TIMESTAMP "UNINSTALLED_ON",
         datediff(day, INSTALLED_ON, IFNULL(UNINSTALLED_ON, current_date())) as "INSTALL_DURATION_DAYS",
         datediff(hour, INSTALLED_ON, IFNULL(UNINSTALLED_ON, current_date())) as "INSTALL_DURATION_HOURS"
     FROM "MONGO"."PHP"."SHOPPAD_INSTALL" "SHOPPAD_INSTALL"
-    LEFT OUTER JOIN "MONGO"."PHP"."SHOPPAD_UNINSTALL" "SHOPPAD_UNINSTALL" 
+    LEFT OUTER JOIN "MONGO"."PHP"."SHOPPAD_UNINSTALL" "SHOPPAD_UNINSTALL"
         ON SHOPPAD_UNINSTALL.USER_ID = SHOPPAD_INSTALL.USER_ID
             AND SHOPPAD_UNINSTALL.HANDLE = 'mesa'
             AND SHOPPAD_UNINSTALL.TIMESTAMP = (
-                SELECT min(TIMESTAMP) from "MONGO"."PHP"."SHOPPAD_UNINSTALL" 
-                WHERE TIMESTAMP >= SHOPPAD_INSTALL.TIMESTAMP 
-                    AND HANDLE = 'mesa' 
+                SELECT min(TIMESTAMP) from "MONGO"."PHP"."SHOPPAD_UNINSTALL"
+                WHERE TIMESTAMP >= SHOPPAD_INSTALL.TIMESTAMP
+                    AND HANDLE = 'mesa'
                     AND USER_ID = SHOPPAD_INSTALL.USER_ID
             )
     WHERE SHOPPAD_INSTALL.HANDLE = 'mesa'
@@ -499,5 +499,5 @@ CREATE OR REPLACE VIEW MONGO.PUBLIC.SP_MESA_INSTALL_UNINSTALL_EVENT_VW AS
             SELECT UUID FROM SP_STAFF
         )
     ORDER BY UUID ASC, INSTALLED_ON DESC;
-    
+
 

@@ -31,6 +31,10 @@ models:
               to: ref('shops')
               field: shop_subdomain
       - name: workflow_step_id
+        meta:
+          metabase.semantic_type: type/FK
+          metabase.fk_target_table: ref('workflow_steps')
+          metabase.fk_target_field: workflow_step_id
         tests:
           - not_null
           - relationships_proportion:

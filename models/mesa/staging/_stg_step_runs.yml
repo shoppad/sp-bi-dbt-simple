@@ -10,6 +10,10 @@ models:
         tests:
           - not_null
       - name: workflow_id
+        meta:
+          metabase.semantic_type: type/FK
+          metabase.fk_target_table: ref('stg_workflows')
+          metabase.fk_target_field: workflow_id
         tests:
           - not_null
           - relationships_proportion:
@@ -33,6 +37,10 @@ models:
             # where: step_type = 'output'
 
       - name: WORKFLOW_STEP_ID
+        meta:
+          metabase.semantic_type: type/FK
+          metabase.fk_target_table: ref('stg_workflow_steps')
+          metabase.fk_target_field: workflow_step_id
         tests:
           # - dbt_utils.not_null_proportion:
           #    at_least: 0.95

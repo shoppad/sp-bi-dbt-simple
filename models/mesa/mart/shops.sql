@@ -32,9 +32,10 @@ workflow_counts AS (
 workflow_run_counts AS (
     SELECT
         shop_subdomain,
-        SUM(run_start_count) AS total_trigger_runs_count,
-        SUM(run_success_count) AS total_successful_workflow_run_count
-    FROM {{ ref('workflows') }}
+        COALESCE(SUM(run_start_count), 0) AS workflow_runs_count,
+        COALESCE(SUM(run_success_count), 0) AS workflow_run_success_count
+    FROM shops
+    LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
     GROUP BY
         1
 ),
@@ -49,18 +50,49 @@ activation_dates AS (
         1
 ),
 
+app_pageview_bookend_times AS (
+    SELECT
+        user_id AS shop_subdomain,
+        {{ pacific_timestamp('MIN(tstamp)') }} AS first_seen_in_app_at_pt,
+        {{ pacific_timestamp('MAX(tstamp)') }} AS last_seen_in_app_at_pt,
+        {{ datediff('first_seen_in_app_at_pt', 'last_seen_in_app_at_pt', 'minute') }} AS minutes_using_app
+    FROM {{ ref('segment_web_page_views__sessionized') }}
+    WHERE page_url_host = 'app.getmesa.com'
+    GROUP BY 1
+),
+
+app_install_bookend_times AS (
+    {# TODO: Start logging Install and Uninstall events. Transition this to use those. #}
+    SELECT
+        id AS shop_subdomain,
+        {{ pacific_timestamp('APPS_MESA_INSTALLEDAT') }} AS installed_app_at_pt,
+        {{ pacific_timestamp('APPS_MESA_UNINSTALLEDAT') }} AS uninstalled_app_at_pt,
+        {{ datediff('installed_app_at_pt', 'uninstalled_app_at_pt', 'minute') }} AS minutes_until_uninstall
+    FROM {{ source('php_segment', 'users') }}
+),
+
+
 final AS (
     SELECT
         *,
         NOT(activation_date_pt IS NULL) AS is_activated,
-        CONCAT('https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/', shop_subdomain, '/mesa') AS backdoor_url,
-        CONCAT('https://insights.hotjar.com/sites/1547357/workspaces/1288874/playbacks/list?filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22', shop_subdomain, '%22%7D%7D%5D%7D') AS hotjar_url
+        'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||
+            shop_subdomain ||
+            '/mesa' AS backdoor_url,
+        'https://insights.hotjar.com/sites/1547357/' ||
+            'workspaces/1288874/playbacks/list?' ||
+            'filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,' ||
+            '%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22' ||
+            shop_subdomain ||
+            '%22%7D%7D%5D%7D' AS hotjar_url
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
     LEFT JOIN workflow_counts USING (shop_subdomain)
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
     LEFT JOIN activation_dates USING (shop_subdomain)
+    LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
+    LEFT JOIN app_install_bookend_times USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

@@ -43,8 +43,6 @@ models:
       - name: billing_overage_last_count
       - name: daily_plan_revenue
       - name: price_per_action
-      - name: total_trigger_runs_count
-      - name: total_successful_workflow_run_count
       - name: activation_date_pt
       - name: is_activated
       - name: templates_installed_count
@@ -73,3 +71,14 @@ models:
       - name: REVENUE_CURRENT_TOTAL
       - name: PLAN_INTERVAL
       - name: TRIAL_DAYS
+      - name: IS_BUILDER_WIZARD_COMPLETED
+      - name: HOTJAR_URL
+      - name: BACKDOOR_URL
+      - name: UNINSTALLED_APP_AT_PT
+      - name: MINUTES_USING_APP
+      - name: INSTALLED_APP_AT_PT
+      - name: WORKFLOW_RUNS_COUNT
+      - name: LAST_SEEN_IN_APP_AT_PT
+      - name: WORKFLOW_RUN_SUCCESS_COUNT
+      - name: MINUTES_UNTIL_UNINSTALL
+      - name: FIRST_SEEN_IN_APP_AT_PT

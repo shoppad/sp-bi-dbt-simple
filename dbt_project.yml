@@ -29,6 +29,8 @@ vars:
     etl_fields: ['CREATED_AT', '__HEVO__DATABASE_NAME', '__HEVO__INGESTED_AT', '__HEVO__LOADED_AT', '__HEVO__MARKED_DELETED', '__HEVO_ID']
     activation_workflow_run_count: 50
     start_date: '2019-12-01'
+    segment:
+        segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
 
 seeds:
     +schema: seed_data

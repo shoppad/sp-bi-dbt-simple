@@ -28,3 +28,4 @@ models:
       - name: LATEST_INSTALLED_AT
       - name: REVENUE_CURRENT_TOTAL
       - name: META
+      - name: IS_BUILDER_WIZARD_COMPLETED
