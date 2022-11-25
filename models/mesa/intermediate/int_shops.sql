@@ -11,7 +11,8 @@ decorated_shops AS (
         analytics:initial:orders_count AS orders_initial_count,
         analytics:initial:orders_gmv AS revenue_initial_total,
         analytics:orders:count AS orders_current_count,
-        analytics:orders:gmv AS revenue_current_total
+        analytics:orders:gmv AS revenue_current_total,
+        wizard:builder:step = 'complete' AS is_builder_wizard_completed
     FROM {{ source_table }}
 ),
 

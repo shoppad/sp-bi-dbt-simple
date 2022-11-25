@@ -52,7 +52,9 @@ activation_dates AS (
 final AS (
     SELECT
         *,
-        NOT(activation_date_pt IS NULL) AS is_activated
+        NOT(activation_date_pt IS NULL) AS is_activated,
+        CONCAT('https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/', shop_subdomain, '/mesa') AS backdoor_url,
+        CONCAT('https://insights.hotjar.com/sites/1547357/workspaces/1288874/playbacks/list?filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22', shop_subdomain, '%22%7D%7D%5D%7D') AS hotjar_url
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

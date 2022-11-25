@@ -32,6 +32,7 @@
       "AUTOMATIONS",
       "builtins",
       "chargebee",
+      "CONCAT",
       "dateadd",
       "hevo",
       "LISTAGG",
