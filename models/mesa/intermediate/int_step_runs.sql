@@ -1,5 +1,4 @@
-SELECT
-    *
+SELECT *
 FROM
     {{ ref('stg_step_runs') }}
 WHERE NOT(is_test_run)

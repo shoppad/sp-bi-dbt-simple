@@ -12,7 +12,7 @@ shops AS (
     SELECT
         shop_subdomain,
         first_installed_at
-    FROM {{ ref('stg_shops') }}
+    FROM {{ ref('int_shops') }}
     WHERE install_status = 'active'
         AND shopify_plan_name NOT IN ('frozen', 'cancelled', 'fraudulent')
 ),
@@ -96,7 +96,7 @@ daily_active_status AS (
         workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }} AS is_active
     FROM activity_dates
     FULL OUTER JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
-    INNER JOIN daily_workflow_run_counts as window_days
+    INNER JOIN daily_workflow_run_counts AS window_days
         ON daily_workflow_run_counts.shop_subdomain = window_days.shop_subdomain AND daily_workflow_run_counts.dt BETWEEN window_days.dt - 30 AND window_days.dt
     GROUP BY
         1,
@@ -106,8 +106,8 @@ daily_active_status AS (
 final AS (
     SELECT
         *,
-        {{ dbt_utils.surrogate_key(['shop_subdomain','dt'] ) }} AS {{ model.name }}_id,
-        (daily_plan_revenue + daily_usage_revenue) as inc_amount
+        {{ dbt_utils.surrogate_key(['shop_subdomain','dt'] ) }} AS "{{ (model.name ~ '_id') | upper }}",
+        (daily_plan_revenue + daily_usage_revenue) AS inc_amount
     FROM daily_workflow_run_counts
     FULL OUTER JOIN daily_charges USING (shop_subdomain, dt)
     INNER JOIN shops USING (shop_subdomain)

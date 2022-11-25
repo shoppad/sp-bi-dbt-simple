@@ -1,7 +1,8 @@
 WITH
 shops AS (
-    SELECT shop_subdomain,
-    billing
+    SELECT
+        shop_subdomain,
+        billing
     FROM {{ ref('stg_shops') }}
 ),
 
@@ -59,7 +60,7 @@ final AS (
         billing:plan:balance_used::STRING AS balance_used,
         billing:plan_type::STRING AS plan_type,
         IFF(plan_price = '', '0', IFF(plan_interval = 'annual', plan_price / 365, plan_price / 30)) AS daily_plan_revenue
-        FROM shops
+    FROM shops
 )
 
 SELECT * FROM final

@@ -49,7 +49,7 @@ sources:
             tests:
               - not_null
 
-      - name: mesa_shop_accounts
+      - name: shops
         identifier: m3_mesa
         description: Each installation record of a Mesa merchant application install.
 

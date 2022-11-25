@@ -1,5 +1,5 @@
 WITH shops AS (
-    SELECT * FROM {{ ref('stg_shops') }}
+    SELECT * FROM {{ ref('int_shops') }}
 ),
 
 charges AS (

@@ -1,10 +1,7 @@
-{% set shop_columns_to_skip = ['billing', 'entitlements'] %}
-
 WITH
 shops AS (
-    SELECT
-        {{ groomed_column_list(ref('stg_shops'), except=shop_columns_to_skip) | join(",\n        ") }}
-    FROM {{ ref('stg_shops') }}
+    SELECT *
+    FROM {{ ref('int_shops') }}
 ),
 
 billing_accounts AS (

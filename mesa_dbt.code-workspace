@@ -28,11 +28,16 @@
     "sqlfluff.format.enabled": true,
     "sqlfluff.suppressNotifications": false,
     "cSpell.words": [
+      "authtoken",
       "AUTOMATIONS",
       "builtins",
+      "chargebee",
       "dateadd",
       "hevo",
       "LISTAGG",
+      "metabase",
+      "mongoid",
+      "overlimit",
       "shoppad",
       "templater"
     ],
