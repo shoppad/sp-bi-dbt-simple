@@ -12,7 +12,7 @@ workflow_steps AS (
 
 workflow_runs AS (
     SELECT *
-    FROM {{ ref('workflow_runs') }}
+    FROM {{ ref('int_workflow_runs') }}
 ),
 
 workflow_counts AS (

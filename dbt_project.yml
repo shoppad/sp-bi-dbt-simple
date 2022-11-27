@@ -56,24 +56,42 @@ models:
             mart:
                 step_runs:
                     +cluster_by: ['shop_subdomain']
+                    +unique_key: step_run_id
 
                 workflow_runs:
                     +cluster_by: ['shop_subdomain', 'workflow_id']
+                    +unique_key: workflow_run_id
 
                 shops:
                     +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +unique_key: shop_subdomain
+
             intermediate:
                 +schema: support
-                +materialized: view
+                int_step_runs:
+                    +on_schema_change: "sync_all_columns"
+                    +unique_key: step_run_id
+                    +cluster_by: ['workflow_run_id']
+                int_workflow_runs:
+                    +on_schema_change: "sync_all_columns"
+                    +unique_key: workflow_run_id
+                    +cluster_by: ['shop_subdomain']
+                int_shops:
+                    +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +unique_key: shop_subdomain
+
             staging:
                 +schema: support
-
                 stg_step_runs:
                     +on_schema_change: "sync_all_columns"
                     +unique_key: step_run_id
                     +cluster_by: ['workflow_run_id']
                 stg_workflows:
+                    +unique_key: workflow_id
                 stg_workflow_runs:
                     +on_schema_change: "sync_all_columns"
                     +unique_key: workflow_run_id
                     +cluster_by: ['shop_subdomain']
+                stg_shops:
+                    +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +unique_key: shop_subdomain

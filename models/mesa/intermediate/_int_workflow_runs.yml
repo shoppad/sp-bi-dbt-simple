@@ -1,0 +1,25 @@
+version: 2
+models:
+  - name: int_workflow_runs
+    columns:
+      - name: WORKFLOW_RUN_ID
+      - name: WORKFLOW_ID
+      - name: SHOP_SUBDOMAIN
+      - name: WORKFLOW_RUN_AT_UTC
+      - name: WORKFLOW_RUN_AT_PT
+      - name: WORKFLOW_RUN_ON_PT
+      - name: RUN_STATUS
+      - name: UNBILLABLE_REASON
+      - name: IS_FREE_WORKFLOW
+      - name: IS_BILLABLE
+      - name: WORKFLOW_NAME
+      - name: SOURCE_APP
+      - name: INTEGRATION_KEY
+      - name: CHILD_FAILURE_COUNT
+      - name: UPDATED_AT
+      - name: IS_TEST_RUN
+      - name: IS_WORKFLOW_HARD_DELETED
+      - name: EXECUTED_STEP_COUNT
+      - name: IS_SUCCESSFUL
+      - name: DESTINATION_APP
+      - name: SOURCE_DESTINATION_PAIR

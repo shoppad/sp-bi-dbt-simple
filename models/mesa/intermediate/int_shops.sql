@@ -1,6 +1,5 @@
 {% set source_table = ref('stg_shops') %}
 WITH
-
 decorated_shops AS (
 {% set columns_to_skip = ['_id', 'group', 'scopes', 'billing', 'status', 'entitlements', 'uuid', 'shopify', 'usage', 'config', 'themes', 'webhooks', 'messages', 'analytics', '_created_at', 'schema', 'account', 'wizard', 'mongoid', 'authtoken', 'metabase'] %}
     SELECT
@@ -16,9 +15,20 @@ decorated_shops AS (
     FROM {{ source_table }}
 ),
 
+activation_dates AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS activation_date_pt
+    FROM {{ ref('int_mesa_shop_days') }}
+    WHERE is_active
+    GROUP BY
+        1
+),
+
 final AS (
     SELECT *
     FROM decorated_shops
+    LEFT JOIN activation_dates USING (shop_subdomain)
 )
 
 SELECT * FROM final

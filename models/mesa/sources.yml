@@ -141,6 +141,12 @@ sources:
           - name: CONTEXT_LIBRARY_VERSION
           - name: USER_ID
           - name: TITLE
+      - name: flow_events
+        identifier: mesa_flow
+        columns:
+          - name: id
+            description: Unique identifier for the flow event.
+
 
   - name: php_segment
     description: Identified users via the GETMESA Segment app.

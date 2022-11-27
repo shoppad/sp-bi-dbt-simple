@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: int_mesa_shop_days
+    columns:
+      - name: SHOP_SUBDOMAIN
+        tests:
+          - not_null
+      - name: DT
+        tests:
+          - not_null
+      - name: WORKFLOW_RUNS_COUNT
+        tests:
+          - not_null
+      - name: WORKFLOW_RUNS_SUCCESS_COUNT
+        tests:
+          - not_null
+      - name: WORKFLOW_SUCCESS_PERCENT
+        tests:
+          - not_null
+      - name: BILLED_COUNT
+        tests:
+          - not_null
+      - name: DAILY_USAGE_REVENUE
+        tests:
+          - not_null
+      - name: FIRST_INSTALLED_AT
+        tests:
+          - not_null
+      - name: WORKFLOW_RUNS_ROLLING_THIRTY_DAY_COUNT
+        tests:
+          - not_null
+      - name: IS_ACTIVE
+        tests:
+          - not_null
+      - name: MESA_SHOP_DAYS_ID
+        tests:
+          - not_null
+          - unique

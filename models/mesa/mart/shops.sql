@@ -40,16 +40,6 @@ workflow_run_counts AS (
         1
 ),
 
-activation_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS activation_date_pt
-    FROM mesa_shop_days
-    WHERE is_active
-    GROUP BY
-        1
-),
-
 app_pageview_bookend_times AS (
     SELECT
         user_id AS shop_subdomain,
@@ -90,7 +80,6 @@ final AS (
     LEFT JOIN price_per_actions USING (shop_subdomain)
     LEFT JOIN workflow_counts USING (shop_subdomain)
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
-    LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
     LEFT JOIN app_install_bookend_times USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL

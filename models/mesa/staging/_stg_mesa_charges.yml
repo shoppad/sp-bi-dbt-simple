@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: stg_mesa_charges
+    columns:
+      - name: CHARGE_ID
+      - name: SHOP_SUBDOMAIN
+      - name: SUBSCRIPTION_ID
+      - name: BILLED_COUNT
+      - name: BILLED_AMOUNT
+      - name: CHARGED_AT_PT
+      - name: CHARGED_ON_PT

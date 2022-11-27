@@ -63,3 +63,5 @@ models:
       - name: workflow_name
       - name: integration_key
       - name: IS_TEST_RUN
+      - name: ACTIVATION_DATE_PT
+      - name: FUNNEL_PHASE

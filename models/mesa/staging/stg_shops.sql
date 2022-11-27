@@ -24,6 +24,7 @@ shops AS (
     FROM {{ source_table }}
     WHERE NOT(shop_subdomain IN (SELECT * FROM staff_subdomains))
         AND NOT(__hevo__marked_deleted)
+        AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY _created_at DESC) = 1
 )
 

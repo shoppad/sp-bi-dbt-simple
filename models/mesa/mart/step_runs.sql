@@ -16,8 +16,7 @@ workflows AS (
 
 final AS (
     SELECT
-        step_runs.*,
-        ROW_NUMBER() OVER (PARTITION BY workflow_run_id ORDER BY step_run_at_pt) AS position_in_workflow_run
+        step_runs.*
     FROM step_runs
     INNER JOIN workflows USING (workflow_id)
     LEFT JOIN workflow_steps USING (workflow_step_id)

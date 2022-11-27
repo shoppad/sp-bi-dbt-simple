@@ -26,3 +26,4 @@ models:
       - name: WORKFLOW_NAME
       - name: SHOP_SUBDOMAIN
       - name: IS_WORKFLOW_HARD_DELETED
+      - name: POSITION_IN_WORKFLOW_RUN

@@ -32,15 +32,13 @@ models:
       - name: daily_plan_revenue
         tests:
           - not_null
-      - name: mesa_shop_days_id
-        tests:
-          - not_null
       - name: inc_amount
         tests:
           - not_null
       - name: WORKFLOW_RUNS_COUNT
         tests:
           - not_null
+      - name: INT_MESA_SHOP_DAYS_ID
     tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list: ["dt", "shop_subdomain"]

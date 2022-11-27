@@ -1,4 +1,6 @@
-SELECT *
+SELECT
+    *,
+    ROW_NUMBER() OVER (PARTITION BY workflow_run_id ORDER BY step_run_at_pt) AS position_in_workflow_run
 FROM
     {{ ref('stg_step_runs') }}
 WHERE NOT(is_test_run)

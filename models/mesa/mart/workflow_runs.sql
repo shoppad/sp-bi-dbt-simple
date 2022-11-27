@@ -1,31 +1,12 @@
-WITH run_starts AS (
+WITH shops AS (
     SELECT
-        {{ groomed_column_list(ref('stg_workflow_runs')) | join(',\n       ') }}
-    FROM {{ ref('stg_workflow_runs') }}
-),
-
-step_runs AS (
-    SELECT *
-    FROM {{ ref('step_runs') }}
-),
-
-action_run_stats AS (
-    SELECT
-        workflow_run_id,
-        COUNT(*) AS executed_step_count,
-        LISTAGG(DISTINCT run_status) = 'success' AS is_successful,
-        SPLIT_PART(LISTAGG(integration_name, ',') WITHIN GROUP (ORDER BY position_in_workflow_run DESC), ',', 1) AS destination_app {# Hack to get the step's app. #}
-    FROM step_runs
-    GROUP BY
-        workflow_run_id
-),
-
-final AS (
-    SELECT
-        *,
-        CONCAT(source_app, '-', destination_app) AS source_destination_pair
-    FROM run_starts
-    LEFT JOIN action_run_stats USING (workflow_run_id)
+        shop_subdomain,
+        activation_date_pt
+    FROM {{ ref('int_shops') }}
 )
 
-SELECT * FROM final
+SELECT
+    *,
+    IFF(workflow_run_on_pt >= activation_date_pt, 'activated', 'onboarding') AS funnel_phase
+FROM {{ ref('int_workflow_runs') }}
+LEFT JOIN shops USING (shop_subdomain)
