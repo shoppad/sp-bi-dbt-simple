@@ -5,6 +5,9 @@ models:
       - name: shop_subdomain
         tests:
           - not_null
+          - relationships:
+              to: ref('int_shops')
+              field: shop_subdomain
       - name: dt
         tests:
           - not_null
