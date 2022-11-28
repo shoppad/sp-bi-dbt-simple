@@ -5,6 +5,9 @@ models:
       - name: shop_subdomain
         tests:
           - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_subdomain
       - name: dt
         tests:
           - not_null
@@ -22,7 +25,7 @@ models:
       - name: daily_usage_revenue
         tests:
           - not_null
-      - name: first_installed_at
+      - name: first_installed_at_pt
         tests:
           - not_null
       - name: is_active
@@ -37,6 +40,8 @@ models:
       - name: inc_amount
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Currency
       - name: WORKFLOW_RUNS_COUNT
         tests:
           - not_null

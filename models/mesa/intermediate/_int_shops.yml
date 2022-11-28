@@ -25,12 +25,12 @@ models:
       - name: ORDERS_CURRENT_COUNT
       - name: ORDERS_INITIAL_COUNT
       - name: HANDLE
-      - name: FIRST_INSTALLED_AT
+      - name: first_installed_at_pt
         tests:
           - not_null
       - name: REFERRAL
       - name: TIMESTAMP
-      - name: LATEST_INSTALLED_AT
+      - name: latest_installed_at_pt
       - name: REVENUE_CURRENT_TOTAL
       - name: META
       - name: IS_BUILDER_WIZARD_COMPLETED

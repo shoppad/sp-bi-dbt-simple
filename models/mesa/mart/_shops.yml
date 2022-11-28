@@ -11,7 +11,7 @@ models:
         tests:
           - not_null
           - unique
-      - name: first_installed_at
+      - name: first_installed_at_pt
         tests:
           - not_null
       - name: currency
@@ -35,7 +35,7 @@ models:
       - name: meta
       - name: handle
       - name: timestamp
-      - name: latest_installed_at
+      - name: latest_installed_at_pt
       - name: billing_method_name
       - name: billing_overage_bucket_start_date_pt
       - name: billing_overage_bucket_end_date_pt

@@ -63,7 +63,7 @@ models:
                     +unique_key: workflow_run_id
 
                 shops:
-                    +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
                     +unique_key: shop_subdomain
 
             intermediate:
@@ -77,7 +77,7 @@ models:
                     +unique_key: workflow_run_id
                     +cluster_by: ['shop_subdomain']
                 int_shops:
-                    +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
                     +unique_key: shop_subdomain
 
             staging:
@@ -93,5 +93,5 @@ models:
                     +unique_key: workflow_run_id
                     +cluster_by: ['shop_subdomain']
                 stg_shops:
-                    +cluster_by: ["date_trunc('day', first_installed_at)"]
+                    +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
                     +unique_key: shop_subdomain

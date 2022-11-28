@@ -22,10 +22,10 @@ models:
       - name: META
       - name: HANDLE
       - name: TIMESTAMP
-      - name: FIRST_INSTALLED_AT
+      - name: first_installed_at_pt
         tests:
           - not_null
-      - name: LATEST_INSTALLED_AT
+      - name: latest_installed_at_pt
         tests:
           - not_null
       - name: MONGOID

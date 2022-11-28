@@ -9,8 +9,8 @@ staff_subdomains AS (
 shop_dates AS (
     SELECT
         uuid::string AS shop_subdomain,
-        {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at,
-        {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at
+        {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at_pt,
+        {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at_pt
     FROM {{ source_table }}
     WHERE NOT(__hevo__marked_deleted)
     GROUP BY 1

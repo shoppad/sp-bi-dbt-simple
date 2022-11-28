@@ -25,7 +25,7 @@ models:
       - name: daily_usage_revenue
         tests:
           - not_null
-      - name: first_installed_at
+      - name: first_installed_at_pt
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count

@@ -11,7 +11,7 @@ WITH RECURSIVE dates AS (
 shops AS (
     SELECT
         shop_subdomain,
-        first_installed_at
+        first_installed_at_pt
     FROM {{ ref('stg_shops') }}
 ),
 
@@ -31,7 +31,7 @@ daily_workflow_run_counts AS (
         COALESCE(COUNT_IF(workflow_runs.is_successful), 0) AS workflow_runs_success_count,
         COALESCE((workflow_runs_success_count / NULLIF(workflow_runs_count, 0)), 0) AS workflow_success_percent
     FROM dates
-    INNER JOIN shops ON dt >= shops.first_installed_at
+    INNER JOIN shops ON dt >= shops.first_installed_at_pt
     LEFT JOIN workflow_runs USING (shop_subdomain, dt)
     GROUP BY
         1,
@@ -57,7 +57,7 @@ daily_charges AS (
         COALESCE(SUM(billed_count), 0) AS billed_count,
         COALESCE(SUM(daily_usage_revenue), 0) AS daily_usage_revenue
     FROM dates
-    INNER JOIN shops ON dt >= shops.first_installed_at
+    INNER JOIN shops ON dt >= shops.first_installed_at_pt
     LEFT JOIN charges USING (dt, shop_subdomain)
     GROUP BY 1, 2
 ),
