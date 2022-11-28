@@ -1,11 +1,7 @@
-WITH RECURSIVE dates AS (
-    -- start date
-    SELECT '{{ var('start_date') }}'::DATE as dt
-    UNION ALL
-    SELECT DATEADD('day', 1, dt) as dt
-    FROM dates
-    -- end date (inclusive)
-    WHERE dt <= current_date() - INTERVAL '1 day'
+WITH dates AS (
+    SELECT
+        date_day AS dt
+    FROM {{ ref('calendar_dates') }}
 ),
 
 shops AS (
