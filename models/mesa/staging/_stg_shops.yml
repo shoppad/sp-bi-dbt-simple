@@ -23,7 +23,11 @@ models:
       - name: HANDLE
       - name: TIMESTAMP
       - name: FIRST_INSTALLED_AT
+        tests:
+          - not_null
       - name: LATEST_INSTALLED_AT
+        tests:
+          - not_null
       - name: MONGOID
       - name: UUID
       - name: __HEVO__MARKED_DELETED

@@ -39,6 +39,9 @@ models:
         tests:
           - not_null
       - name: MESA_SHOP_DAYS_ID
+        tests:
+          - not_null
+          - unique
     tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list: ["dt", "shop_subdomain"]

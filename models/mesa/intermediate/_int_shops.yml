@@ -17,12 +17,17 @@ models:
         tests:
           - not_null
       - name: SHOP_SUBDOMAIN
+        tests:
+          - not_null
+          - unique
       - name: REVENUE_INITIAL_TOTAL
       - name: METHOD
       - name: ORDERS_CURRENT_COUNT
       - name: ORDERS_INITIAL_COUNT
       - name: HANDLE
       - name: FIRST_INSTALLED_AT
+        tests:
+          - not_null
       - name: REFERRAL
       - name: TIMESTAMP
       - name: LATEST_INSTALLED_AT
