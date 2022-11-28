@@ -8,6 +8,8 @@ models:
       - name: dt
         tests:
           - not_null
+          - dbt_utils.accepted_range:
+              max_value: "getdate()"
       - name: workflow_runs_success_count
         tests:
           - not_null

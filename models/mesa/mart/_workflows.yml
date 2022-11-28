@@ -23,6 +23,9 @@ models:
       - name: key
       - name: tags
       - name: step_count
+        tests:
+          - dbt_utils.accepted_range:
+              max_value: 40
       - name: first_run_at_pt
       - name: first_successful_run_at_pt
       - name: run_start_count

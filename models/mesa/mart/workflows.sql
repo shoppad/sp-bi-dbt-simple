@@ -8,6 +8,7 @@ WITH workflows AS (
 workflow_steps AS (
     SELECT *
     FROM {{ ref('stg_workflow_steps') }}
+    WHERE NOT(is_deleted)
 ),
 
 workflow_runs AS (
@@ -18,7 +19,7 @@ workflow_runs AS (
 workflow_counts AS (
     SELECT
         workflow_id,
-        COUNT(*) AS step_count,
+        COUNT(DISTINCT workflow_steps.*) AS step_count,
         MIN(
             IFF(workflow_runs.is_billable, workflow_runs.workflow_run_at_pt, NULL)
         ) AS first_run_at_pt,

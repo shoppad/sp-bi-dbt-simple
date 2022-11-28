@@ -2,37 +2,39 @@ version: 2
 models:
   - name: int_mesa_shop_days
     columns:
-      - name: SHOP_SUBDOMAIN
+      - name: shop_subdomain
         tests:
           - not_null
-      - name: DT
+      - name: dt
         tests:
           - not_null
-      - name: WORKFLOW_RUNS_COUNT
+          - dbt_utils.accepted_range:
+              max_value: "current_date()"
+      - name: workflow_runs_count
         tests:
           - not_null
-      - name: WORKFLOW_RUNS_SUCCESS_COUNT
+      - name: workflow_runs_success_count
         tests:
           - not_null
-      - name: WORKFLOW_SUCCESS_PERCENT
+      - name: workflow_success_percent
         tests:
           - not_null
-      - name: BILLED_COUNT
+      - name: billed_count
         tests:
           - not_null
-      - name: DAILY_USAGE_REVENUE
+      - name: daily_usage_revenue
         tests:
           - not_null
-      - name: FIRST_INSTALLED_AT
+      - name: first_installed_at
         tests:
           - not_null
-      - name: WORKFLOW_RUNS_ROLLING_THIRTY_DAY_COUNT
+      - name: workflow_runs_rolling_thirty_day_count
         tests:
           - not_null
-      - name: IS_ACTIVE
+      - name: is_active
         tests:
           - not_null
-      - name: MESA_SHOP_DAYS_ID
+      - name: mesa_shop_days_id
         tests:
           - not_null
           - unique

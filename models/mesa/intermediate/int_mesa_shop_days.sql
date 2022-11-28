@@ -5,7 +5,7 @@ WITH RECURSIVE dates AS (
     SELECT DATEADD('day', 1, dt) as dt
     FROM dates
     -- end date (inclusive)
-    WHERE dt <= current_date()
+    WHERE dt <= current_date() - INTERVAL '1 day'
 ),
 
 shops AS (
@@ -27,8 +27,8 @@ daily_workflow_run_counts AS (
     SELECT
         shop_subdomain,
         dt,
-        COALESCE(COUNT(*), 0) AS workflow_runs_count,
-        COALESCE(COUNT_IF(is_successful), 0) AS workflow_runs_success_count,
+        COALESCE(COUNT(workflow_runs.*), 0) AS workflow_runs_count,
+        COALESCE(COUNT_IF(workflow_runs.is_successful), 0) AS workflow_runs_success_count,
         COALESCE((workflow_runs_success_count / NULLIF(workflow_runs_count, 0)), 0) AS workflow_success_percent
     FROM dates
     INNER JOIN shops ON dt >= shops.first_installed_at
