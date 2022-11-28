@@ -47,11 +47,11 @@ test_runs AS (
 test_counts AS (
     SELECT
         workflow_id,
-        MIN(workflow_run_at_pt) AS first_test_at_pt,
+        MIN(test_run_at_pt) AS first_test_at_pt,
         MIN(
-            IFF(is_successful, workflow_run_at_pt, NULL)
+            IFF(is_successful, test_run_at_pt, NULL)
         ) AS first_successful_test_at_pt,
-        COALESCE(COUNT(DISTINCT test_runs.workflow_run_id), 0) AS test_start_count,
+        COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_start_count,
         COALESCE(COUNT_IF(test_runs.is_successful), 0) AS test_success_count
     FROM workflows
     LEFT JOIN test_runs USING (workflow_id)
