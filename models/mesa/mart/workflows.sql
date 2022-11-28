@@ -26,10 +26,10 @@ workflow_counts AS (
             IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_at_pt, NULL)
         ) AS first_successful_run_at_pt,
         COUNT(
-            IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
+            DISTINCT IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
         ) AS run_start_count,
         COUNT(
-            IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
+            DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
             {# TODO: is is_successful appropriate here? Do failed filter run results result in something besides success? #}
         ) AS run_success_count
     FROM workflows

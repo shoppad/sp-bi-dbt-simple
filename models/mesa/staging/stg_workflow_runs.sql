@@ -32,7 +32,7 @@ first_step_runs AS (
         NOT(__hevo__marked_deleted)
         AND metadata:trigger:trigger_type = 'input'
         AND workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's
-        AND run_status IN ('ready','fail','success','replayed','stop')
+        AND run_status IN ('fail','success','replayed','stop')
         AND NOT(integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
 )
 

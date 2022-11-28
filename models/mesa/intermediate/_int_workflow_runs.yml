@@ -2,24 +2,73 @@ version: 2
 models:
   - name: int_workflow_runs
     columns:
-      - name: WORKFLOW_RUN_ID
-      - name: WORKFLOW_ID
-      - name: SHOP_SUBDOMAIN
-      - name: WORKFLOW_RUN_AT_UTC
-      - name: WORKFLOW_RUN_AT_PT
-      - name: WORKFLOW_RUN_ON_PT
-      - name: RUN_STATUS
-      - name: UNBILLABLE_REASON
-      - name: IS_FREE_WORKFLOW
-      - name: IS_BILLABLE
-      - name: WORKFLOW_NAME
-      - name: SOURCE_APP
-      - name: INTEGRATION_KEY
-      - name: CHILD_FAILURE_COUNT
-      - name: UPDATED_AT
-      - name: IS_TEST_RUN
-      - name: IS_WORKFLOW_HARD_DELETED
-      - name: EXECUTED_STEP_COUNT
-      - name: IS_SUCCESSFUL
-      - name: DESTINATION_APP
-      - name: SOURCE_DESTINATION_PAIR
+      - name: workflow_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships_proportion:
+              to: ref('stg_workflows')
+              field: workflow_id
+              warn_if: '>1'
+              error_if: '>5'
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_shops')
+              field: shop_subdomain
+      - name: workflow_run_at_utc
+        tests:
+          - not_null
+      - name: workflow_run_at_pt
+        tests:
+          - not_null
+      - name: workflow_run_on_pt
+        tests:
+          - not_null
+      - name: run_status
+        tests:
+          - not_null
+      - name: unbillable_reason
+      - name: is_free_workflow
+        tests:
+          - not_null
+      - name: is_billable
+        tests:
+          - not_null
+      - name: workflow_name
+        tests:
+          - not_null
+      - name: source_app
+        tests:
+          - not_null
+      - name: integration_key
+        tests:
+          - not_null
+      - name: child_failure_count
+        tests:
+          - not_null
+      - name: updated_at
+        tests:
+          - not_null
+      - name: is_test_run
+        tests:
+          - not_null
+      - name: is_workflow_hard_deleted
+        tests:
+          - not_null
+      - name: executed_step_count
+        tests:
+          - not_null
+      - name: is_successful
+        tests:
+          - not_null
+      - name: destination_app
+        tests:
+          - not_null
+      - name: source_destination_pair
+        tests:
+          - not_null

@@ -2,21 +2,45 @@ version: 2
 models:
   - name: int_test_runs
     columns:
-      - name: WORKFLOW_ID
-      - name: SHOP_SUBDOMAIN
-      - name: WORKFLOW_RUN_ID
-      - name: WORKFLOW_RUN_AT_UTC
-      - name: WORKFLOW_RUN_AT_PT
-      - name: WORKFLOW_RUN_ON_PT
-      - name: RUN_STATUS
-      - name: UNBILLABLE_REASON
-      - name: IS_FREE_WORKFLOW
-      - name: IS_BILLABLE
-      - name: WORKFLOW_NAME
-      - name: SOURCE_APP
-      - name: INTEGRATION_KEY
-      - name: CHILD_FAILURE_COUNT
-      - name: UPDATED_AT
-      - name: IS_TEST_RUN
-      - name: IS_WORKFLOW_HARD_DELETED
-      - name: IS_SUCCESSFUL
+      - name: workflow_id
+      - name: shop_subdomain
+        tests:
+          - relationships:
+              to: ref('int_shops')
+              field: shop_subdomain
+      - name: test_run_id
+        tests:
+          - unique
+          - not_null
+      - name: test_run_at_utc
+        tests:
+          - not_null
+      - name: test_run_at_pt
+        tests:
+          - not_null
+      - name: test_run_on_pt
+        tests:
+          - not_null
+      - name: run_status
+        tests:
+          - not_null
+      - name: unbillable_reason
+      - name: is_free_workflow
+      - name: is_billable
+      - name: workflow_name
+        tests:
+          - not_null
+      - name: source_app
+        tests:
+          - not_null
+      - name: integration_key
+      - name: child_failure_count
+        tests:
+          - not_null
+      - name: updated_at
+      - name: is_workflow_hard_deleted
+        tests:
+          - not_null
+      - name: is_successful
+        tests:
+          - not_null

@@ -3,27 +3,63 @@ models:
   - name: int_step_runs
     columns:
       - name: WORKFLOW_RUN_ID
+        tests:
+          - not_null
       - name: STEP_RUN_ID
+        tests:
+          - unique
+          - not_null
       - name: WORKFLOW_STEP_ID
         meta:
           metabase.semantic_type: type/FK
           metabase.fk_target_table: ref('stg_workflow_steps')
           metabase.fk_target_field: workflow_step_id
       - name: STEP_RUN_AT_UTC
+        tests:
+          - not_null
       - name: STEP_RUN_AT_PT
+        tests:
+          - not_null
       - name: STEP_RUN_ON_PT
+        tests:
+          - not_null
       - name: STEP_TYPE
+        tests:
+          - not_null
       - name: INTEGRATION_NAME
+        tests:
+          - not_null
       - name: INTEGRATION_KEY
+        tests:
+          - not_null
       - name: RUN_STATUS
+        tests:
+          - not_null
       - name: WORKFLOW_STEP_NAME
+        tests:
+          - not_null
       - name: WORKFLOW_STEP_KEY
+        tests:
+          - not_null
       - name: IS_TEST_RUN
+        tests:
+          - not_null
       - name: PRIORITY
       - name: TRIES
       - name: UPDATED_AT
+        tests:
+          - not_null
       - name: WORKFLOW_ID
       - name: WORKFLOW_NAME
       - name: SHOP_SUBDOMAIN
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_shops')
+              field: shop_subdomain
       - name: IS_WORKFLOW_HARD_DELETED
+        tests:
+          - not_null
       - name: POSITION_IN_WORKFLOW_RUN
+        tests:
+          - not_null
