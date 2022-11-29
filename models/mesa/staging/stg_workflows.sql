@@ -18,7 +18,7 @@ workflows AS (
         *,
         uuid AS shop_subdomain,
         __hevo__marked_deleted AS is_deleted
-    FROM {{ source('mesa_mongo', 'workflows') }}
+    FROM source_workflows
 
 ),
 

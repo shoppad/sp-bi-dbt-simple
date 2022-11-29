@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: int_shop_install_sources
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 2000
+    columns:
+      - name: shop_subdomain
+      - name: acquisition_campaign
+      - name: acquisition_content
+      - name: acquisition_referrer
+      - name: acquisition_first_page_path
+      - name: acquisition_source
+      - name: acquisition_medium
+      - name: acquisition_source_medium

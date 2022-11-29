@@ -44,7 +44,7 @@ models:
       - name: latest_installed_at_pt
         description: The most recent app installation date.
       - name: billing_method_name
-        description: The method used to charge the customer for their subscription & usage.
+        description: The method used to charge the Shop for their subscription & usage.
       - name: billing_overage_bucket_start_date_pt
         description: "[Fill]"
       - name: billing_overage_bucket_end_date_pt
@@ -58,7 +58,7 @@ models:
       - name: price_per_action
         description: "[Fill]"
       - name: activation_date_pt
-        description: The date the customer achieved the current definition of Activated.
+        description: The date the Shop achieved the current definition of Activated.
       - name: is_activated
         description: Whether the Shop has achieved Activation.
       - name: templates_installed_count
@@ -78,7 +78,7 @@ models:
       - name: billing_on_pt
         description: "[Fill]"
       - name: plan_name
-        description: The Mesa plan the customer is currently subscribed to.
+        description: The Mesa plan the Shop is currently subscribed to.
       - name: percent_used
         description: "[Fill]"
       - name: overlimit_date_pt
@@ -118,7 +118,7 @@ models:
       - name: hotjar_url
         description: A direct link to the user's hotjar sessions.
       - name: backdoor_url
-        description: A direct link to the customer's backdoor UI.
+        description: A direct link to the Shop's backdoor UI.
       - name: minutes_using_app
         description: The total minutes between the first and last pageview inside the app.
         tests:
@@ -161,3 +161,17 @@ models:
         description: The timestamp of the latest uninstallation of the app.
       - name: plan_upgrade_date
         description: The date of the first plan upgrade action.
+      - name: acquisition_campaign
+        description: The campaign that the Shop was acquired through.
+      - name: acquisition_content
+        description: The content that the Shop was acquired through.
+      - name: acquisition_first_page_path
+        description: The first page path that the Shop was acquired through.
+      - name: acquisition_referrer
+        description: The referrer that the Shop was acquired through.
+      - name: acquisition_medium
+        description: The medium that the Shop was acquired through.
+      - name: acquisition_source
+        description: The source that the Shop was acquired through.
+      - name: acquisition_source_medium
+        description: The source & medium that the Shop was acquired through.

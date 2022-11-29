@@ -66,6 +66,11 @@ current_rolling_counts AS (
     LEFT JOIN yesterdays USING (shop_subdomain)
 ),
 
+install_sources AS (
+    SELECT *
+    FROM {{ ref('int_shop_install_sources') }}
+),
+
 final AS (
     SELECT
         *,
@@ -87,6 +92,7 @@ final AS (
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
     LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
     LEFT JOIN current_rolling_counts USING (shop_subdomain)
+    LEFT JOIN install_sources USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
