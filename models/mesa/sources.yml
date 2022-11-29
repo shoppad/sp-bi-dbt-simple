@@ -79,6 +79,8 @@ sources:
           - name: created_at
             tests:
               - not_null
+      - name: mesa_install_events
+        identifier: m3_mesa_installs
 
   - name: mesa_segment
     description: Events and objects sent to Snowflake via Segment.com.

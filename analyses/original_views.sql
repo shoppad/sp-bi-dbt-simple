@@ -123,15 +123,15 @@ DROP TABLE SP_PARTNER_EXPORT;
 
 -- Mesa-specific
 CREATE OR REPLACE VIEW "SP_MESA_LOOKUP-TABLE_VW" AS SELECT t1.UUID as UUID, max(t2._ID) as MESA_ID from "MONGO"."PUBLIC"."M3_MESA_AUTOMATIONS" t1 right join "MONGO"."PUBLIC"."M3_MESA" t2 on t1.uuid = t2.uuid group by t1.uuid;
-CREATE OR REPLACE VIEW "M3_MESA_TRIGGERS_VW" AS
+{# CREATE OR REPLACE VIEW "M3_MESA_TRIGGERS_VW" AS
     SELECT *,
     (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_TRIGGERS t1
--- CREATE OR REPLACE VIEW "M3_MESA_AUTOMATIONS_VW" AS SELECT *, CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT, (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_AUTOMATIONS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
-CREATE OR REPLACE VIEW "M3_MESA_ENTITLEMENTS_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name as NAME, lv.value:status as STATUS, lv.value:value as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.entitlements) lv
+-- CREATE OR REPLACE VIEW "M3_MESA_AUTOMATIONS_VW" AS SELECT *, CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT, (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_AUTOMATIONS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false; #}
+{# CREATE OR REPLACE VIEW "M3_MESA_ENTITLEMENTS_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name as NAME, lv.value:status as STATUS, lv.value:value as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.entitlements) lv #}
 CREATE OR REPLACE VIEW "M3_MESA_META_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name::string as NAME, lv.value:status::string as STATUS, lv.value:value::string as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.meta) lv
-CREATE OR REPLACE VIEW "M3_MESA_CHARGES_VW" AS SELECT * FROM "MONGO"."PUBLIC"."M3_MESA_CHARGES" WHERE UUID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
+{# CREATE OR REPLACE VIEW "M3_MESA_CHARGES_VW" AS SELECT * FROM "MONGO"."PUBLIC"."M3_MESA_CHARGES" WHERE UUID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"); #}
 CREATE OR REPLACE VIEW "M3_MESA_LAUNCH_SESSIONS_VW" AS SELECT "PUBLIC"."M3_MESA_META_VW"."_ID" AS "_ID", CAST("PUBLIC"."M3_MESA_META_VW"."VALUE" AS timestamp) AS "timestamp", "mesa"."_ID" AS "mesa_merchant_id", "mesa"."UUID" AS "uuid", "mesa"."_CREATED_AT_PT" AS "mesa_merchant_installed_at_pt" FROM "MONGO"."PUBLIC"."M3_MESA_META_VW" LEFT JOIN "MONGO"."PUBLIC"."M3_MESA_VW" "mesa" ON "PUBLIC"."M3_MESA_META_VW"."PARENT_ID" = "mesa"."_ID" WHERE "PUBLIC"."M3_MESA_META_VW"."NAME" = 'launchsessiondate';
-
+{#
 CREATE OR REPLACE VIEW "M3_MESA_TASKS_VW" AS SELECT *,
     CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT,
     (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID,
@@ -139,8 +139,8 @@ CREATE OR REPLACE VIEW "M3_MESA_TASKS_VW" AS SELECT *,
     IFNULL(metadata:parents[0]:"task_id"::string, _ID) as AUTOMATION_ID,
     metadata:automation:"_id"::string as WORKFLOW_ID,
     metadata:"child_fails"::string as CHILD_FAILS
-    FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
-
+    FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false; #}
+{#
 CREATE OR REPLACE VIEW "M3_MESA_RUNS_VW" AS SELECT *,
     CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT,
     STATUS NOT IN ('ready', 'skip') as is_executed,
@@ -149,10 +149,10 @@ CREATE OR REPLACE VIEW "M3_MESA_RUNS_VW" AS SELECT *,
     metadata:"child_fails"::string as FAILURES
     FROM MONGO.PUBLIC.M3_MESA_TASKS t1 WHERE
         metadata:"trigger":"step_type"::string = 'input' AND
-        UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false;
+        UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false; #}
 
 
-CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS
+{# CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS
     SELECT
         ROW_NUMBER() over (order by _ID DESC) as _ID,
         _id as PARENT_ID,
@@ -185,9 +185,9 @@ CREATE OR REPLACE VIEW mongo.public.m3_mesa_billing_vw AS
         billing:"plan"."balance_used"::STRING as plan_balance_used,
         billing:"plan_type"::STRING as plan_type
     FROM mongo.public.m3_mesa
-    WHERE UUID NOT IN (select UUID from SP_STAFF);
+    WHERE UUID NOT IN (select UUID from SP_STAFF); #}
 
-
+{#
 CREATE OR REPLACE VIEW "SP_MESA_WORKFLOWS_FACTS_VW" AS
 with inputs as (
     select * from M3_MESA_TRIGGERS_VW t2 where t2.step_type = 'input' and weight = 0
@@ -217,11 +217,11 @@ SELECT
   col3,
   col4
 FROM table
-QUALIFY ROW_NUMBER() OVER (PARTITION BY col1, col2 ORDER BY col1, col2) = 1
+QUALIFY ROW_NUMBER() OVER (PARTITION BY col1, col2 ORDER BY col1, col2) = 1 #}
 
 
 
-CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS
+{# CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS
   SELECT
     "install"."USER_ID" as uuid,
     coalesce("page"."CONTEXT_CAMPAIGN_SOURCE", REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE("page"."CONTEXT_PAGE_REFERRER", '(.*)apps\.shopify\.com(.*)', 'shopify'), '(.*)www\.google\.com(.*)', 'google'), '(.*)www\.getmesa\.com(.*)?', 'getmesa')) as combined_source,
@@ -245,9 +245,9 @@ CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" AS
     )
     AND (lower("install"."CONTEXT_PAGE_URL") like '%/apps/mesa/install%')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "install"."USER_ID" ORDER BY "install"."TIMESTAMP" DESC) = 1
-    ORDER BY "install"."TIMESTAMP" DESC;
+    ORDER BY "install"."TIMESTAMP" DESC; #}
 
-
+{#
 CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" AS
   SELECT
     "server"."UUID" as uuid,
@@ -265,13 +265,13 @@ CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_INSTALL_SOURCES_VW" AS
   LEFT JOIN "MONGO"."PUBLIC"."SP_MESA_MERCHANTS_CLIENTSIDE_INSTALL_SOURCES_VW" "client"
     ON "server"."UUID" = "client"."UUID"
   QUALIFY ROW_NUMBER() OVER (PARTITION BY "server"."UUID" ORDER BY "server"."CREATED_AT" DESC) = 1
-  ORDER BY "server"."CREATED_AT" DESC;
+  ORDER BY "server"."CREATED_AT" DESC; #}
 
 
-CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" AS
+{# CREATE OR REPLACE VIEW "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" AS
   SELECT * FROM SP_MESA_MERCHANTS_FACTS_VW
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "UUID" ORDER BY "INSTALLED_AT_PT" DESC) = 1
-    ORDER BY INSTALLED_AT_PT DESC;
+    ORDER BY INSTALLED_AT_PT DESC; #}
 
 
 -- Hourly task to rebuild the Mesa Merchants (Fact Table)

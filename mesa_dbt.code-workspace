@@ -45,6 +45,7 @@
       "mongoid",
       "overlimit",
       "pageview",
+      "referer",
       "sessionized",
       "shoppad",
       "templater",
