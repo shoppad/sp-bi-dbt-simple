@@ -101,4 +101,4 @@ models:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: WORKFLOW_RUNS_ROLLING_YEAR_COUNT
-      - name: UNINSTALLED_APP_AT_PT
+      - name: UNINSTALLED_AT_PT

@@ -1,18 +1,29 @@
 WITH
+source_workflows as (
+
+    select * from {{ source('mesa_mongo', 'workflows') }}
+
+),
+
 shops AS (
+
     SELECT shop_subdomain
     FROM {{ ref('stg_shops') }}
+
 ),
 
 workflows AS (
+
     SELECT
         *,
         uuid AS shop_subdomain,
         __hevo__marked_deleted AS is_deleted
     FROM {{ source('mesa_mongo', 'workflows') }}
+
 ),
 
 final AS (
+
     SELECT
         _id AS workflow_id,
         {{ pacific_timestamp('created_at') }} AS created_at_pt,
@@ -31,6 +42,7 @@ final AS (
     INNER JOIN shops USING (shop_subdomain) -- Filter out any workflows that don't belong to a shop.
     WHERE
         NOT(template = 'shopify/order/send_order_report_card_email')
+
 )
 
 SELECT * FROM final

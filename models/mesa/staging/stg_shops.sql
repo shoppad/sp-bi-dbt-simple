@@ -34,6 +34,15 @@ shops AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY _created_at DESC) = 1
 ),
 
+plan_upgrade_dates AS (
+    SELECT
+        user_id AS shop_subdomain,
+        MIN(timestamp)::date as plan_upgrade_date
+    FROM {{ ref('stg_mesa_flow_events') }}
+    WHERE event_id IN ('plan_upgrade', 'plan_select')
+    GROUP BY 1
+),
+
 final AS (
     SELECT
         *,
@@ -41,6 +50,7 @@ final AS (
     FROM shops
     LEFT JOIN install_dates USING (shop_subdomain)
     LEFT JOIN uninstall_dates USING (shop_subdomain)
+    LEFT JOIN plan_upgrade_dates USING (shop_subdomain)
 )
 
 SELECT * FROM final

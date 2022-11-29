@@ -63,6 +63,9 @@ models:
                     +cluster_by: ['shop_subdomain', 'workflow_id']
                     +unique_key: workflow_run_id
 
+                workflows:
+                    +unique_key: workflow_id
+
                 shops:
                     +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
                     +unique_key: shop_subdomain
@@ -84,6 +87,8 @@ models:
 
             staging:
                 +schema: support
+                calendar_dates:
+                    +materialized: view
                 stg_step_runs:
                     +materialized: incremental
                     +on_schema_change: "sync_all_columns"

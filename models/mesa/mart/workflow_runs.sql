@@ -1,4 +1,5 @@
-WITH shops AS (
+WITH
+shops AS (
     SELECT
         shop_subdomain,
         activation_date_pt

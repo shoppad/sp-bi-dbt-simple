@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_flow_events
+  - name: int_mesa_flow_events
     columns:
       - name: SHOP_SUBDOMAIN
       - name: PROPERTIES_STEP_LABEL

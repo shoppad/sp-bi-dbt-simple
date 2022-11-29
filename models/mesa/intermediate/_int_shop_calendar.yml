@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: int_shop_calendar
+    tests:
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list: ["dt", "shop_subdomain"]
+
+    columns:
+      - name: shop_subdomain
+        type: string
+        tests:
+          - not_null
+      - name: dt
+        tests:
+          - not_null

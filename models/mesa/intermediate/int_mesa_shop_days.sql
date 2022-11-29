@@ -1,17 +1,7 @@
 WITH
-shop_lifespans AS (
-    SELECT *
-    FROM {{ ref('int_shop_lifespans') }}
-),
-
 shop_calendar AS (
-    SELECT
-        shop_subdomain,
-        date_day AS dt
-    FROM shop_lifespans
-    LEFT JOIN {{ ref('calendar_dates') }}
-        ON dt BETWEEN first_dt AND last_dt
-
+    SELECT *
+    FROM {{ ref('int_shop_calendar') }}
 ),
 
 workflow_runs AS (
@@ -82,7 +72,7 @@ final AS (
     SELECT
         *,
         {{ dbt_utils.surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
-        workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }} AS is_active
+        daily_usage_revenue > 0 OR workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }} AS is_active
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
     LEFT JOIN daily_charges USING (shop_subdomain, dt)

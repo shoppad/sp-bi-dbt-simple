@@ -10,7 +10,7 @@ workflow_runs AS (
 ),
 
 decorated_step_runs AS (
-    {% set columns_to_skip = [
+    {%- set columns_to_skip = [
         '_id',
         'created_at',
         '_created_at',

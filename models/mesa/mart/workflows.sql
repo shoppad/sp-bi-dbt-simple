@@ -1,19 +1,25 @@
 {{ config(materialized = 'table') }}
 
 WITH workflows AS (
+
     SELECT *
     FROM {{ ref('stg_workflows') }}
+
 ),
 
 workflow_steps AS (
+
     SELECT *
     FROM {{ ref('stg_workflow_steps') }}
     WHERE NOT(is_deleted)
+
 ),
 
 workflow_runs AS (
+
     SELECT *
     FROM {{ ref('int_workflow_runs') }}
+
 ),
 
 workflow_counts AS (
@@ -41,11 +47,14 @@ workflow_counts AS (
 ),
 
 test_runs AS (
+
     SELECT *
     FROM {{ ref('int_test_runs') }}
+
 ),
 
 test_counts AS (
+
     SELECT
         workflow_id,
         MIN(test_run_at_pt) AS first_test_at_pt,
@@ -59,9 +68,11 @@ test_counts AS (
     FROM workflows
     LEFT JOIN test_runs USING (workflow_id)
     GROUP BY 1
+
 ),
 
 page_views AS (
+
     SELECT
         shop_subdomain,
         workflow_id,
@@ -70,37 +81,46 @@ page_views AS (
     FROM workflows
     LEFT JOIN {{ ref('segment_web_page_views__sessionized') }}
     GROUP BY 1, 2
+
 ),
 
 workflow_saves AS (
+
     SELECT
         workflow_id,
-        COALESCE(COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND properties_workflow_id = workflow_id), 0) AS save_count, {# TODO: Which event_ids do we want to count? #}
+        COALESCE(
+            COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND properties_workflow_id = workflow_id),
+            0)
+        AS save_count, {# TODO: Which event_ids do we want to count? #}
         save_count > 0 AS has_edited_or_saved_workflow
     FROM workflows
-    LEFT JOIN {{ ref('stg_flow_events') }} USING (shop_subdomain)
+    LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
     GROUP BY 1
+
 ),
 
 workflow_enables AS (
+
     SELECT
         workflow_id,
         COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id = properties_workflow_id), 0) AS enable_count,
         enable_count > 0 AS has_enabled_workflow
     FROM workflows
-    LEFT JOIN {{ ref('stg_flow_events') }} USING (shop_subdomain)
+    LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
     GROUP BY 1
+
 ),
 
 final AS (
-    SELECT
-        *
+
+    SELECT *
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)
     LEFT JOIN test_counts USING (workflow_id)
     LEFT JOIN workflow_saves USING (workflow_id)
     LEFT JOIN workflow_counts USING (workflow_id)
     LEFT JOIN workflow_enables USING (workflow_id)
+
 )
 
 SELECT * FROM final

@@ -15,8 +15,7 @@ workflows AS (
 ),
 
 final AS (
-    SELECT
-        step_runs.*
+    SELECT step_runs.*
     FROM step_runs
     INNER JOIN workflows USING (workflow_id)
     LEFT JOIN workflow_steps USING (workflow_step_id)

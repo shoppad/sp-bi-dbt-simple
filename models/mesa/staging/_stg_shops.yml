@@ -57,3 +57,4 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
+      - name: PLAN_UPGRADE_DATE

@@ -35,6 +35,7 @@
       "CONCAT",
       "dateadd",
       "datediff",
+      "datepart",
       "getmesa",
       "hevo",
       "hotjar",

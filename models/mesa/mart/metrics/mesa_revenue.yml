@@ -1,7 +1,7 @@
 version: 2
 metrics:
   - name: total_mesa_revenue
-    label: The revenue of our business
+    label: Revenue from the mesa_charges table.
     model: ref('mesa_charges')
     description: "The Mesa-attributed revenue."
 
