@@ -9,7 +9,7 @@ packages:
     version: [">=1.3.0", "<1.4.0"]
   - package: dbt-labs/dbt_utils
     version: 0.9.5
-  - git: 'https://github.com/JonCrawford/dbt_segment'
+  - git: "https://github.com/JonCrawford/dbt_segment"
     warn-unpinned: false
   - package: dbt-labs/codegen
     version: 0.9.0

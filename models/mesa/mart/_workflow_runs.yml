@@ -7,61 +7,101 @@ models:
           min_value: 10000
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000
-          row_condition: "is_billable"
+          row_condition: is_billable
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000
-          row_condition: "not(is_billable)"
+          row_condition: not(is_billable)
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10
-          row_condition: "is_free_workflow"
+          row_condition: is_free_workflow
     columns:
       - name: workflow_run_id
         tests:
           - not_null
+        description: The foreign key to the Workflow Run.
       - name: is_billable
-        description: a step/workflow is only billed once -- not for each step. so only true for the first trigger.
+        description:
+          a step/workflow is only billed once -- not for each step. so only
+          true for the first trigger.
         tests:
           - not_null
-
       - name: shop_subdomain
         tests:
           - not_null
           - relationships:
               to: ref('shops')
               field: shop_subdomain
+        description: The foreign key for the Shop.
       - name: run_status
         test:
           - not_null
+        description: The status of the step run. `success` or `failure`.
       - name: workflow_id
+        description: The foreign key to the originating workflow
       - name: shop_subdomain
+        description: The foreign key for the Shop.
       - name: workflow_run_at_utc
         tests:
           - not_null
+        description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
+        description: The timestamp of the workflow run execution in PT.
         tests:
           - not_null
       - name: workflow_run_on_pt
+        description: The date of the workflow run execution in PT.
         tests:
           - not_null
       - name: unbillable_reason
+        description: The reason why a workflow run is not billable.
+        meta:
+          metabase.caveats: Seems to often say that billing is not set up when it is.
         tests:
           - not_null:
-              where: "not(is_billable)"
+              where: not(is_billable)
       - name: source_app
+        description:
+          The originating app that triggered the execution of the workflow
+          run.
       - name: updated_at
+        description: Used to build incremental models.
       - name: executed_step_count
+        description: The number of steps that were executed in the workflow run.
+        tests:
+          - not_null
       - name: child_failure_count
+        description: The number of steps that failed in the workflow run.
         tests:
           - not_null
       - name: is_successful
+        description:
+          Whether the workflow run was successfully until the end or a safe
+          exit.
+        tests:
+          - not_null
       - name: destination_app
+        description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
+        description: The source and destination app integration in one string.
+        meta:
+          metabase.points_of_interest:
+            This is a good field to Group By to understand
+            the popularity of different pairs.
       - name: is_free_workflow
+        description:
+          Whether the workflow run was a free workflow. Free workflows are
+          not billed.
         tests:
           - not_null
       - name: is_workflow_hard_deleted
+        description:
+          Whether the workflow was hard deleted from the database and therefore
+          missing
       - name: workflow_name
+        description: The customer-provided name of the originating workflow.
       - name: integration_key
-      - name: IS_TEST_RUN
-      - name: ACTIVATION_DATE_PT
-      - name: FUNNEL_PHASE
+        description: The code-friendly string of the app this step integrates with.
+      - name: activation_date_pt
+        description: The date the customer achieved the current definition of Activated.
+      - name: funnel_phase
+        description: The funnel phase the Shop was in when the workflow run was executed.

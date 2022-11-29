@@ -2,27 +2,46 @@ version: 2
 models:
   - name: int_test_step_runs
     columns:
-      - name: WORKFLOW_RUN_ID
-      - name: STEP_RUN_ID
-      - name: WORKFLOW_STEP_ID
+      - name: test_run_id
+        tests:
+          - not_null
+      - name: test_step_run_id
+        tests:
+          - not_null
+          - unique
+      - name: workflow_step_id
         meta:
-          metabase.semantic_type: type/FK
+          metabase.semantic_type: type/fk
           metabase.fk_target_table: ref('stg_workflow_steps')
           metabase.fk_target_field: workflow_step_id
-      - name: STEP_RUN_AT_UTC
+        description: The foreign key to the originating workflow step.
+      - name: test_step_run_at_utc
+      - name: test_step_run_at_pt
+      - name: test_step_run_on_pt
+      - name: step_type
+        description: The type of step that was run. `input` or `output`.
+      - name: integration_name
+        description: The name of the app this step integrates with.
+      - name: integration_key
+        description: The code-friendly string of the app this step integrates with.
+      - name: run_status
+        description: The status of the step run. `success` or `failure`.
+      - name: workflow_step_name
+        description: The name of the originating workflow step.
+      - name: workflow_step_key
+        description: The code-friendly string of the workflow step.
+      - name: tries
+        description: The number of attempts to run the step.
+      - name: updated_at
+        description: Used to build incremental models.
+      - name: workflow_id
+        description: The foreign key to the originating workflow
+      - name: workflow_name
+        description: The customer-provided name of the originating workflow.
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: is_workflow_hard_deleted
+        description: Whether the workflow was hard deleted from the database and therefore missing
       - name: STEP_RUN_AT_PT
       - name: STEP_RUN_ON_PT
-      - name: STEP_TYPE
-      - name: INTEGRATION_NAME
-      - name: INTEGRATION_KEY
-      - name: RUN_STATUS
-      - name: WORKFLOW_STEP_NAME
-      - name: WORKFLOW_STEP_KEY
-      - name: IS_TEST_RUN
-      - name: PRIORITY
-      - name: TRIES
-      - name: UPDATED_AT
-      - name: WORKFLOW_ID
-      - name: WORKFLOW_NAME
-      - name: SHOP_SUBDOMAIN
-      - name: IS_WORKFLOW_HARD_DELETED
+      - name: STEP_RUN_AT_UTC

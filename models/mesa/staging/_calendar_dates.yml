@@ -1,5 +1,10 @@
 version: 2
 models:
   - name: calendar_dates
+    description: A generated list of calendar days used to build timeline models.
     columns:
-      - name: DATE_DAY
+      - name: date_day
+        description: The calendar day.
+        tests:
+          - unique
+          - not_null

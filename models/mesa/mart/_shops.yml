@@ -1,104 +1,163 @@
 version: 2
 models:
   - name: shops
-    description: "formatted, production-ready shops."
+    description: Formatted, production-ready Shops.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
-
     columns:
       - name: shop_subdomain
         tests:
           - not_null
           - unique
+        description: The foreign key for the Shop.
       - name: first_installed_at_pt
         tests:
           - not_null
+        description: The effective Created At for the Shop.
       - name: currency
         tests:
           - not_null
+        description: The financial currency used by the Shop with its customers.
       - name: workflows_successfully_run_count
         tests:
           - not_null
+        description: The number of workflow runs that have completed without error.
       - name: workflows_created_count
+        description: The number of workflows the Shop has created.
         tests:
           - not_null
       - name: workflows_enabled_count
+        description: The number of workflows currently enabled for the Shop.
         tests:
           - not_null
-
       - name: shopify_plan_name
+        description: The Shopify plan used by the Shop.
       - name: install_status
+        description: The current Mesa app installation status of the Shop.
       - name: status
+        description: The usage status of the Shop.
       - name: referral
+        description: "[Fill]"
       - name: meta
-      - name: timestamp
+        description: A field used by Account Services to record onboarding sessions.
       - name: latest_installed_at_pt
+        description: The most recent app installation date.
       - name: billing_method_name
+        description: The method used to charge the customer for their subscription & usage.
       - name: billing_overage_bucket_start_date_pt
+        description: "[Fill]"
       - name: billing_overage_bucket_end_date_pt
+        description: "[Fill]"
       - name: billing_overage_bypass_until
+        description: "[Fill]"
       - name: billing_overage_last_count
+        description: "[Fill]"
       - name: daily_plan_revenue
+        description: The current value of the users plan on a daily basis.
       - name: price_per_action
+        description: "[Fill]"
       - name: activation_date_pt
+        description: The date the customer achieved the current definition of Activated.
       - name: is_activated
+        description: Whether the Shop has achieved Activation.
       - name: templates_installed_count
+        description: The number of Templates the Shop has installed as a Workflow.
       - name: balance_used
+        description: "[Fill]"
       - name: shopify_id
+        description: The official Shopify identifier for the Shop.
       - name: orders_current_count
+        description: The current monthly order volume of the Shop.
       - name: plan_price
+        description: The current Mesa plan's monthly cost.
       - name: plan_used
+        description: "[Fill]"
       - name: percent_complete
+        description: "[Fill]"
       - name: billing_on_pt
+        description: "[Fill]"
       - name: plan_name
+        description: The Mesa plan the customer is currently subscribed to.
       - name: percent_used
+        description: "[Fill]"
       - name: overlimit_date_pt
+        description: "[Fill]"
       - name: balance_remaining
+        description: "[Fill]"
       - name: orders_initial_count
+        description: The 30-day order count volume at the time of app installation.
       - name: start_date_pt
+        description: "[Fill]"
       - name: end_date_pt
+        description: "[Fill]"
       - name: revenue_initial_total
+        description: The 30-day GMV of the Shop at the time of installation.
       - name: created_at_pt
+        description: "[Fill]"
       - name: trial_ends_pt
+        description: The date the initial billing trial period ends.
       - name: chargebee_id
+        description: The ID of the chargebee account if used for billing.
       - name: billing_updated_at_pt
+        description: The timestamp the billing information was updated at in PT.
       - name: plan_type
+        description: "[Fill]"
       - name: days_complete
+        description: "[Fill]"
       - name: plan_id
+        description: The code-friendly shortcode of the current Mesa plan.
       - name: revenue_current_total
+        description: The current 30-day GMV of the Shop.
       - name: plan_interval
+        description: The frequency of the Billing Plan interval.
       - name: trial_days
+        description: The initial lenght of the Trial period.
       - name: is_builder_wizard_completed
+        description: "[Fill]"
       - name: hotjar_url
+        description: A direct link to the user's hotjar sessions.
       - name: backdoor_url
+        description: A direct link to the customer's backdoor UI.
       - name: minutes_using_app
+        description: The total minutes between the first and last pageview inside the app.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
               config:
-                where: "first_installed_at_pt > '2020-12-18'"
+                where: first_installed_at_pt > '2020-12-18'
       - name: workflow_runs_count
+        description: The number of Workflow Run attempts that have been started.
         tests:
           - not_null
       - name: last_seen_in_app_at_pt
+        description: The timestamp of the last pageview inside the pap.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
       - name: workflow_run_success_count
+        description: The number of Workflow Run attempts that have completed successfully.
         tests:
           - not_null
       - name: minutes_until_uninstall
+        description: The minutes between initial install and the latest uninstall.
       - name: first_seen_in_app_at_pt
+        description: The timestamp of the first pageview within the app.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
       - name: workflow_runs_rolling_thirty_day_count
+        description: The number of workflow run attempts initiated in the last 30 days.
         tests:
           - not_null
       - name: days_to_activation
+        description: The number of days from first install to activation.
         tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.1
-      - name: WORKFLOW_RUNS_ROLLING_YEAR_COUNT
-      - name: UNINSTALLED_AT_PT
+              at_least: 0.02
+      - name: workflow_runs_rolling_year_count
+        description: The number of workflow run attempts initiated in the last 365 days.
+      - name: uninstalled_at_pt
+        description: The timestamp of the latest uninstallation of the app.
+      - name: plan_upgrade_date
+        description: The date of the first plan upgrade action.

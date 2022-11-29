@@ -23,6 +23,7 @@ decorated_step_runs AS (
         'response',
         'request',
         'uuid',
+        'priority',
     ] %}
     SELECT
         _id AS step_run_id,

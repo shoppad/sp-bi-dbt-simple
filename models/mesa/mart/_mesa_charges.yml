@@ -3,9 +3,26 @@ models:
   - name: mesa_charges
     columns:
       - name: shop_subdomain
+        tests:
+          - relationships:
+              to: ref('int_shops')
+              field: shop_subdomain
+        description: The foreign key for the Shop.
       - name: subscription_id
+        description: "[Fill]"
       - name: billed_count
+        description: "[Fill]"
       - name: billed_amount
+        description: The amount charged to the customer with this charge.
       - name: charged_at_pt
+        description: The timestamp of the charge in PT.
+        tests:
+          - not_null
       - name: charged_on_pt
+        description: The date of the charge in PT.
+        tests:
+          - not_null
       - name: charge_id
+        description: The unique identifier of the charge.
+        tests:
+          - unique

@@ -2,64 +2,81 @@ version: 2
 models:
   - name: int_step_runs
     columns:
-      - name: WORKFLOW_RUN_ID
+      - name: workflow_run_id
         tests:
           - not_null
-      - name: STEP_RUN_ID
+        description: The foreign key to the Workflow Run.
+      - name: step_run_id
         tests:
           - unique
           - not_null
-      - name: WORKFLOW_STEP_ID
+        description: The unique identifier for the step run.
+      - name: workflow_step_id
         meta:
-          metabase.semantic_type: type/FK
+          metabase.semantic_type: type/fk
           metabase.fk_target_table: ref('stg_workflow_steps')
           metabase.fk_target_field: workflow_step_id
-      - name: STEP_RUN_AT_UTC
+        description: The foreign key to the originating workflow step.
+      - name: step_run_at_utc
         tests:
           - not_null
-      - name: STEP_RUN_AT_PT
+        description: The timestamp for when the step was run in UTC.
+      - name: step_run_at_pt
         tests:
           - not_null
-      - name: STEP_RUN_ON_PT
+        description: The timestamp for when the step was run in PT.
+      - name: step_run_on_pt
         tests:
           - not_null
-      - name: STEP_TYPE
+        description: The date for when the step was run in PT.
+      - name: step_type
         tests:
           - not_null
-      - name: INTEGRATION_NAME
+        description: The type of step that was run. `input` or `output`.
+      - name: integration_name
         tests:
           - not_null
-      - name: INTEGRATION_KEY
+        description: The name of the app this step integrates with.
+      - name: integration_key
         tests:
           - not_null
-      - name: RUN_STATUS
+        description: The code-friendly string of the app this step integrates with.
+      - name: run_status
         tests:
           - not_null
-      - name: WORKFLOW_STEP_NAME
+        description: The status of the step run. `success` or `failure`.
+      - name: workflow_step_name
         tests:
           - not_null
-      - name: WORKFLOW_STEP_KEY
+        description: The name of the originating workflow step.
+      - name: workflow_step_key
         tests:
           - not_null
-      - name: IS_TEST_RUN
+        description: The code-friendly string of the workflow step.
+      - name: tries
+        description: The number of attempts to run the step.
+      - name: updated_at
         tests:
           - not_null
-      - name: PRIORITY
-      - name: TRIES
-      - name: UPDATED_AT
-        tests:
-          - not_null
-      - name: WORKFLOW_ID
-      - name: WORKFLOW_NAME
-      - name: SHOP_SUBDOMAIN
+        description: Used to build incremental models.
+      - name: workflow_id
+        description: The foreign key to the originating workflow
+      - name: workflow_name
+        description: The customer-provided name of the originating workflow.
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
         tests:
           - not_null
           - relationships:
               to: ref('stg_shops')
               field: shop_subdomain
-      - name: IS_WORKFLOW_HARD_DELETED
+      - name: is_workflow_hard_deleted
+        description: Whether the workflow was hard deleted from the database and therefore missing
         tests:
           - not_null
-      - name: POSITION_IN_WORKFLOW_RUN
+      - name: position_in_workflow_run
+        description:
+          The chronological execution order of the step within the workflow
+          run.
         tests:
           - not_null

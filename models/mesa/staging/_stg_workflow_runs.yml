@@ -1,7 +1,9 @@
 version: 2
 models:
   - name: stg_workflow_runs
-    description: A intermediate model that isolates the very first step executed of each workflow run.
+    description:
+      a intermediate model that isolates the very first step executed of
+      each workflow run.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
@@ -9,8 +11,11 @@ models:
       - name: workflow_run_id
         tests:
           - not_null
+        description: The foreign key to the Workflow Run.
       - name: is_billable
-        description: A step/workflow is only billed once -- not for each step. So only true for the first trigger.
+        description:
+          a step/workflow is only billed once -- not for each step. so only
+          true for the first trigger.
         tests:
           - not_null
       - name: shop_subdomain
@@ -19,36 +24,53 @@ models:
           - relationships:
               to: ref('stg_shops')
               field: shop_subdomain
+        description: The foreign key for the Shop.
       - name: run_status
         test:
           - not_null
-
-###########################################
-### Roll-up Models #########################
-###########################################
-
-      - name: WORKFLOW_ID
+        description: The status of the step run. `success` or `failure`.
+      - name: workflow_id
         tests:
           - not_null
-      - name: workflow_RUN_AT_UTC
+        description: The foreign key to the originating workflow
+      - name: workflow_run_at_utc
         tests:
           - not_null
-      - name: workflow_RUN_AT_PT
+        description: The timestamp of the workflow run execution in UTC.
+      - name: workflow_run_at_pt
         tests:
           - not_null
-      - name: workflow_RUN_ON_PT
+        description: The timestamp of the workflow run execution in PT.
+      - name: workflow_run_on_pt
         tests:
           - not_null
-      - name: UNBILLABLE_REASON
-      - name: SOURCE_APP
-      - name: UPDATED_AT
+        description: The date of the workflow run execution in PT.
+      - name: unbillable_reason
+        description: The reason why a workflow run is not billable.
+      - name: source_app
+        description:
+          The originating app that triggered the execution of the workflow
+          run.
+      - name: updated_at
         tests:
           - not_null
+        description: Used to build incremental models.
       - name: is_workflow_hard_deleted
         tests:
           - not_null
-      - name: CHILD_FAILURE_COUNT
-      - name: IS_FREE_WORKFLOW
-      - name: INTEGRATION_KEY
-      - name: WORKFLOW_NAME
-      - name: IS_TEST_RUN
+        description:
+          Whether the workflow was hard deleted from the database and therefore
+          missing
+      - name: child_failure_count
+        description: The number of steps that failed in the workflow run.
+      - name: is_free_workflow
+        description:
+          Whether the workflow run was a free workflow. Free workflows are
+          not billed.
+      - name: integration_key
+        description: The code-friendly string of the app this step integrates with.
+      - name: workflow_name
+        description: The customer-provided name of the originating workflow.
+      - name: is_test_run
+        tests:
+          - not_null

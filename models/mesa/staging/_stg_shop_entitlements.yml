@@ -2,7 +2,11 @@ version: 2
 models:
   - name: stg_shop_entitlements
     columns:
-      - name: SHOP_subdomain
+      - name: shop_subdomain
+        tests:
+          - not_null
+        description: The foreign key for the Shop.
       - name: name
       - name: value
       - name: status
+        description: The usage status of the Shop.

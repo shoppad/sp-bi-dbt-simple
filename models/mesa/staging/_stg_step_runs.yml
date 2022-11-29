@@ -6,9 +6,11 @@ models:
         tests:
           - not_null
           - unique
+        description: The unique identifier for the step run.
       - name: workflow_run_id
         tests:
           - not_null
+        description: The foreign key to the Workflow Run.
       - name: workflow_id
         meta:
           metabase.semantic_type: type/FK
@@ -19,47 +21,45 @@ models:
           - relationships_proportion:
               to: ref('stg_workflows')
               field: workflow_id
-              warn_if: '>1'
-              error_if: '>5'
-
+              warn_if: ">1"
+              error_if: ">5"
+        description: The foreign key to the originating workflow
       - name: step_run_at_utc
         tests:
           - not_null
+        description: The timestamp for when the step was run in UTC.
       - name: step_run_at_pt
         tests:
           - not_null
+        description: The timestamp for when the step was run in PT.
       - name: workflow_step_name
         tests:
           - not_null
+        description: The name of the originating workflow step.
       - name: workflow_step_key
-        # tests:
-          # - not_null:
-            # where: step_type = 'output'
-
+        description: The code-friendly string of the workflow step.
       - name: WORKFLOW_STEP_ID
         meta:
           metabase.semantic_type: type/FK
           metabase.fk_target_table: ref('stg_workflow_steps')
           metabase.fk_target_field: workflow_step_id
         tests:
-          # - dbt_utils.not_null_proportion:
-          #    at_least: 0.95
           - not_null
           - relationships_proportion:
               to: ref('stg_workflow_steps')
               field: workflow_step_id
-              warn_if: '>1'
-              error_if: '>5'
+              warn_if: ">1"
+              error_if: ">5"
       - name: STEP_RUN_ON_PT
         tests:
           - not_null
       - name: step_type
         tests:
           - not_null
+        description: The type of step that was run. `input` or `output`.
       - name: RUN_STATUS
         tESTS:
           - not_null
-      - name: PRIORITY
       - name: TRIES
       - name: UPDATED_AT
       - name: SHOP_SUBDOMAIN
@@ -71,6 +71,7 @@ models:
       - name: is_workflow_hard_deleted
         tests:
           - not_null
+        description: Whether the workflow was hard deleted from the database and therefore missing
       - name: INTEGRATION_NAME
       - name: WORKFLOW_NAME
       - name: INTEGRATION_KEY

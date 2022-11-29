@@ -6,69 +6,86 @@ models:
         tests:
           - not_null
           - unique
+        description: The foreign key to the Workflow Run.
       - name: workflow_id
         tests:
           - not_null
           - relationships_proportion:
               to: ref('stg_workflows')
               field: workflow_id
-              warn_if: '>1'
-              error_if: '>5'
+              warn_if: ">5"
+              error_if: ">15"
+        description: The foreign key to the originating workflow
       - name: shop_subdomain
         tests:
           - not_null
           - relationships:
               to: ref('int_shops')
               field: shop_subdomain
+        description: The foreign key for the Shop.
       - name: workflow_run_at_utc
         tests:
           - not_null
+        description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
         tests:
           - not_null
+        description: The timestamp of the workflow run execution in PT.
       - name: workflow_run_on_pt
         tests:
           - not_null
+        description: The date of the workflow run execution in PT.
       - name: run_status
         tests:
           - not_null
+        description: The status of the step run. `success` or `failure`.
       - name: unbillable_reason
+        description: The reason why a workflow run is not billable.
       - name: is_free_workflow
         tests:
           - not_null
+        description: Whether the workflow run was a free workflow. Free workflows are not billed.
       - name: is_billable
         tests:
           - not_null
+        description: a step/workflow is only billed once -- not for each step. so only true for the first trigger.
       - name: workflow_name
         tests:
           - not_null
+        description: The customer-provided name of the originating workflow.
       - name: source_app
         tests:
           - not_null
+        description: The originating app that triggered the execution of the workflow run.
       - name: integration_key
         tests:
           - not_null
+        description: The code-friendly string of the app this step integrates with.
       - name: child_failure_count
         tests:
           - not_null
+        description: The number of steps that failed in the workflow run.
       - name: updated_at
         tests:
           - not_null
-      - name: is_test_run
-        tests:
-          - not_null
+        description: Used to build incremental models.
       - name: is_workflow_hard_deleted
         tests:
           - not_null
+        description: Whether the workflow was hard deleted from the database and therefore missing
       - name: executed_step_count
         tests:
           - not_null
+        description: The number of steps that were executed in the workflow run.
       - name: is_successful
         tests:
           - not_null
+        description: Whether the workflow run was successfully until the end or a safe exit.
       - name: destination_app
         tests:
           - not_null
+        description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
         tests:
           - not_null
+        description: The source and destination app integration in one string.

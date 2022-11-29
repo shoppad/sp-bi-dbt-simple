@@ -6,4 +6,4 @@ Some shop records are filtered out that meet the following criteria.
 
 - deleted: `(__hevo__marked_deleted)`
 - certain Shopify plans: `shopify_plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')`
-{% enddocs %}
+  {% enddocs %}

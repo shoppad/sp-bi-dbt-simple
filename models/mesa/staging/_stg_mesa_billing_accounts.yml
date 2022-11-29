@@ -13,13 +13,13 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['shopify', 'chargebee']
+              values: ["shopify", "chargebee"]
       - name: BILLING_OVERAGE_BUCKET_START_DATE_PT
       - name: BILLING_OVERAGE_BUCKET_END_DATE_PT
       - name: BILLING_OVERAGE_BYPASS_UNTIL
         tests:
           - dbt_utils.not_accepted_values:
-              values: ['null']
+              values: ["null"]
       - name: BILLING_OVERAGE_LAST_COUNT
       - name: DAILY_PLAN_REVENUE
       - name: BALANCE_USED

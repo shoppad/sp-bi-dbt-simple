@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/datacoves/pre-commit-dbt
+    rev: v2.0.0
+    hooks:
+      - id: dbt-compile
+      - id: check-script-semicolon
+        files: ^models
+      - id: check-script-has-no-table-name
+        files: ^models
+      - id: unify-column-description
+      - id: check-column-name-contract
+        args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+      - id: check-model-has-all-columns
+        name: Check columns - mart
+        files: ^models/mesa/mart
+      - id: check-model-has-tests
+        args: ["--test-cnt", "1", "--"]
+      - id: check-model-columns-have-desc
+        files: ^models/mesa/mart
+      - id: dbt-test
+      - id: dbt-docs-generate
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: end-of-file-fixer
+        exclude: ^.bumpversion.cfg
+      - id: trailing-whitespace
+        exclude: ^.bumpversion.cfg
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.0.0-alpha.4"
+    hooks:
+      - id: prettier

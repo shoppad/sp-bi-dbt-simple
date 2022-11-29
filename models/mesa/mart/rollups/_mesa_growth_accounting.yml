@@ -2,9 +2,27 @@ version: 2
 models:
   - name: mesa_growth_accounting
     columns:
-      - name: MONTH
-      - name: MAU
-      - name: RETAINED
-      - name: NEW
-      - name: RESURRECTED
-      - name: CHURNED
+      - name: month
+        description: The month of the revenue accounting.
+        tests:
+          - unique
+      - name: mau
+        description: The number of paying users in the month.
+        tests:
+          - not_null
+      - name: retained
+        description: The amount of revenue attributed to pre-existing customers before the period.
+        tests:
+          - not_null
+      - name: new
+        description: The amount of revenue attributed to new customers this period.
+        tests:
+          - not_null
+      - name: resurrected
+        description: The amount of revenue attributed to customers who were not active in the last period.
+        tests:
+          - not_null
+      - name: churned
+        description: The amount of revenue lost in the period from customers paying in the last period.
+        tests:
+          - not_null

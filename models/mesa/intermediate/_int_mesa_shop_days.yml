@@ -8,14 +8,16 @@ models:
           - relationships:
               to: ref('int_shops')
               field: shop_subdomain
+        description: The foreign key for the Shop.
       - name: dt
         tests:
           - not_null
           - dbt_utils.accepted_range:
-              max_value: "current_date()"
+              max_value: current_date()
       - name: workflow_runs_count
         tests:
           - not_null
+        description: The number of Workflow Run attempts that have been started.
       - name: workflow_runs_success_count
         tests:
           - not_null
@@ -25,15 +27,18 @@ models:
       - name: billed_count
         tests:
           - not_null
+        description: "[Fill]"
       - name: daily_usage_revenue
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count
         tests:
           - not_null
+        description: The number of workflow run attempts initiated in the last 30 days.
       - name: workflow_runs_rolling_year_count
         tests:
           - not_null
+        description: The number of workflow run attempts initiated in the last 365 days.
       - name: is_active
         tests:
           - not_null

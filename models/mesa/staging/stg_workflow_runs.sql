@@ -26,13 +26,13 @@ first_step_runs AS (
         metadata:trigger:trigger_key::STRING AS integration_key,
         COALESCE(metadata:child_fails, 0) AS child_failure_count,
         updated_at,
-        NOT(metadata:is_test = TRUE)  AS is_test_run
+        NOT(metadata:is_test = TRUE) AS is_test_run
     FROM {{ source('mesa_mongo', 'tasks') }}
     WHERE
         NOT(__hevo__marked_deleted)
         AND metadata:trigger:trigger_type = 'input'
         AND workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's
-        AND run_status IN ('fail','success','replayed','stop')
+        AND run_status IN ('fail', 'success', 'replayed', 'stop')
         AND NOT(integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
 )
 

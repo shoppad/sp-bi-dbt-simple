@@ -7,6 +7,5 @@ flow_events AS (
     WHERE shop_subdomain NOT IN (SELECT * FROM {{ ref('staff_subdomains') }})
 )
 
-SELECT
-    *
+SELECT *
 FROM flow_events

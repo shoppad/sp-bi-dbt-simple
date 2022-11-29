@@ -8,14 +8,15 @@ models:
       - name: currency
         tests:
           - not_null
-
+        description: The financial currency used by the Shop with its customers.
       - name: install_status
         tests:
           - not_null
-
+        description: The current Mesa app installation status of the Shop.
       - name: shopify_plan_name
         tests:
           - not_null
+        description: The Shopify plan used by the Shop.
       - name: SHOP_SUBDOMAIN
         tests:
           - not_null
@@ -26,12 +27,14 @@ models:
       - name: first_installed_at_pt
         tests:
           - not_null
+        description: The effective Created At for the Shop.
       - name: REFERRAL
-      - name: TIMESTAMP
       - name: latest_installed_at_pt
+        description: The most recent app installation date.
       - name: REVENUE_CURRENT_TOTAL
       - name: META
       - name: IS_BUILDER_WIZARD_COMPLETED
       - name: ACTIVATION_DATE_PT
       - name: UNINSTALLED_AT_PT
       - name: MINUTES_UNTIL_UNINSTALL
+      - name: PLAN_UPGRADE_DATE
