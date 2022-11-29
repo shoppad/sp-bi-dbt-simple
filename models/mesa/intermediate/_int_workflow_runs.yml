@@ -1,6 +1,9 @@
 version: 2
 models:
   - name: int_workflow_runs
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000000
     columns:
       - name: workflow_run_id
         tests:

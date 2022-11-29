@@ -8,7 +8,7 @@ SELECT
     {{ groomed_column_list(source_table, except=columns_to_skip)  | join(",\n       ") }},
     run_status = 'success' AND child_failure_count = 0 AS is_successful
 FROM {{ source_table }}
-WHERE is_test_run
+WHERE is_test_run = TRUE
 
 {% if is_incremental() %}
 -- this filter will only be applied on an incremental run

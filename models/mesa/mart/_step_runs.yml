@@ -16,10 +16,10 @@ models:
         description: The foreign key to the Workflow Run.
         tests:
           - not_null
-          - relationships:
-              field: workflow_run_id
+          - relationships_proportion:
               to: ref('workflow_runs')
-              # where: step_type='input'
+              field: workflow_run_id
+              error_if: ">1"
       - name: workflow_id
         description: The foreign key to the originating workflow
         tests:

@@ -42,7 +42,7 @@ decorated_step_runs AS (
         status AS run_status,
         metadata:trigger:trigger_name::VARCHAR AS workflow_step_name,
         metadata:trigger:trigger_key::VARCHAR AS workflow_step_key,
-        NOT(metadata:is_test = TRUE) AS is_test_run,
+        metadata:is_test AS is_test_run,
         {{ groomed_column_list(source('mesa_mongo', 'tasks'), except=columns_to_skip)  | join(",\n      ") }}
     FROM
         {{ source('mesa_mongo', 'tasks') }}

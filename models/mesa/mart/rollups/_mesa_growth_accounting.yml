@@ -10,19 +10,33 @@ models:
         description: The number of paying users in the month.
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Number
+
       - name: retained
         description: The amount of revenue attributed to pre-existing customers before the period.
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+
       - name: new
         description: The amount of revenue attributed to new customers this period.
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+
       - name: resurrected
         description: The amount of revenue attributed to customers who were not active in the last period.
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+
       - name: churned
         description: The amount of revenue lost in the period from customers paying in the last period.
         tests:
           - not_null
+        meta:
+          metabase.semantic_type: type/Currency

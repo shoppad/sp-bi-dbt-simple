@@ -26,7 +26,7 @@ first_step_runs AS (
         metadata:trigger:trigger_key::STRING AS integration_key,
         COALESCE(metadata:child_fails, 0) AS child_failure_count,
         updated_at,
-        NOT(metadata:is_test = TRUE) AS is_test_run
+        metadata:is_test AS is_test_run
     FROM {{ source('mesa_mongo', 'tasks') }}
     WHERE
         NOT(__hevo__marked_deleted)
@@ -34,16 +34,22 @@ first_step_runs AS (
         AND workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's
         AND run_status IN ('fail', 'success', 'replayed', 'stop')
         AND NOT(integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
+),
+
+final AS (
+
+    SELECT
+        *,
+        workflows.workflow_id IS NULL AS is_workflow_hard_deleted
+    FROM first_step_runs
+    INNER JOIN shops USING (shop_subdomain)
+    LEFT JOIN workflows USING (workflow_id)
+
+    {% if is_incremental() -%}
+        WHERE
+            updated_at > '{{ get_max_updated_at() }}'
+    {% endif %}
+
 )
 
-SELECT
-    *,
-    workflows.workflow_id IS NULL AS is_workflow_hard_deleted
-FROM first_step_runs
-INNER JOIN shops USING (shop_subdomain)
-LEFT JOIN workflows USING (workflow_id)
-
-{% if is_incremental() -%}
-    WHERE
-        updated_at > '{{ get_max_updated_at() }}'
-{% endif %}
+SELECT * FROM final

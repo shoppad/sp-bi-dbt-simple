@@ -17,7 +17,6 @@ repos:
         args: ["--test-cnt", "1", "--"]
       - id: check-model-columns-have-desc
         files: ^models/mesa/mart
-      - id: dbt-test
       - id: dbt-docs-generate
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

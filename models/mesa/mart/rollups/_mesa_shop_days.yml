@@ -3,53 +3,67 @@ models:
   - name: mesa_shop_days
     tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
-          column_list: ["dt", "shop_subdomain"]
-
+          column_list:
+            - dt
+            - shop_subdomain
     columns:
       - name: shop_subdomain
+        description: The foreign key for the Shop.
         tests:
           - not_null
           - relationships:
               to: ref('shops')
               field: shop_subdomain
       - name: dt
+        description: The calendar date of the shop day.
         tests:
           - not_null
           - dbt_utils.accepted_range:
-              max_value: "getdate()"
+              max_value: getdate()
       - name: workflow_runs_success_count
+        description: The number of workflow runs that succeeded on this day.
         tests:
           - not_null
       - name: workflow_success_percent
+        description: The percentage of workflow runs that succeeded on this day.
         tests:
           - not_null
       - name: billed_count
+        description: "[Fill]"
         tests:
           - not_null
       - name: daily_usage_revenue
+        description: The amount of revenue from usage charges for this day.
         tests:
           - not_null
       - name: is_active
+        description: Whether the shop is considered active on this day.
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count
+        description: The number of workflow runs in the last 30 days.
         tests:
           - not_null
       - name: workflow_runs_rolling_year_count
+        description: The number of workflow runs in the last 365 days.
         tests:
           - not_null
       - name: daily_plan_revenue
+        description: The amount of revenue from plan charges for this day.
         tests:
           - not_null
       - name: inc_amount
+        description: The revenue attributed to this shop for this day
         tests:
           - not_null
         meta:
           metabase.semantic_type: type/currency
       - name: workflow_runs_count
+        description: The number of workflow run attempts in a given day
         tests:
           - not_null
       - name: mesa_shop_days_id
+        description: Unique identifier for each row
         tests:
           - not_null
           - unique

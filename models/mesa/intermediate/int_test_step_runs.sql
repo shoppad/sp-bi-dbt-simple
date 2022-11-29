@@ -9,7 +9,7 @@ WITH test_runs AS (
         step_run_on_pt AS test_step_run_on_pt,
         {{ groomed_column_list(source_table, except=columns_to_skip) | join(',\n        ') }}
     FROM {{ source_table }}
-    WHERE is_test_run
+    WHERE is_test_run = TRUE
 )
 
 SELECT *
