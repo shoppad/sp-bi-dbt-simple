@@ -1,0 +1,5 @@
+version: 2
+models:
+  - name: calendar_dates
+    columns:
+      - name: DATE_DAY

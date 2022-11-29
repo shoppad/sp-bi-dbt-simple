@@ -15,7 +15,6 @@ models:
       - name: template_name
         description: The name of the template the workflow originated from.
 
-      - name: CREATED_AT
       - name: SHOP_SUBDOMAIN
       - name: TITLE
       - name: IS_PREMIUM
@@ -23,3 +22,5 @@ models:
       - name: KEY
       - name: TAGS
       - name: IS_ENABLED
+      - name: UPDATED_AT_PT
+      - name: CREATED_AT_PT

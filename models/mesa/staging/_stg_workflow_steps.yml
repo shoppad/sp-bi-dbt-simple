@@ -9,3 +9,4 @@ models:
       - name: step_type
       - name: STEP_WEIGHT
       - name: POSITION_IN_WORKFLOW
+      - name: IS_DELETED

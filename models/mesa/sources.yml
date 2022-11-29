@@ -147,7 +147,6 @@ sources:
           - name: id
             description: Unique identifier for the flow event.
 
-
   - name: php_segment
     description: Identified users via the GETMESA Segment app.
     schema: php

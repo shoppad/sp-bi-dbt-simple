@@ -38,9 +38,9 @@ models:
       - name: CREATED_AT_PT
       - name: TRIAL_ENDS_PT
       - name: CHARGEBEE_ID
-      - name: UPDATED_AT_PT
       - name: PLAN_TYPE
       - name: DAYS_COMPLETE
       - name: PLAN_ID
       - name: PLAN_INTERVAL
       - name: TRIAL_DAYS
+      - name: BILLING_UPDATED_AT_PT

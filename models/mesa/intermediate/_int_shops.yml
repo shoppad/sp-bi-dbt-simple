@@ -21,10 +21,8 @@ models:
           - not_null
           - unique
       - name: REVENUE_INITIAL_TOTAL
-      - name: METHOD
       - name: ORDERS_CURRENT_COUNT
       - name: ORDERS_INITIAL_COUNT
-      - name: HANDLE
       - name: first_installed_at_pt
         tests:
           - not_null
@@ -35,3 +33,5 @@ models:
       - name: META
       - name: IS_BUILDER_WIZARD_COMPLETED
       - name: ACTIVATION_DATE_PT
+      - name: UNINSTALLED_AT_PT
+      - name: MINUTES_UNTIL_UNINSTALL

@@ -4,4 +4,3 @@
     end_date="current_date()"
    )
 }}
-

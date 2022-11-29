@@ -31,9 +31,7 @@ models:
       - name: install_status
       - name: status
       - name: referral
-      - name: method
       - name: meta
-      - name: handle
       - name: timestamp
       - name: latest_installed_at_pt
       - name: billing_method_name
@@ -46,39 +44,61 @@ models:
       - name: activation_date_pt
       - name: is_activated
       - name: templates_installed_count
-      - name: BALANCE_USED
-      - name: SHOPIFY_ID
-      - name: ORDERS_CURRENT_COUNT
-      - name: PLAN_PRICE
-      - name: PLAN_USED
-      - name: PERCENT_COMPLETE
-      - name: BILLING_ON_PT
-      - name: PLAN_NAME
-      - name: PERCENT_USED
-      - name: OVERLIMIT_DATE_PT
-      - name: BALANCE_REMAINING
-      - name: ORDERS_INITIAL_COUNT
-      - name: START_DATE_PT
-      - name: END_DATE_PT
-      - name: REVENUE_INITIAL_TOTAL
-      - name: CREATED_AT_PT
-      - name: TRIAL_ENDS_PT
-      - name: CHARGEBEE_ID
-      - name: UPDATED_AT_PT
-      - name: PLAN_TYPE
-      - name: DAYS_COMPLETE
-      - name: PLAN_ID
-      - name: REVENUE_CURRENT_TOTAL
-      - name: PLAN_INTERVAL
-      - name: TRIAL_DAYS
-      - name: IS_BUILDER_WIZARD_COMPLETED
-      - name: HOTJAR_URL
-      - name: BACKDOOR_URL
+      - name: balance_used
+      - name: shopify_id
+      - name: orders_current_count
+      - name: plan_price
+      - name: plan_used
+      - name: percent_complete
+      - name: billing_on_pt
+      - name: plan_name
+      - name: percent_used
+      - name: overlimit_date_pt
+      - name: balance_remaining
+      - name: orders_initial_count
+      - name: start_date_pt
+      - name: end_date_pt
+      - name: revenue_initial_total
+      - name: created_at_pt
+      - name: trial_ends_pt
+      - name: chargebee_id
+      - name: billing_updated_at_pt
+      - name: plan_type
+      - name: days_complete
+      - name: plan_id
+      - name: revenue_current_total
+      - name: plan_interval
+      - name: trial_days
+      - name: is_builder_wizard_completed
+      - name: hotjar_url
+      - name: backdoor_url
+      - name: minutes_using_app
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.7
+              config:
+                where: "first_installed_at_pt > '2020-12-18'"
+      - name: workflow_runs_count
+        tests:
+          - not_null
+      - name: last_seen_in_app_at_pt
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.7
+      - name: workflow_run_success_count
+        tests:
+          - not_null
+      - name: minutes_until_uninstall
+      - name: first_seen_in_app_at_pt
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.7
+      - name: workflow_runs_rolling_thirty_day_count
+        tests:
+          - not_null
+      - name: days_to_activation
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.1
+      - name: WORKFLOW_RUNS_ROLLING_YEAR_COUNT
       - name: UNINSTALLED_APP_AT_PT
-      - name: MINUTES_USING_APP
-      - name: INSTALLED_APP_AT_PT
-      - name: WORKFLOW_RUNS_COUNT
-      - name: LAST_SEEN_IN_APP_AT_PT
-      - name: WORKFLOW_RUN_SUCCESS_COUNT
-      - name: MINUTES_UNTIL_UNINSTALL
-      - name: FIRST_SEEN_IN_APP_AT_PT

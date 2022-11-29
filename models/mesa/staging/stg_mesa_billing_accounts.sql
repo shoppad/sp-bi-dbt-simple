@@ -45,7 +45,7 @@ final AS (
         billing:method:shopify_id::FLOAT AS shopify_id,
         billing:plan:trial_days::FLOAT AS trial_days,
         {{ pacific_timestamp('to_timestamp(billing:plan:trial_ends::INT, 3)') }} AS trial_ends_pt,
-        {{ pacific_timestamp('billing:plan:updated_at::STRING') }} AS updated_at_pt,
+        {{ pacific_timestamp('billing:plan:updated_at::STRING') }} AS billing_updated_at_pt,
         billing:plan:billing_on::STRING AS billing_on_pt,
         billing:plan:overlimit_date::STRING AS overlimit_date_pt,
         billing:plan:balance_remaining::STRING AS balance_remaining,

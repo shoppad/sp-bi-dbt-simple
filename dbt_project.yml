@@ -28,7 +28,7 @@ vars:
     "dbt_date:time_zone": "America/Los_Angeles"
     etl_fields: ['CREATED_AT', '__HEVO__DATABASE_NAME', '__HEVO__INGESTED_AT', '__HEVO__LOADED_AT', '__HEVO__MARKED_DELETED', '__HEVO_ID']
     activation_workflow_run_count: 50
-    start_date: '2019-12-01'
+    start_date: '2018-01-01'
     segment:
         segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
 
@@ -55,6 +55,7 @@ models:
         mesa:
             mart:
                 step_runs:
+                    +materialized: incremental
                     +cluster_by: ['shop_subdomain']
                     +unique_key: step_run_id
 
@@ -69,6 +70,7 @@ models:
             intermediate:
                 +schema: support
                 int_step_runs:
+                    +materialized: incremental
                     +on_schema_change: "sync_all_columns"
                     +unique_key: step_run_id
                     +cluster_by: ['workflow_run_id']
@@ -83,6 +85,7 @@ models:
             staging:
                 +schema: support
                 stg_step_runs:
+                    +materialized: incremental
                     +on_schema_change: "sync_all_columns"
                     +unique_key: step_run_id
                     +cluster_by: ['workflow_run_id']

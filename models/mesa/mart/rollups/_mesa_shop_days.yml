@@ -25,13 +25,13 @@ models:
       - name: daily_usage_revenue
         tests:
           - not_null
-      - name: first_installed_at_pt
-        tests:
-          - not_null
       - name: is_active
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count
+        tests:
+          - not_null
+      - name: workflow_runs_rolling_year_count
         tests:
           - not_null
       - name: daily_plan_revenue
@@ -41,11 +41,11 @@ models:
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Currency
-      - name: WORKFLOW_RUNS_COUNT
+          metabase.semantic_type: type/currency
+      - name: workflow_runs_count
         tests:
           - not_null
-      - name: MESA_SHOP_DAYS_ID
+      - name: mesa_shop_days_id
         tests:
           - not_null
           - unique

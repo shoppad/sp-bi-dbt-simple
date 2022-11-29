@@ -12,40 +12,48 @@ models:
           - not_null
           - unique
 
-      - name: STATUS
-      - name: BILLING
-      - name: SCOPES
-      - name: THEMES
-      - name: ENTITLEMENTS
-      - name: REFERRAL
-      - name: METHOD
-      - name: META
-      - name: HANDLE
-      - name: TIMESTAMP
+      - name: status
+      - name: billing
+      - name: scopes
+      - name: themes
+      - name: entitlements
+      - name: referral
+      - name: method
+      - name: meta
+      - name: handle
+      - name: timestamp
       - name: first_installed_at_pt
         tests:
           - not_null
       - name: latest_installed_at_pt
         tests:
           - not_null
-      - name: MONGOID
-      - name: UUID
-      - name: __HEVO__MARKED_DELETED
-      - name: ANALYTICS
-      - name: WEBHOOKS
-      - name: _CREATED_AT
-      - name: AUTHTOKEN
-      - name: USAGE
-      - name: __HEVO__INGESTED_AT
-      - name: __HEVO__LOADED_AT
-      - name: WIZARD
-      - name: CONFIG
-      - name: SHOPIFY
-      - name: MESSAGES
-      - name: ACCOUNT
-      - name: METABASE
-      - name: SCHEMA
-      - name: GROUP
-      - name: __HEVO__DATABASE_NAME
-      - name: _ID
-      - name: __HEVO_ID
+      - name: mongoid
+      - name: uuid
+      - name: __hevo__marked_deleted
+      - name: analytics
+      - name: webhooks
+      - name: _created_at
+      - name: authtoken
+      - name: usage
+      - name: __hevo__ingested_at
+      - name: __hevo__loaded_at
+      - name: wizard
+      - name: config
+      - name: shopify
+      - name: messages
+      - name: account
+      - name: metabase
+      - name: schema
+      - name: group
+      - name: __hevo__database_name
+      - name: _id
+      - name: __hevo_id
+      - name: uninstalled_at_pt
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.5
+      - name: minutes_until_uninstall
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.5

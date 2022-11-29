@@ -13,9 +13,8 @@ models:
               field: shop_subdomain
               to: ref('shops')
       - name: template_name
-        description: The name of the template the workflow originated from.
+        description: the name of the template the workflow originated from.
 
-      - name: created_at
       - name: shop_subdomain
       - name: title
       - name: is_premium
@@ -40,3 +39,31 @@ models:
         tests:
           - not_null
 
+      - name: has_edited_or_saved_workflow
+        tests:
+          - not_null
+      - name: has_viewed_workflow
+        tests:
+          - not_null
+      - name: has_enabled_workflow
+        tests:
+          - not_null
+      - name: created_at_pt
+        tests:
+          - not_null
+      - name: updated_at_pt
+        tests:
+          - not_null
+      - name: enable_count
+        tests:
+          - not_null
+      - name: save_count
+        tests:
+          - not_null
+      - name: has_tested_workflow
+        tests:
+          - not_null
+      - name: has_tested_successfully_workflow
+        tests:
+          - not_null
+      - name: page_view_count

@@ -28,10 +28,10 @@ models:
       - name: daily_usage_revenue
         tests:
           - not_null
-      - name: first_installed_at_pt
+      - name: workflow_runs_rolling_thirty_day_count
         tests:
           - not_null
-      - name: workflow_runs_rolling_thirty_day_count
+      - name: workflow_runs_rolling_year_count
         tests:
           - not_null
       - name: is_active

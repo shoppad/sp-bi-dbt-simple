@@ -51,21 +51,26 @@ app_pageview_bookend_times AS (
     GROUP BY 1
 ),
 
-app_install_bookend_times AS (
-    {# TODO: Start logging Install and Uninstall events. Transition this to use those. #}
-    SELECT
-        id AS shop_subdomain,
-        {{ pacific_timestamp('APPS_MESA_INSTALLEDAT') }} AS installed_app_at_pt,
-        {{ pacific_timestamp('APPS_MESA_UNINSTALLEDAT') }} AS uninstalled_app_at_pt,
-        {{ datediff('installed_app_at_pt', 'uninstalled_app_at_pt', 'minute') }} AS minutes_until_uninstall
-    FROM {{ source('php_segment', 'users') }}
+yesterdays AS (
+    SELECT *
+    FROM {{ ref('mesa_shop_days') }}
+    WHERE dt = {{ pacific_timestamp('CURRENT_DATE()') }}::date - INTERVAL '1 day'
 ),
 
+current_rolling_counts AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(workflow_runs_rolling_thirty_day_count, 0) AS workflow_runs_rolling_thirty_day_count,
+        COALESCE(workflow_runs_rolling_year_count, 0) AS workflow_runs_rolling_year_count
+    FROM shops
+    LEFT JOIN yesterdays USING (shop_subdomain)
+),
 
 final AS (
     SELECT
         *,
         NOT(activation_date_pt IS NULL) AS is_activated,
+        {{ datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
         'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||
             shop_subdomain ||
             '/mesa' AS backdoor_url,
@@ -81,7 +86,7 @@ final AS (
     LEFT JOIN workflow_counts USING (shop_subdomain)
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
     LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
-    LEFT JOIN app_install_bookend_times USING (shop_subdomain)
+    LEFT JOIN current_rolling_counts USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
