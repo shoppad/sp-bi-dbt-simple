@@ -32,7 +32,7 @@ workflow_counts AS (
         ) AS first_successful_run_at_pt,
         COUNT(
             DISTINCT IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
-        ) AS run_start_count,
+        ) AS run_attempt_count,
         COUNT(
             DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
             {# TODO: is is_successful appropriate here? Do failed filter run results result in something besides success? #}
@@ -59,10 +59,10 @@ test_counts AS (
         MIN(
             IFF(is_successful, test_run_at_pt, NULL)
         ) AS first_successful_test_at_pt,
-        COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_start_count,
+        COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_attempt_count,
         COALESCE(COUNT_IF(test_runs.is_successful), 0) AS test_success_count,
-        test_start_count = 0 AS has_tested_workflow,
-        test_success_count = 0 AS has_tested_successfully_workflow
+        test_attempt_count = 0 AS has_test_attempted_workflow,
+        test_success_count = 0 AS has_test_succeeded_workflow
     FROM workflows
     LEFT JOIN test_runs USING (workflow_id)
     GROUP BY 1

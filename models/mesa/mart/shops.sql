@@ -32,7 +32,7 @@ workflow_counts AS (
 workflow_run_counts AS (
     SELECT
         shop_subdomain,
-        COALESCE(SUM(run_start_count), 0) AS workflow_runs_count,
+        COALESCE(SUM(run_attempt_count), 0) AS workflow_runs_count,
         COALESCE(SUM(run_success_count), 0) AS workflow_run_success_count
     FROM shops
     LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)

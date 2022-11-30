@@ -13,57 +13,110 @@ models:
               field: shop_subdomain
               to: ref('shops')
       - name: template_name
-        description: the name of the template the workflow originated from.
+        description: The Shop-provided name of the template the workflow originated from.
 
-      - name: shop_subdomain
       - name: title
+        description: The title of the workflow.
+        tests:
+          - not_null
       - name: is_premium
+        description: Whether the workflow is premium or not.
+        tests:
+          - not_null
       - name: description
+        description: The Shop-provided description of the workflow.
+        tests:
+          - not_null
       - name: key
+        description: The code-friendly key of the workflow.
+        tests:
+          - not_null
       - name: tags
+        description: The tags associated with the workflow.
+        tests:
+          - not_null
       - name: step_count
+        description: The current number of steps in the workflow.
         tests:
           - dbt_utils.accepted_range:
               max_value: 40
       - name: first_run_at_pt
+        description: The timestamp of the first run of the workflow.
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.1
       - name: first_successful_run_at_pt
-      - name: run_start_count
+        description: The timestamp of the first successful run of the workflow in PT.
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.1
+      - name: run_attempt_count
+        description: The number of times the workflow has been run.
+        tests:
+          - not_null
       - name: run_success_count
+        description: The number of times the workflow has been run successfully.
+        tests:
+          - not_null
       - name: is_enabled
+        description: Whether the workflow is currently enabled or not.
+        tests:
+          - not_null
       - name: first_test_at_pt
+        description: The timestamp of the first test attempt of the workflow in PT.
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.1
       - name: first_successful_test_at_pt
-      - name: test_start_count
+        description: The timestamp of the first successful test attempt of the workflow in PT.
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.1
+      - name: test_attempt_count
+        description: The number of times the workflow has had a test attempt.
         tests:
           - not_null
       - name: test_success_count
+        description: The number of times the workflow has had a successful test attempt.
         tests:
           - not_null
-
       - name: has_edited_or_saved_workflow
+        description: Whether the workflow has been edited or saved. Determined by presence of `workflow_save` and `dashboard_workflow_edit` events.
         tests:
           - not_null
       - name: has_viewed_workflow
+        description: Whether the workflow has been viewed. Determined by presence of Pageview of the workflow's URL.
         tests:
           - not_null
       - name: has_enabled_workflow
+        description: Whether the workflow has been enabled. Determined by presence of `workflow_enable` event featuring the workflow_id.
         tests:
           - not_null
       - name: created_at_pt
+        description: The timestamp of the workflow's creation in PT.
         tests:
           - not_null
       - name: updated_at_pt
+        description: The timestamp of the workflow's last update in PT.
         tests:
           - not_null
       - name: enable_count
+        description: The number of times the workflow has been enabled.
         tests:
           - not_null
       - name: save_count
+        description: The number of times the workflow has been saved.
         tests:
           - not_null
-      - name: has_tested_workflow
+      - name: has_test_attempted_workflow
+        description: Whether the workflow has had a test attempt.
         tests:
           - not_null
-      - name: has_tested_successfully_workflow
+      - name: has_test_succeeded_workflow
+        description: Whether the workflow has had a successful test attempt.
         tests:
           - not_null
       - name: page_view_count
+        description: The number of times the workflow has been viewed.
+        tests:
+          - not_null
