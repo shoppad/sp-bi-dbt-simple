@@ -14,6 +14,7 @@ repos:
         name: Check columns - mart
         files: ^models/mesa/mart
       - id: check-model-has-tests
+        files: ^models/mesa/mart
         args: ["--test-cnt", "1", "--"]
       - id: check-model-columns-have-desc
         files: ^models/mesa/mart
