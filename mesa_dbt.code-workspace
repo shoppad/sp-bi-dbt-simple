@@ -75,7 +75,7 @@
         "dorzey.vscode-dbt-language",
         "fivetran.dbt-language-server"
       ],
-      "todo-tree.excludeGlobs": ["target/", "logs/"]
+      "todo-tree.excludeGlobs": ["target/", "logs/", ".git/"]
   },
 
   "editor.quickSuggestions": {

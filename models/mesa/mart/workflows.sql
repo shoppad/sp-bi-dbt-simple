@@ -35,7 +35,7 @@ workflow_counts AS (
         ) AS run_attempt_count,
         COUNT(
             DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
-            {# TODO: is is_successful appropriate here? Do failed filter run results result in something besides success? #}
+            {# ?: is is_successful appropriate here? Do failed filter runs result in something besides success? #}
         ) AS run_success_count
     FROM workflows
     LEFT JOIN workflow_steps USING (workflow_id)
@@ -102,6 +102,7 @@ workflow_enables AS (
     SELECT
         workflow_id,
         COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id = properties_workflow_id), 0) AS enable_count,
+        {# TODO: Which event_ids do we want to count? #}
         enable_count > 0 AS has_enabled_workflow
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
