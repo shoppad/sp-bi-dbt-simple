@@ -79,11 +79,10 @@ models:
           +unique_key: shop_subdomain
 
       intermediate:
+        +materialized: view
         +schema: support
         int_shop_calendar:
-          +materialized: view
         int_step_runs:
-          +materialized: incremental
           +on_schema_change: "sync_all_columns"
           +unique_key: step_run_id
           +cluster_by: ["workflow_run_id"]
@@ -96,23 +95,18 @@ models:
           +unique_key: shop_subdomain
 
       staging:
+        +materialized: view
         +schema: support
-        calendar_dates:
-          +materialized: view
         stg_step_runs:
-          +materialized: view
           +on_schema_change: "sync_all_columns"
           +unique_key: step_run_id
           +cluster_by: ["workflow_run_id"]
         stg_workflows:
-          +materialized: view
           +unique_key: workflow_id
         stg_workflow_runs:
-          +materialized: view
           +on_schema_change: "sync_all_columns"
           +unique_key: workflow_run_id
           +cluster_by: ["shop_subdomain"]
         stg_shops:
-          +materialized: view
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
