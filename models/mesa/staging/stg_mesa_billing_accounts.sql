@@ -60,6 +60,7 @@ final AS (
         billing:plan:balance_used::STRING AS balance_used,
         billing:plan_type::STRING AS plan_type,
         IFF(plan_price = '', '0', IFF(plan_interval = 'annual', plan_price / 365, plan_price / 30)) AS daily_plan_revenue
+        {# TODO: Replace daily_plan_revenue with backfilled logic to account for historical plan upgrades & downgrades. #}
     FROM shops
 )
 

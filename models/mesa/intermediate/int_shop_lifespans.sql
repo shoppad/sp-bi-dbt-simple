@@ -8,7 +8,7 @@ workflow_run_dates AS (
     GROUP BY 1
 ),
 
-charge_dates AS(
+charge_dates AS (
     SELECT
         shop_subdomain,
         MIN(charged_on_pt) AS first_dt,
@@ -23,6 +23,17 @@ shop_dates AS (
         first_installed_at_pt::date AS first_dt,
         IFNULL(uninstalled_at_pt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }})::date AS last_dt
     FROM {{ ref('stg_shops') }}
+),
+
+custom_app_revenue AS (
+
+    SELECT
+        shop_subdomain,
+        first_dt,
+        COALESCE(last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}) AS last_dt
+        {# TODO: Add start/end dates to custom apps. #}
+    FROM {{ ref('custom_app_daily_revenues') }}
+
 ),
 
 combined_dates AS (
@@ -41,7 +52,7 @@ combined_dates AS (
         FROM shop_dates
         UNION ALL
         SELECT *
-        FROM shop_dates
+        FROM custom_app_revenue
     )
     GROUP BY 1
 ),

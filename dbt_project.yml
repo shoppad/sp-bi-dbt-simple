@@ -41,6 +41,11 @@ vars:
 
 seeds:
   +schema: seed_data
+  shoppad:
+    custom_app_daily_revenues:
+      +column_types:
+        first_dt: DATE
+        last_dt: DATE
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -79,7 +84,7 @@ models:
           +unique_key: shop_subdomain
 
       intermediate:
-        +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
+        # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
         int_shop_calendar:
         int_step_runs:
@@ -95,7 +100,7 @@ models:
           +unique_key: shop_subdomain
 
       staging:
-        +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
+        # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
         stg_step_runs:
           +on_schema_change: "sync_all_columns"

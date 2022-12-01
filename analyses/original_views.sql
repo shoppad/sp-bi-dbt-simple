@@ -19,8 +19,8 @@ CREATE OR REPLACE VIEW "M3_STORES_VW" AS SELECT *,'fablet' as APP_HANDLE, CONVER
 
 -- Segment events
 -- CREATE OR REPLACE VIEW "MONGO"."GETMESA"."AUTOMATION_VW" AS SELECT * FROM "MONGO"."GETMESA"."AUTOMATION" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
-CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_DASHBOARD_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_DASHBOARD" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
-CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_TEST_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_TEST" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
+{# CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_DASHBOARD_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_DASHBOARD" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"); #}
+{# CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_TEST_VW" AS SELECT * FROM "MONGO"."GETMESA"."MESA_TEST" WHERE USER_ID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"); #}
 
 -- CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_WORKFLOW_VW" AS SELECT
 --     "AUTOMATION".*,
@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_TEST_VW" AS SELECT * FROM "MONGO"
 -- LEFT JOIN "MONGO"."PUBLIC"."SP_MESA_MERCHANTS_FACTS_VW" "SP_MESA_MERCHANTS_FACTS_VW" ON "AUTOMATION"."USER_ID" = "SP_MESA_MERCHANTS_FACTS_VW"."UUID"
 -- WHERE "AUTOMATION"."USER_ID" NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
 
-CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_FLOW_VW" AS SELECT
+{# CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_FLOW_VW" AS SELECT
     "MESA_FLOW".*,
     CASE
         WHEN "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW"."ACTIVATED_AT" >= "MESA_FLOW"."TIMESTAMP" then 'activated'
@@ -40,7 +40,7 @@ CREATE OR REPLACE VIEW "MONGO"."GETMESA"."MESA_FLOW_VW" AS SELECT
     END AS FUNNEL_PHASE
 FROM "MONGO"."GETMESA"."MESA_FLOW" "MESA_FLOW"
 LEFT JOIN "MONGO"."PUBLIC"."SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW" ON "MESA_FLOW"."USER_ID" = "SP_MESA_MERCHANTS_FACTS_BY_UUID_VW"."UUID"
-WHERE "MESA_FLOW"."USER_ID" NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF");
+WHERE "MESA_FLOW"."USER_ID" NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"); #}
 
 -- You may need to run this as ACCOUNTADMIN
 GRANT SELECT on all views in schema "MONGO"."GETMESA" to role PIPELINE;
@@ -76,16 +76,16 @@ CREATE OR REPLACE VIEW "SP_CONSTELLATION_FACTS_VW" AS
 -- Load constellation partner export
 -- Use the snowsql command on the terminal and put in password when prompted
 -- Run commands one at a time
-create or replace stage partner_stage;
+{# create or replace stage partner_stage;
 create or replace file format partner_format type = 'csv' field_delimiter = ',' FIELD_OPTIONALLY_ENCLOSED_BY ='"' skip_header = 1;
 put file:///Users/aaronwadler/Desktop/partner_export.csv @partner_stage;
 create or replace table SP_PARTNER_EXPORT (
     SHOP VARCHAR(16777216),
     CHARGE_CREATION_TIME TIMESTAMP_NTZ,
     PARTNER_SALE FLOAT
-);
-copy into SP_PARTNER_EXPORT(SHOP, CHARGE_CREATION_TIME, PARTNER_SALE) from (select t.$3, replace(t.$5, ' UTC', ''), t.$8 from @partner_stage t) file_format = (format_name = 'partner_format');
-create or replace table "SP_CONSTELLATION_LTV" as
+); #}
+{# copy into SP_PARTNER_EXPORT(SHOP, CHARGE_CREATION_TIME, PARTNER_SALE) from (select t.$3, replace(t.$5, ' UTC', ''), t.$8 from @partner_stage t) file_format = (format_name = 'partner_format'); #}
+{# create or replace table "SP_CONSTELLATION_LTV" as
     with last_30 as (
         select shop,
         sum(partner_sale) as sales
@@ -119,16 +119,16 @@ create or replace table "SP_CONSTELLATION_LTV" as
     join last_30 on shops.shop = last_30.shop
     join last_90 on shops.shop = last_90.shop
     join all_time on shops.shop = all_time.shop;
-DROP TABLE SP_PARTNER_EXPORT;
+DROP TABLE SP_PARTNER_EXPORT; #}
 
 -- Mesa-specific
-CREATE OR REPLACE VIEW "SP_MESA_LOOKUP-TABLE_VW" AS SELECT t1.UUID as UUID, max(t2._ID) as MESA_ID from "MONGO"."PUBLIC"."M3_MESA_AUTOMATIONS" t1 right join "MONGO"."PUBLIC"."M3_MESA" t2 on t1.uuid = t2.uuid group by t1.uuid;
+{# CREATE OR REPLACE VIEW "SP_MESA_LOOKUP-TABLE_VW" AS SELECT t1.UUID as UUID, max(t2._ID) as MESA_ID from "MONGO"."PUBLIC"."M3_MESA_AUTOMATIONS" t1 right join "MONGO"."PUBLIC"."M3_MESA" t2 on t1.uuid = t2.uuid group by t1.uuid; #}
 {# CREATE OR REPLACE VIEW "M3_MESA_TRIGGERS_VW" AS
     SELECT *,
     (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_TRIGGERS t1
 -- CREATE OR REPLACE VIEW "M3_MESA_AUTOMATIONS_VW" AS SELECT *, CONVERT_TIMEZONE('UTC', 'America/Los_Angeles', _CREATED_AT) as _CREATED_AT_PT, (select max(_ID) from "M3_MESA" t2 where t1.uuid = t2.uuid) as MESA_ID FROM MONGO.PUBLIC.M3_MESA_AUTOMATIONS t1 WHERE UUID NOT IN (select UUID from SP_STAFF) and __HEVO__MARKED_DELETED = false; #}
 {# CREATE OR REPLACE VIEW "M3_MESA_ENTITLEMENTS_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name as NAME, lv.value:status as STATUS, lv.value:value as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.entitlements) lv #}
-CREATE OR REPLACE VIEW "M3_MESA_META_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name::string as NAME, lv.value:status::string as STATUS, lv.value:value::string as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.meta) lv
+{# CREATE OR REPLACE VIEW "M3_MESA_META_VW" AS SELECT ROW_NUMBER() over (order by _ID DESC) as _ID, t1._id as PARENT_ID, lv.value:name::string as NAME, lv.value:status::string as STATUS, lv.value:value::string as VALUE FROM M3_MESA t1, LATERAL FLATTEN(input => t1.meta) lv #}
 {# CREATE OR REPLACE VIEW "M3_MESA_CHARGES_VW" AS SELECT * FROM "MONGO"."PUBLIC"."M3_MESA_CHARGES" WHERE UUID NOT IN (select UUID from "MONGO"."PUBLIC"."SP_STAFF"); #}
 CREATE OR REPLACE VIEW "M3_MESA_LAUNCH_SESSIONS_VW" AS SELECT "PUBLIC"."M3_MESA_META_VW"."_ID" AS "_ID", CAST("PUBLIC"."M3_MESA_META_VW"."VALUE" AS timestamp) AS "timestamp", "mesa"."_ID" AS "mesa_merchant_id", "mesa"."UUID" AS "uuid", "mesa"."_CREATED_AT_PT" AS "mesa_merchant_installed_at_pt" FROM "MONGO"."PUBLIC"."M3_MESA_META_VW" LEFT JOIN "MONGO"."PUBLIC"."M3_MESA_VW" "mesa" ON "PUBLIC"."M3_MESA_META_VW"."PARENT_ID" = "mesa"."_ID" WHERE "PUBLIC"."M3_MESA_META_VW"."NAME" = 'launchsessiondate';
 {#
