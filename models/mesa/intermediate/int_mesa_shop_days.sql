@@ -52,7 +52,7 @@ thirty_day_workflow_counts AS (
         dt,
         COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_runs_rolling_thirty_day_count
     FROM shop_calendar
-    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
+    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE dt BETWEEN DATEADD(day, -30, dt) AND dt
     GROUP BY 1, 2
 ),
@@ -61,9 +61,9 @@ year_workflow_counts AS (
     SELECT
         shop_subdomain,
         dt,
-        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_runs_rolling_year_count
+        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_runs_rolling_year_count
     FROM shop_calendar
-    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
+    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE dt BETWEEN DATEADD(day, -365, dt) AND dt
     GROUP BY 1, 2
 ),
@@ -82,3 +82,4 @@ final AS (
 )
 
 SELECT * FROM final
+WHERE shop_subdomain = 'couturebylolita'
