@@ -61,8 +61,8 @@ test_counts AS (
         ) AS first_successful_test_at_pt,
         COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_attempt_count,
         COALESCE(COUNT_IF(test_runs.is_successful), 0) AS test_success_count,
-        test_attempt_count = 0 AS has_test_attempted_workflow,
-        test_success_count = 0 AS has_test_succeeded_workflow
+        test_attempt_count > 0 AS has_test_attempted_workflow,
+        test_success_count > 0 AS has_test_succeeded_workflow
     FROM workflows
     LEFT JOIN test_runs USING (workflow_id)
     GROUP BY 1

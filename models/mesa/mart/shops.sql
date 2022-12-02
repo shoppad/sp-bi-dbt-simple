@@ -50,6 +50,7 @@ app_pageview_bookend_times AS (
     WHERE page_url_host = 'app.getmesa.com'
     GROUP BY 1
 ),
+{# TODO: Change minutes_using_app to SUM() all session lengths. #}
 
 yesterdays AS (
     SELECT *
