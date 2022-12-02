@@ -16,15 +16,20 @@ price_per_actions AS (
     WHERE "name" = 'price_per_action'
 ),
 
+workflows AS (
+    SELECT * FROM {{ ref('workflows') }}
+
+)
+
 workflow_counts AS (
     SELECT
         shop_subdomain,
-        COUNT(*) AS workflows_created_count,
-        COUNT_IF(is_enabled) AS workflows_enabled_count,
+        COUNT(workflows.*) AS workflows_current_count,
+        COUNT_IF(is_enabled) AS workflows_enabled_current_count,
         COUNT_IF(first_successful_run_at_pt IS NOT NULL) AS workflows_successfully_run_count,
         COUNT(DISTINCT template_name) AS templates_installed_count
     FROM shops
-    LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
+    LEFT JOIN USING workflows (shop_subdomain)
     GROUP BY
         1
 ),

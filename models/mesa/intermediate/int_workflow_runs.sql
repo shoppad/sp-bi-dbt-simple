@@ -25,7 +25,7 @@ action_run_stats AS (
 final AS (
     SELECT
         *,
-        source_app || '-' || destination_app AS source_destination_pair,
+        source_app || ' - ' || destination_app AS source_destination_pair,
         child_failure_count = 0 and run_status = 'success' AS is_successful
     FROM workflow_runs
     LEFT JOIN action_run_stats USING (workflow_run_id)
