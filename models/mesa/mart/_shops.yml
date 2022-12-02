@@ -175,3 +175,5 @@ models:
         description: The source that the Shop was acquired through.
       - name: acquisition_source_medium
         description: The source & medium that the Shop was acquired through.
+      - name: funnel_phase
+        description: The top-level step in the funnel that the Shop is currently in.

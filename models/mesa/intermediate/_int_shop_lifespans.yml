@@ -8,6 +8,9 @@ models:
           or_equal: true
     columns:
       - name: shop_subdomain
+        tests:
+          - unique
+        description: The foreign key for the Shop.
       - name: first_dt
       - name: last_dt
       - name: LIFESPAN_LENGTH

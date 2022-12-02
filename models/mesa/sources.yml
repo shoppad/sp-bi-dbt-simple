@@ -148,6 +148,11 @@ sources:
         columns:
           - name: id
             description: Unique identifier for the flow event.
+      - name: workflow_events
+        identifier: automation
+        columns:
+          - name: id
+            description: Unique identifier for the workflow event.
 
   - name: php_segment
     description: Identified users via the GETMESA Segment app.

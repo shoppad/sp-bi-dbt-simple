@@ -14,6 +14,8 @@ models:
           - relationships:
               to: ref('shops')
               field: shop_subdomain
+              config:
+                where: NOT(shop_subdomain ILIKE '%dev%')
       - name: dt
         description: The calendar date of the shop day.
         tests:
@@ -59,7 +61,7 @@ models:
         meta:
           metabase.semantic_type: type/currency
       - name: workflow_runs_count
-        description: The number of workflow run attempts in a given day
+        description: The number of Workflow Run attempts that have been started.
         tests:
           - not_null
       - name: mesa_shop_days_id

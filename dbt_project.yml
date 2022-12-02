@@ -98,6 +98,8 @@ models:
         int_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
+        int_workflow_event_achievements:
+          +materialized: ephemeral
 
       staging:
         # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
@@ -119,6 +121,6 @@ tests:
   shoppad:
     mesa:
       staging:
-        enabled: "{{ target.name not in ['prod', 'default'] }}"
+        enabled: false #"{{ target.name not in ['prod', 'default'] }}"
       intermediate:
-        enabled: "{{ target.name not in ['prod', 'default'] }}"
+        enabled: false #"{{ target.name not in ['prod', 'default'] }}"

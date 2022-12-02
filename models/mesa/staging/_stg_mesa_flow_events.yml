@@ -33,7 +33,7 @@ models:
       - name: sent_at
       - name: context_campaign_content
       - name: event_text
-      - name: id
+      - name: mesa_flow_event_id
         tests:
           - unique
           - not_null
@@ -52,9 +52,6 @@ models:
       - name: properties_button_color
       - name: properties_state
       - name: properties_name
-      - name: user_id
-        tests:
-          - not_null
       - name: uuid_ts
       - name: app_name
       - name: context_app_version

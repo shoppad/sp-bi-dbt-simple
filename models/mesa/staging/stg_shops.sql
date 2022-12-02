@@ -10,7 +10,9 @@ install_dates AS (
     SELECT
         uuid::string AS shop_subdomain,
         {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at_pt,
-        {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at_pt
+        {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at_pt,
+        date_trunc('week', first_installed_at_pt)::date AS cohort_week,
+        date_trunc('month', first_installed_at_pt)::date AS cohort_month
     FROM {{ source_table }}
     WHERE NOT(__hevo__marked_deleted)
     GROUP BY 1
@@ -25,7 +27,7 @@ uninstall_dates AS (
 
 shops AS (
     SELECT
-        *,
+        {{ groomed_column_list(source_table, except=['_id', 'uuid','group']) | join(',\n      ') }},
         uuid::string AS shop_subdomain
     FROM {{ source_table }}
     WHERE NOT(shop_subdomain IN (SELECT * FROM staff_subdomains))
@@ -36,7 +38,7 @@ shops AS (
 
 plan_upgrade_dates AS (
     SELECT
-        user_id AS shop_subdomain,
+        shop_subdomain,
         MIN(timestamp)::date as plan_upgrade_date
     FROM {{ ref('stg_mesa_flow_events') }}
     WHERE event_id IN ('plan_upgrade', 'plan_select')

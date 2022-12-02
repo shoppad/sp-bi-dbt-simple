@@ -1,4 +1,12 @@
 WITH
+shop_cohort_dates AS (
+    SELECT
+        shop_subdomain,
+        cohort_week,
+        cohort_month
+    FROM {{ ref('stg_shops') }}
+),
+
 shop_calendar AS (
     SELECT *
     FROM {{ ref('int_shop_calendar') }}
@@ -79,7 +87,7 @@ final AS (
     LEFT JOIN daily_charges USING (shop_subdomain, dt)
     LEFT JOIN thirty_day_workflow_counts USING (shop_subdomain, dt)
     LEFT JOIN year_workflow_counts USING (shop_subdomain, dt)
+    LEFT JOIN shop_cohort_dates USING (shop_subdomain)
 )
 
 SELECT * FROM final
-WHERE shop_subdomain = 'couturebylolita'
