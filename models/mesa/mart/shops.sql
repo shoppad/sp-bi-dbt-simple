@@ -19,7 +19,7 @@ price_per_actions AS (
 workflows AS (
     SELECT * FROM {{ ref('workflows') }}
 
-)
+),
 
 workflow_counts AS (
     SELECT
