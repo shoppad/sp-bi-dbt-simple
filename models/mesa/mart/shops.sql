@@ -29,7 +29,7 @@ workflow_counts AS (
         COUNT_IF(first_successful_run_at_pt IS NOT NULL) AS workflows_successfully_run_count,
         COUNT(DISTINCT template_name) AS templates_installed_count
     FROM shops
-    LEFT JOIN USING workflows (shop_subdomain)
+    LEFT JOIN workflows USING (shop_subdomain)
     GROUP BY
         1
 ),
