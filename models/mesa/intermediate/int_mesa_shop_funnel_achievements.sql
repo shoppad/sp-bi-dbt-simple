@@ -12,8 +12,16 @@ workflow_achievements AS (
     SELECT
         shop_subdomain,
         achieved_at_pt,
-        action AS key
+        action AS key,
+        'workflow_events' AS source
     FROM {{ ref('int_workflow_event_achievements') }}
+    UNION ALL
+    SELECT
+        shop_subdomain,
+        achieved_at_pt,
+        action AS key,
+        'mesa_flow_events' AS source
+    FROM {{ ref('int_mesa_flow_achievements') }}
 ),
 
 funnel_achievements AS (
@@ -22,7 +30,7 @@ funnel_achievements AS (
         funnel_steps.*,
         achieved_at_pt
     FROM funnel_steps
-    LEFT JOIN workflow_achievements USING (key)
+    LEFT JOIN workflow_achievements USING (key, source)
     INNER JOIN shops USING (shop_subdomain)
 )
 

@@ -1,9 +1,9 @@
 name, key, step_order, source
-"Added a Step to a Workflow",create_new_workflow_action_click, 2, workflow_events
-"Created a Workflow",create, 3, workflow_events
-"Installed a Template",install_template, 3, workflow_events
-"Created a Workflow",workflow_create, 3, mesa_flow_events
-"Created a Workflow",workflow_install_template, 3, mesa_flow_events
-"Saved a Workflow",workflow_save, 4, workflow_events
-"Tested a Workflow",test, 5, workflow_events
-"Enabled a Workflow",enable, 6, workflow_events
+"Added a Step to a Workflow",create_new_workflow_action_click, 2,workflow_events
+"Created a Workflow",create, 3,workflow_events
+"Installed a Template",install_template, 3,workflow_events
+"Created a Workflow",workflow_create, 3,mesa_flow_events
+"Created a Workflow",workflow_install_template, 3,mesa_flow_events
+"Saved a Workflow",workflow_save, 4,workflow_events
+"Tested a Workflow",test, 5,workflow_events
+"Enabled a Workflow",enable, 6,workflow_events
