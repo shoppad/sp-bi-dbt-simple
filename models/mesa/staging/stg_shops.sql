@@ -27,7 +27,7 @@ uninstall_dates AS (
 
 shops AS (
     SELECT
-        {{ groomed_column_list(source_table, except=['_id', 'uuid','group']) | join(',\n      ') }},
+        {{ groomed_column_list(source_table, except=['_id', '_created_at', 'uuid','group']) | join(',\n      ') }},
         uuid::string AS shop_subdomain
     FROM {{ source_table }}
     WHERE NOT(shop_subdomain IN (SELECT * FROM staff_subdomains))

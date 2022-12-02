@@ -10,7 +10,7 @@ mesa_flow_events AS (
 step_achievements AS (
     SELECT
         shop_subdomain,
-        action,
+        event_id AS action,
         {{ pacific_timestamp('MIN(timestamp)') }} AS achieved_at_pt
     FROM shops
     INNER JOIN mesa_flow_events USING (shop_subdomain)
