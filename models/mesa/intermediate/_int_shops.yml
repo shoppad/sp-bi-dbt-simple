@@ -21,20 +21,36 @@ models:
         tests:
           - not_null
           - unique
+        description: The foreign key for the Shop.
       - name: revenue_initial_total
+        description: the 30-day gmv of the shop at the time of installation.
       - name: orders_current_count
+        description: the current monthly order volume of the shop.
       - name: orders_initial_count
+        description: the 30-day order count volume at the time of app installation.
       - name: first_installed_at_pt
         tests:
           - not_null
         description: the effective created at for the shop.
       - name: referral
+        description: "[fill]"
       - name: latest_installed_at_pt
         description: the most recent app installation date.
       - name: revenue_current_total
+        description: the current 30-day gmv of the shop.
       - name: meta
+        description: a field used by account services to record onboarding sessions.
       - name: is_builder_wizard_completed
+        description: "[fill]"
       - name: activation_date_pt
+        description: the date the shop achieved the current definition of activated.
       - name: uninstalled_at_pt
+        description: the timestamp of the latest uninstallation of the app.
       - name: minutes_until_uninstall
+        description: the minutes between initial install and the latest uninstall.
       - name: plan_upgrade_date
+        description: the date of the first plan upgrade action.
+      - name: cohort_week
+        description: The week of the Shop's first app installation.
+      - name: cohort_month
+        description: The month of the Shop's first app installation.

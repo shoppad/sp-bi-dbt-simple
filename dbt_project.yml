@@ -117,6 +117,10 @@ models:
         stg_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
+
+    mesa_segment:
+      staging:
+        +schema: support
 tests:
   shoppad:
     mesa:

@@ -1,4 +1,9 @@
 WITH
+shops AS (
+    SELECT *
+    FROM {{ ref('shops') }}
+),
+
 workflow_setup_counts AS (
     SELECT
         cohort_week,

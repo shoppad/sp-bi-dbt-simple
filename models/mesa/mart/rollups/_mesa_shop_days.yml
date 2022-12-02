@@ -43,11 +43,11 @@ models:
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count
-        description: The number of workflow runs in the last 30 days.
+        description: The number of successful workflow run attempts initiated in the last 30 days.
         tests:
           - not_null
       - name: workflow_runs_rolling_year_count
-        description: The number of workflow runs in the last 365 days.
+        description: The number of successful workflow run attempts initiated in the last 365 days.
         tests:
           - not_null
       - name: daily_plan_revenue
@@ -55,7 +55,7 @@ models:
         tests:
           - not_null
       - name: inc_amount
-        description: The revenue attributed to this shop for this day
+        description: The revenue attributed to this shop for this day.
         tests:
           - not_null
         meta:
@@ -69,3 +69,11 @@ models:
         tests:
           - not_null
           - unique
+      - name: cohort_month
+        description: The month of the Shop's first app installation.
+        tests:
+          - not_null
+      - name: cohort_week
+        description: The week of the Shop's first app installation.
+        tests:
+          - not_null

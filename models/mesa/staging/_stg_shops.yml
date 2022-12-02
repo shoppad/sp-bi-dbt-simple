@@ -5,39 +5,39 @@ models:
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
-
     columns:
       - name: shop_subdomain
         tests:
           - not_null
           - unique
-
+        description: The foreign key for the Shop.
       - name: status
+        description: the usage status of the shop.
       - name: billing
       - name: scopes
       - name: themes
       - name: entitlements
       - name: referral
+        description: "[fill]"
       - name: method
       - name: meta
+        description: a field used by account services to record onboarding sessions.
       - name: handle
       - name: timestamp
       - name: first_installed_at_pt
         tests:
           - not_null
+        description: the effective created at for the shop.
       - name: latest_installed_at_pt
         tests:
           - not_null
+        description: the most recent app installation date.
       - name: mongoid
-      - name: uuid
-      - name: __hevo__marked_deleted
       - name: analytics
       - name: webhooks
       - name: _created_at
       - name: authtoken
       - name: usage
-      - name: __hevo__ingested_at
-      - name: __hevo__loaded_at
       - name: wizard
       - name: config
       - name: shopify
@@ -45,16 +45,19 @@ models:
       - name: account
       - name: metabase
       - name: schema
-      - name: group
-      - name: __hevo__database_name
-      - name: _id
-      - name: __hevo_id
       - name: uninstalled_at_pt
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
+        description: the timestamp of the latest uninstallation of the app.
       - name: minutes_until_uninstall
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
-      - name: PLAN_UPGRADE_DATE
+        description: the minutes between initial install and the latest uninstall.
+      - name: plan_upgrade_date
+        description: the date of the first plan upgrade action.
+      - name: cohort_week
+        description: The week of the Shop's first app installation.
+      - name: cohort_month
+        description: The month of the Shop's first app installation.

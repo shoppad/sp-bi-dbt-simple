@@ -1,0 +1,25 @@
+version: 2
+models:
+  - name: stg_workflow_events
+    columns:
+      - name: WORKFLOW_EVENT_ID
+      - name: SHOP_SUBDOMAIN
+      - name: TEMPLATE
+      - name: TIMESTAMP
+      - name: AUTOMATION_ID
+      - name: CATEGORY
+      - name: ORIGINAL_TIMESTAMP
+      - name: SENT_AT
+      - name: TASK_ID
+      - name: ACTION
+      - name: EVENT_TEXT
+      - name: ANONYMOUS_ID
+      - name: AUTOMATION_NAME
+      - name: CONTEXT_GOOGLE_ANALYTICS_CLIENT_ID
+      - name: CONTEXT_LIBRARY_NAME
+      - name: CONTEXT_LIBRARY_VERSION
+      - name: EVENT
+      - name: RECEIVED_AT
+      - name: UUID_TS
+      - name: DATA
+      - name: SOURCE
