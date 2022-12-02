@@ -1,0 +1,7 @@
+version: 2
+models:
+  - name: int_workflow_event_achievements
+    columns:
+      - name: SHOP_SUBDOMAIN
+      - name: ACTION
+      - name: ACHIEVED_AT_PT

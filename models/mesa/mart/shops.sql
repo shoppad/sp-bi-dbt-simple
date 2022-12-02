@@ -24,7 +24,7 @@ workflows AS (
 workflow_counts AS (
     SELECT
         shop_subdomain,
-        COUNT(workflows.*) AS workflows_current_count,
+        COUNT(DISTINCT workflows.workflow_id) AS workflows_current_count,
         COUNT_IF(workflows.is_enabled) AS workflows_enabled_current_count,
         COUNT_IF(workflows.first_successful_run_at_pt IS NOT NULL) AS workflows_successfully_run_count, {# TODO: This needs to be based on events or workflow_runs as Workflows will get deleted. #}
         COUNT(DISTINCT workflows.template_name) AS templates_installed_count

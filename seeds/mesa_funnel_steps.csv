@@ -7,3 +7,4 @@ name, key, step_order, source
 "Saved a Workflow",workflow_save, 4,workflow_events
 "Tested a Workflow",test, 5,workflow_events
 "Enabled a Workflow",enable, 6,workflow_events
+"Enabled a Workflow",workflow_enable, 6,mesa_flow_events
