@@ -125,4 +125,4 @@ tests:
       staging:
         enabled: false #"{{ target.name not in ['prod', 'default'] }}"
       intermediate:
-        enabled: false #"{{ target.name not in ['prod', 'default'] }}"
+        enabled: true #"{{ target.name not in ['prod', 'default'] }}"

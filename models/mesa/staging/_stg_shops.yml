@@ -35,7 +35,6 @@ models:
       - name: mongoid
       - name: analytics
       - name: webhooks
-      - name: _created_at
       - name: authtoken
       - name: usage
       - name: wizard

@@ -1,15 +1,26 @@
 WITH
-shop_cohort_dates AS (
-    SELECT
-        shop_subdomain,
-        cohort_week,
-        cohort_month
-    FROM {{ ref('stg_shops') }}
-),
 
 shop_calendar AS (
     SELECT *
     FROM {{ ref('int_shop_calendar') }}
+),
+
+first_shop_calendar_days AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS first_calendar_dt
+    FROM shop_calendar
+    GROUP BY 1
+),
+
+shop_cohort_dates AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(cohort_week, date_trunc('week', first_calendar_dt)::DATE) AS cohort_week,
+        COALESCE(cohort_month, date_trunc('month', first_calendar_dt)::DATE) AS cohort_month
+    FROM {{ ref('stg_shops') }}
+    FULL OUTER JOIN first_shop_calendar_days
+        USING (shop_subdomain)
 ),
 
 workflow_runs AS (
