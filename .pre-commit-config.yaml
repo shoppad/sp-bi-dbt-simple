@@ -2,9 +2,10 @@ repos:
   - repo: https://github.com/datacoves/pre-commit-dbt
     rev: v2.0.0
     hooks:
-      - id: dbt-compile
+      - id: dbt-docs-generate
       - id: check-script-semicolon
         files: ^models
+      - id: check-model-has-properties-file
       - id: check-script-has-no-table-name
         files: ^models
       - id: unify-column-description
@@ -18,7 +19,6 @@ repos:
         args: ["--test-cnt", "1", "--"]
       - id: check-model-columns-have-desc
         files: ^models/mesa/mart
-      - id: dbt-docs-generate
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
