@@ -68,7 +68,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ["success", "fail", "replayed", "running"]
+              values: ["success", "fail", "replayed", "running", "stop"]
       - name: tries
         description: The number of attempts to run the step.
       - name: updated_at
