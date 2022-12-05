@@ -39,7 +39,7 @@ decorated_step_runs AS (
         metadata:trigger:trigger_type::STRING AS step_type,
         metadata:trigger:trigger_name::STRING AS integration_name,
         metadata:trigger:trigger_key::STRING AS integration_key,
-        status AS run_status,
+        IFF(status ILIKE '%fail%', 'fail', status) AS run_status,
         metadata:trigger:trigger_name::VARCHAR AS workflow_step_name,
         metadata:trigger:trigger_key::VARCHAR AS workflow_step_key,
         metadata:is_test AS is_test_run,

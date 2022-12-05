@@ -67,6 +67,8 @@ models:
         description: The status of the step run. `success` or `failure`.
         tests:
           - not_null
+          - accepted_values:
+              values: ["success", "fail", "replayed", "running"]
       - name: tries
         description: The number of attempts to run the step.
       - name: updated_at
