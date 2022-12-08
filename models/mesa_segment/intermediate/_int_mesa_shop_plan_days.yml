@@ -1,0 +1,7 @@
+version: 2
+models:
+  - name: int_mesa_shop_plan_days
+    columns:
+      - name: DT
+      - name: SHOP_SUBDOMAIN
+      - name: DAILY_PLAN_REVENUE

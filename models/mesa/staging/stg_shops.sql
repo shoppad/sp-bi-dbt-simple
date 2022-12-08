@@ -11,8 +11,8 @@ install_dates AS (
         uuid::string AS shop_subdomain,
         {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at_pt,
         {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at_pt,
-        date_trunc('week', first_installed_at_pt)::date AS cohort_week,
-        date_trunc('month', first_installed_at_pt)::date AS cohort_month
+        date_trunc('week', first_installed_at_pt)::DATE AS cohort_week,
+        date_trunc('month', first_installed_at_pt)::DATE AS cohort_month
     FROM {{ source_table }}
     WHERE NOT(__hevo__marked_deleted)
     GROUP BY 1
@@ -48,6 +48,7 @@ plan_upgrade_dates AS (
 final AS (
     SELECT
         *,
+        TO_TIMESTAMP(billing:plan:trial_ends::NUMERIC)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall
     FROM shops
     LEFT JOIN install_dates USING (shop_subdomain)

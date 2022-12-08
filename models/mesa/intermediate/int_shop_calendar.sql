@@ -1,22 +1,17 @@
 WITH
-daily_plan_revenues_non_unique AS (
+shop_trial_end_dates AS (
     SELECT
         shop_subdomain,
-        daily_plan_revenue
-    FROM {{ ref('custom_app_daily_revenues') }}
-    UNION ALL
-    SELECT
-        shop_subdomain,
-        daily_plan_revenue
-    FROM {{ ref('stg_mesa_billing_accounts') }}
+        trial_end_dt AS dt
+    FROM {{ ref('stg_shops') }}
 ),
 
-summed_daily_plan_revenues AS (
+shop_plan_days AS (
     SELECT
-        shop_subdomain,
-        SUM(daily_plan_revenue) AS daily_plan_revenue
-    FROM daily_plan_revenues_non_unique
-    GROUP BY 1
+       shop_subdomain,
+       dt,
+       daily_plan_revenue
+    FROM {{ ref('int_mesa_shop_plan_days') }}
 ),
 
 shop_lifespans AS (
@@ -24,15 +19,25 @@ shop_lifespans AS (
     FROM {{ ref('int_shop_lifespans') }}
 ),
 
+calendar_dates AS (
+    SELECT date_day as dt
+    FROM {{ ref('calendar_dates') }}
+),
+
 shop_calendar AS (
     SELECT
         shop_subdomain,
-        date_day AS dt,
-        COALESCE(daily_plan_revenue, 0) AS daily_plan_revenue
+        dt,
+        CASE
+            WHEN NOT(shop_trial_end_dates.dt IS NULL OR dt <= shop_trial_end_dates.dt)
+                THEN COALESCE(daily_plan_revenue, 0)
+            ELSE 0
+            END AS daily_plan_revenue
     FROM shop_lifespans
-    INNER JOIN summed_daily_plan_revenues USING (shop_subdomain)
-    INNER JOIN {{ ref('calendar_dates') }}
+    INNER JOIN calendar_dates
         ON dt BETWEEN first_dt AND last_dt
+    LEFT JOIN shop_plan_days USING (shop_subdomain, dt)
+    LEFT JOIN shop_trial_end_dates USING (shop_subdomain)
 )
 
 SELECT *

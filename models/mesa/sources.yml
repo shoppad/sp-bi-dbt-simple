@@ -2,10 +2,10 @@ version: 2
 
 sources:
   - name: mesa_mongo
-    description: Imports of Mongo DB into Snowflake JSON objects
+    description: imports of mongo db into snowflake json objects
     database: mongo
     schema: public
-    loader: HEVO
+    loader: hevo
     loaded_at_field: __hevo__loaded_at::varchar::timestamp_ntz
 
     freshness:
@@ -25,46 +25,46 @@ sources:
     tables:
       - name: workflows
         identifier: m3_mesa_automations
-        description: Individual workflow records with user-input name, description, starting time and more.
+        description: individual workflow records with user-input name, description, starting time and more.
 
       - name: workflow_steps
         identifier: m3_mesa_triggers
-        description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
+        description: the individual steps of a workflow, including the step name, type, and the workflow it belongs to.
 
       - name: tasks
-        description: Individual step execution records with integration app, execution time, payload server response and more.
+        description: individual step execution records with integration app, execution time, payload server response and more.
 
         identifier: m3_mesa_tasks
 
         columns:
           - name: _id
-            description: Unique identifier for the task.
+            description: unique identifier for the task.
             tests:
               - unique
               - not_null
           - name: created_at
-            description: DO NOT USE. This column is sometimes NULL.
+            description: do not use. this column is sometimes null.
           - name: _created_at
-            description: The time the task was created.
+            description: the time the task was created.
             tests:
               - not_null
 
       - name: shops
         identifier: m3_mesa
-        description: Each installation record of a Mesa merchant application install.
+        description: each installation record of a mesa merchant application install.
 
         columns:
           - name: _id
-            description: Unique identifier for the shop account.
+            description: unique identifier for the shop account.
             tests:
               - unique
               - not_null
           - name: _created_at
-            description: The time the shop account was created by installing the app.
+            description: the time the shop account was created by installing the app.
             tests:
               - not_null
           - name: uuid
-            description: The shopify subdomain of the shop account.
+            description: the shopify subdomain of the shop account.
             tests:
               - not_null
 
@@ -72,7 +72,7 @@ sources:
         identifier: m3_mesa_charges
         columns:
           - name: _id
-            description: Unique identifier for the charge.
+            description: unique identifier for the charge.
             tests:
               - unique
               - not_null
@@ -83,10 +83,10 @@ sources:
         identifier: m3_mesa_installs
 
   - name: mesa_segment
-    description: Events and objects sent to Snowflake via Segment.com.
+    description: events and objects sent to snowflake via segment.com.
     database: mongo
     schema: getmesa
-    loader: Segment.com
+    loader: segment.com
     loaded_at_field: received_at
 
     freshness:
@@ -106,612 +106,614 @@ sources:
     tables:
       - name: pages
         identifier: pages
-        description: Page views on the Mesa website or app.
+        description: page views on the mesa website or app.
         columns:
           - name: id
-            description: Unique identifier for the page view.
-          - name: CONTEXT_PAGE_URL
-          - name: CONTEXT_CAMPAIGN_MEDIUM
-          - name: PATH
-          - name: CONTEXT_PAGE_PATH
-          - name: NAME
-          - name: ORIGINAL_TIMESTAMP
-          - name: REFERRER
-          - name: RECEIVED_AT
-          - name: SENT_AT
-          - name: CONTEXT_CAMPAIGN_UTM_CONTENT
-          - name: CONTEXT_CAMPAIGN_UTM_SOURCE
-          - name: ANONYMOUS_ID
-          - name: CONTEXT_APP_VERSION
-          - name: CONTEXT_LOCALE
-          - name: UUID_TS
-          - name: CONTEXT_USER_AGENT
-          - name: CONTEXT_PAGE_SEARCH
-          - name: CONTEXT_CAMPAIGN_UTM_CAMPAIGN
-          - name: TIMESTAMP
-          - name: CONTEXT_CAMPAIGN_UTM_MEDIUM
-          - name: CONTEXT_CAMPAIGN_NAME
-          - name: CONTEXT_PAGE_REFERRER
-          - name: SEARCH
-          - name: CONTEXT_LIBRARY_NAME
-          - name: CONTEXT_PAGE_TITLE
-          - name: CONTEXT_CAMPAIGN_CONTENT
-          - name: URL
-          - name: CONTEXT_IP
-          - name: CONTEXT_CAMPAIGN_TERM
-          - name: CONTEXT_CAMPAIGN_SOURCE
-          - name: CONTEXT_LIBRARY_VERSION
-          - name: USER_ID
-          - name: TITLE
+            description: unique identifier for the page view.
+          - name: context_page_url
+          - name: context_campaign_medium
+          - name: path
+          - name: context_page_path
+          - name: name
+          - name: original_timestamp
+          - name: referrer
+          - name: received_at
+          - name: sent_at
+          - name: context_campaign_utm_content
+          - name: context_campaign_utm_source
+          - name: anonymous_id
+          - name: context_app_version
+          - name: context_locale
+          - name: uuid_ts
+          - name: context_user_agent
+          - name: context_page_search
+          - name: context_campaign_utm_campaign
+          - name: timestamp
+          - name: context_campaign_utm_medium
+          - name: context_campaign_name
+          - name: context_page_referrer
+          - name: search
+          - name: context_library_name
+          - name: context_page_title
+          - name: context_campaign_content
+          - name: url
+          - name: context_ip
+          - name: context_campaign_term
+          - name: context_campaign_source
+          - name: context_library_version
+          - name: user_id
+          - name: title
       - name: flow_events
         identifier: mesa_flow
         columns:
           - name: id
-            description: Unique identifier for the flow event.
+            description: unique identifier for the flow event.
       - name: workflow_events
         identifier: automation
         columns:
           - name: id
-            description: Unique identifier for the workflow event.
+            description: unique identifier for the workflow event.
 
   - name: php_segment
-    description: Identified users via the GETMESA Segment app.
+    description: identified users via the getmesa segment app.
     schema: php
-    loader: Segment.com
+    loader: segment.com
     loaded_at_field: received_at
     tables:
       - name: users
         identifier: users
         columns:
           - name: id
-            description: Shop Subdomain and unique identifier for the User.
-          - name: APPS_MESA_META_EXTMESAONBOARDREVIEW_ENABLED
-          - name: META
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_API_STATUS
-          - name: APPS_PAGESTUDIO_META_PAGES_ENABLED
-          - name: APPS_MESA_BILLING_USAGE_CHARGE_ENABLED
-          - name: APPS_BLOGSTUDIO_BILLING_UPDATEDAT
-          - name: APPS_PAGESTUDIO_INSTALLEDAT
-          - name: APPS_MESA_META_EXT_JOHN_TEST_2
-          - name: APPS_BOUNCER_BILLING_INTERVAL
-          - name: APPS_TRACKTOR_META_EXTTRACKTORREVIEWASKEIS_ENABLED
-          - name: APPS_MESA_META_EXT_JOHN_TEST_2_ENABLED
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME
-          - name: APPS_MESA_NPS_SCORE
-          - name: APPS_CUSTOMIZERY_META_OPTIONSETS_VALUE
-          - name: APPS_TRACKTOR_BILLING_USAGECHARGE_ENABLED
-          - name: APPS_BLOGSTUDIO_STATUS
-          - name: APPS_MESA_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_TRACKTOR_ORDERS_PERCENT_ELAPSED
-          - name: APPS_MESA_CONTACTS_0_EMAIL
-          - name: APPS_CUSTOMIZERY_MESA_OPTIONSETS_VALUE
-          - name: APPS_COIN_BILLING_UPDATEDAT
-          - name: APPS_TRACKTOR_BILLING_TRIALENDSAT
-          - name: APPS_MESA_META_JEFF_VALUE
-          - name: META_0_NAME
-          - name: APPS_COIN_META
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_API_AVAILABLE
-          - name: APPS_PAGESTUDIO_BILLING_INTERVAL
-          - name: APPS_MESA_META_HADLAUNCHSESSION_ENABLED
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ADVANCED_REPORTING_STATUS
-          - name: APPS_TRACKTOR_IS_ACTIVE
-          - name: APPS_MESA_META_EXT_JOHN_TEST_3_ENABLED
-          - name: ADDRESS_STATE_CODE
-          - name: APPS_MESA_PLAN_PLAN_NAME
-          - name: APPS_CUSTOMIZERY_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_COIN_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_TRACKTOR_CONTACTS_1_FIRSTNAME
-          - name: APPS_MESA_IS_ACTIVE
-          - name: APPS_BOUNCER_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_TRACKTOR_META_ENTITLEMENTS_VALUE
-          - name: APPS_COIN_CONTACTS_0_FIRSTNAME
-          - name: SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_API_STATUS
-          - name: APPS_TRACKTOR_CONTACTS_0_LASTNAME
-          - name: APPS_COIN_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_UPLOADERY_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_COIN_BILLING_TRIALDAYS
-          - name: APPS_UPLOADERY_BILLING_TRIALDAYS
-          - name: APPS_TRACKTOR_META_ANALYTICS_ID
-          - name: CONTACTS_LIST_1_FIRSTNAME
-          - name: APPS_CUSTOMIZERY_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_MEMORY_VALUE
-          - name: APPS_TRACKTOR_META_ANALYTICSID
-          - name: ID_OID
-          - name: APPS_COIN_INSTALLEDAT
-          - name: APPS_MESA_BILLING_USAGECHARGE_ENABLED
-          - name: APPS_MESA_META_AUTOMATIONS
-          - name: APPS_PAGESTUDIO_SUPPORT_DIDEIS
-          - name: APPS_UPLOADERY_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_KITKARTS_META
-          - name: SHOPIFY_PLANDISPLAYNAME
-          - name: APPS_UPLOADERY_PLAN_CREATEDAT
-          - name: APPS_TRACKTOR_ISACTIVE_DATE_NUMBER_LONG
-          - name: ADDRESS_COUNTRY
-          - name: CONTACTS_LIST_0_FIRSTNAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_EXPORT_AVAILABLE
-          - name: APPS_CUSTOMIZERY_PLAN_CREATEDAT
-          - name: APPS_COIN_PLAN_PLANNAME
-          - name: CONTACTS_ALLEMAILS
-          - name: APPS_KITKARTS_PLAN_CREATEDAT
-          - name: APPS_BOUNCER_BILLING_UPDATEDAT
-          - name: APPS_MESA_META_ACTIONS
-          - name: APPS_MESA_META_LASTSUPPORTCREATEDAT_VALUE
-          - name: APPS_TRACKTOR_CONTACTS_0_EMAIL
-          - name: APPS_MESA_BILLING_USAGECHARGE_PREMIUMPERCENTELAPSED
-          - name: APPS_CUSTOMIZERY_INSTALLEDAT
-          - name: APPS_CUSTOMIZERY_BILLING_INTERVAL
-          - name: APPS_TRACKTOR_BILLING_USAGECHARGE_BALANCEREMAINING
-          - name: FIRST_NAME
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_RATE_LIMIT_VALUE
-          - name: APPS_TRACKTOR_BILLING_TRIALDAYS
-          - name: APPS_UPLOADERY_BILLING_TRIALENDSAT
-          - name: APPS_MESA_BILLING_USAGECHARGE_BALANCECAP
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED
-          - name: ADDRESS_COUNTRYCODE
-          - name: APPS_BOUNCER_STATUS
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_CUSTOM_ORDER_STATUSES_STATUS
-          - name: APPS_TRACKTOR_PLAN_META_ORDERS_PERCENTELAPSED
-          - name: ANALYTICS_ORDERS
-          - name: APPS_SMILE_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_TRACKTOR_PLAN_META_ORDERS_LIMIT
-          - name: APPS_TRACKTOR_SUPPORT_DONEEIS
-          - name: APPS_KITKARTS_BILLING_PRICE
-          - name: TRACKTOR_ANALYTICS_DELIVERED
-          - name: APPS_CUSTOMIZERY_PLAN_META
-          - name: APPS_PAGESTUDIO_CONTACTS_0_FIRSTNAME
-          - name: CONTACTS_LIST_0_EMAIL
-          - name: APPS_MESA_META_EXT_MESAEXTTEST_ENABLED
-          - name: APPS_KITKARTS_PLAN_PLANID
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_BALANCE_CAP
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_PRICE_PER_ORDER_VALUE
-          - name: ADDRESS_COUNTRY_CODE
-          - name: APPS_COIN_STATUS
-          - name: APPS_TRACKTOR_UNINSTALLEDAT
-          - name: APPS_BLOGSTUDIO_INSTALLEDAT
-          - name: APPS_COIN_ISACTIVE
-          - name: APPS_TRACKTOR_BILLING_TRIAL_DAYS
-          - name: APPS_PAGESTUDIO_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_MESA_PLAN_META
-          - name: APPS_BLOGSTUDIO_PLAN_CREATEDAT
-          - name: APPS_MESA_BILLING_TRIAL_ENDS_ON
-          - name: APPS_KITKARTS_SUPPORT_DIDEIS
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_ORDER_STATUSES_AVAILABLE
-          - name: APPS_KITKARTS_CONTACTS_1_FIRSTNAME
-          - name: APPS_PAGESTUDIO_CONTACTS_0_LASTNAME
-          - name: APPS_MESA_META_EXT_JOHN_TEST_1_ENABLED
-          - name: APPS_UPLOADERY_BILLING_METHOD
-          - name: APPS_FABLET_INSTALLEDAT
-          - name: APPS_BOUNCER_PLAN_PLANNAME
-          - name: APPS_SMILE_META
-          - name: CONTACTS_ALL_EMAILS
-          - name: APPS_MESA_META_EXTMESAEXTTEST_ENABLED
-          - name: UUID_TS
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_DEDICATED_SUPPORT_STATUS
-          - name: APPS_COIN_PLAN_PLANID
-          - name: APPS_KITKARTS_INSTALLEDAT
-          - name: APPS_MESA_META_HAD_LAUNCH_SESSION_VALUE
-          - name: APPS_MESA_META_HAD_LAUNCH_SESSION_ENABLED
-          - name: UUID
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_PREMIUM_DATA_SOURCES_AVAILABLE
-          - name: APPS_BOUNCER_UNINSTALLEDAT
-          - name: APPS_COIN_PLAN_CREATEDAT
-          - name: APPS_CUSTOMIZERY_META_EXTINFINITEOPTIONSREVIEWASKEIS_ENABLED
-          - name: APPS_TRACKTOR_BILLING_NAME
-          - name: APPS_TRACKTOR_SUPPORT_DONE_EIS
-          - name: APPS_MESA_BILLING_INTERVAL
-          - name: APPS_BOUNCER_INSTALLEDAT
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_PREMIUM_DATA_SOURCES_STATUS
-          - name: APPS_PAGESTUDIO_BILLING_CREATEDAT
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_TRANSLATE_AVAILABLE
-          - name: APPS_UPLOADERY_META_OPTIONSETS_VALUE
-          - name: APPS_MESA_META_COUPONCODE_VALUE
-          - name: APPS_PAGESTUDIO_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_COIN_BILLING_PRICE
-          - name: APPS_CUSTOMIZERY_META
-          - name: APPS_TRACKTOR_CONTACTS_4_EMAIL
-          - name: APPS_KITKARTS_ISACTIVE
-          - name: APPS_UPLOADERY_PLAN_META
-          - name: CREATED_AT
-          - name: APPS_MESA_META_EXT_JOHN_TEST_3
-          - name: APPS_MESA_META_HAD_LAUNCH_SESSION1_ENABLED
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_SUPPORT_VALUE
-          - name: APPS_SMILE_PLAN_CREATEDAT
-          - name: CONTEXT_LIBRARY_NAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_BRANDING_STATUS
-          - name: APPS_PAGESTUDIO_PLAN_PLANNAME
-          - name: APPS_TRACKTOR_INSTALLED_AT
-          - name: APPS_KITKARTS_PLAN_PLANNAME
-          - name: APPS_TRACKTOR_CONTACTS_1_EMAIL
-          - name: TRACKTOR_ANALYTICS_DAYS_TO_DELIVERED
-          - name: SHOPIFY_INACTIVEAT
-          - name: APPS_UPLOADERY_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_MESA_META_ACTIVATEDAT_VALUE
-          - name: SHOPIFY_PLAN_DISPLAY_NAME
-          - name: APPS_TRACKTOR_CONTACTS_2_EMAIL
-          - name: APPS_KITKARTS_CONTACTS_1_EMAIL
-          - name: APPS_SMILE_PLAN_PLANID
-          - name: APPS_BLOGSTUDIO_PLAN_ENTITLEMENTS
-          - name: LAST_NAME
-          - name: TRACKTOR_ANALYTICS_SUM_ORDERS
-          - name: ADDRESS_STREET
-          - name: ADDRESS_POSTAL_CODE
-          - name: APPS_TRACKTOR_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_BOUNCER_META_EXTBOUNCERREVIEWASK_ENABLED
-          - name: APPS_PAGESTUDIO_SUPPORT_REVIEWREQUESTEDAT
-          - name: ANALYTICS_SUMPRICE
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_AUTOMATIONS_VALUE
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_BALANCEUSED
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_ORDERS_STATUS
-          - name: ADDRESS_LONGITUDE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ONBOARDING_STATUS
-          - name: APPS_BOUNCER_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_CUSTOMIZERY_BILLING_TRIALDAYS
-          - name: APPS_BLOGSTUDIO_META_ARTICLES_ENABLED
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_BRANDING_AVAILABLE
-          - name: APPS_PAGESTUDIO_META_EXTPAGESTUDIOREVIEWASK_ENABLED
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_LOG_RETENTION_VALUE
-          - name: APPS_MESA_BILLING_NAME
-          - name: APPS_MESA_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_CUSTOMIZERY_META_EXTCUSTOMIZERYREVIEWASKEIS_ENABLED
-          - name: APPS_UPLOADERY_PLAN_PLANNAME
-          - name: APPS_SMILE_CONTACTS_0_LASTNAME
-          - name: APPS_CUSTOMIZERY_BILLING_CREATEDAT
-          - name: APPS_COIN_BILLING_METHOD
-          - name: APPS_COIN_PLAN_META
-          - name: APPS_MESA_ISACTIVE
-          - name: APPS_TRACKTOR_ORDERS_STARTS_AT
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_MAP_STYLES_STATUS
-          - name: APPS_BOUNCER_BILLING_TRIALDAYS
-          - name: APPS_BOUNCER_PLAN_ENTITLEMENTS
-          - name: APPS_MESA_SUPPORT_DONE_EIS
-          - name: APPS_PAGESTUDIO_BILLING_UPDATEDAT
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_2
-          - name: APPS_TRACKTOR_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_PAGESTUDIO_BILLING_METHOD
-          - name: APPS_TRACKTOR_BILLING_UPDATED_AT
-          - name: PHONE
-          - name: APPS_CUSTOMIZERY_STATUS
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_ACTIONS_STATUS
-          - name: APPS_KITKARTS_UNINSTALLEDAT
-          - name: APPS_CUSTOMIZERY_ISACTIVE
-          - name: APPS_CUSTOMIZERY_CONTACTS_0_EMAIL
-          - name: APPS_PAGESTUDIO_ISACTIVE
-          - name: APPS_SMILE_STATUS
-          - name: APPS_SMILE_UNINSTALLEDAT
-          - name: APPS_COIN_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_BLOGSTUDIO_BILLING_TRIALDAYS
-          - name: APPS_UPLOADERY_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_SMILE_META_EXTSMILEREVIEWASK_ENABLED
-          - name: APPS_MESA_BILLING_USAGECHARGE_BALANCEUSED
-          - name: APPS_BLOGSTUDIO_PLAN_PLANID
-          - name: APPS_PAGESTUDIO_BILLING_TRIALDAYS
-          - name: APPS_MESA_META_IS_ENABLED_ENABLED
-          - name: APPS_KITKARTS_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_COIN_SUPPORT_DIDEIS
-          - name: APPS_PAGESTUDIO_UNINSTALLEDAT
-          - name: APPS_BLOGSTUDIO_PLAN_META
-          - name: TIMEZONE
-          - name: APPS_KITKARTS_META_METHOD_VALUE
-          - name: APPS_TRACKTOR_BILLING_TRIALENDSON
-          - name: APPS_TRACKTOR_META_LOOKUPS_VALUE
-          - name: APPS_UPLOADERY_BILLING_PRICE
-          - name: APPS_MESA_META_ACTIVATED_AT_VALUE
-          - name: APPS_CUSTOMIZERY_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_MESA_BILLING_USAGECHARGE_PREMIUMELAPSED
-          - name: CONTACTS_HASMULTIPLE
-          - name: APPS_TRACKTOR_ORDERS_ENDSAT
-          - name: APPS_MESA_BILLING_TRIAL_ENDS_ON_DATE_NUMBER_LONG
-          - name: APPS_SMILE_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_EXPORT_STATUS
-          - name: APPS_TRACKTOR_BILLING_USAGECHARGE_BALANCEUSED
-          - name: APPS_UPLOADERY_UNINSTALLEDAT
-          - name: APPS_UPLOADERY_BILLING_UPDATEDAT
-          - name: APPS_FABLET_PLAN_META
-          - name: APPS_BLOGSTUDIO_BILLING_METHOD
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_TRANSLATE_STATUS
-          - name: APPS_KITKARTS_BILLING_NAME
-          - name: APPS_PAGESTUDIO_CONTACTS_0_EMAIL
-          - name: UPDATED_AT
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_TRANSLATE_STATUS
-          - name: APPS_PAGESTUDIO_BILLING_PRICE
-          - name: APPS_MESA_META_EXT_MESA_VIP
-          - name: ANALYTICS_GMV
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_PREMIUM_DATA_SOURCES_STATUS
-          - name: APPS_MESA_BILLING_TRIALDAYS
-          - name: APPS_BOUNCER_META
-          - name: APPS_MESA_META_MYNAME2_VALUE
-          - name: APPS_FABLET_PLAN_PLANID
-          - name: APPS_KITKARTS_BILLING_TRIALENDSAT
-          - name: APPS_BLOGSTUDIO_META_EXTBLOGSTUDIOREVIEWASK_ENABLED
-          - name: APPS_MESA_META_TEST_ENABLED
-          - name: APPS_BOUNCER_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_MESA_META_EXT_JOHN_TEST_NEW_1_ENABLED
-          - name: APPS_BOUNCER_CONTACTS_0_FIRSTNAME
-          - name: APPS_TRACKTOR_PLAN_PLAN_NAME
-          - name: APPS_BLOGSTUDIO_CONTACTS_0_EMAIL
-          - name: APPS_TRACKTOR_CONTACTS_3_FIRSTNAME
-          - name: APPS_TRACKTOR_CONTACTS_0_FIRSTNAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_DEDICATED_SUPPORT_STATUS
-          - name: APPS_TRACKTOR_CONTACTS_3_EMAIL
-          - name: APPS_UPLOADERY_META_COUPONCODE_VALUE
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_6
-          - name: APPS_SMILE_BILLING_METHOD
-          - name: TRACKTOR_ANALYTICS_SUM_PRICE
-          - name: APPS_FABLET_BILLING_USAGECHARGE_ISENABLED
-          - name: META_IS_NOTABLE_ENABLED
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_EXECUTION_TIME_VALUE
-          - name: APPS_SMILE_CONTACTS_0_FIRSTNAME
-          - name: APPS_UPLOADERY_CONTACTS_0_EMAIL
-          - name: APPS_TRACKTOR_ORDERS_PERCENTELAPSED
-          - name: APPS_TRACKTOR_ISACTIVE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ADVANCED_REPORTING_AVAILABLE
-          - name: APPS_PAGESTUDIO_STATUS
-          - name: APPS_BOUNCER_PLAN_META
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_3
-          - name: APPS_COIN_CONTACTS_0_EMAIL
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_CUSTOM_MAP_STYLES_STATUS
-          - name: APPS_KITKARTS_BILLING_INTERVAL
-          - name: APPS_TRACKTOR_PLAN_PLANNAME
-          - name: APPS_MESA_PLAN_META_ACTIONS_LIMIT
-          - name: APPS_CUSTOMIZERY_BILLING_UPDATEDAT
-          - name: APPS_UPLOADERY_META_EXTUPLOADERYREVIEWASK_ENABLED
-          - name: FIRSTNAME
-          - name: SHOPIFY_PLANNAME
-          - name: APPS_FABLET_STATUS
-          - name: APPS_COIN_META_EXTCOINREVIEWASK_ENABLED
-          - name: APPS_TRACKTOR_PLAN_META_ORDERS_STARTSAT
-          - name: APPS_COIN_META_EXTCOINREVIEWASKEIS_ENABLED
-          - name: APPS_SMILE_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_MESA_BILLING_METHOD
-          - name: CREATEDAT
-          - name: APPS_MESA_PLAN_META_ACTIONS_ELAPSED
-          - name: APPS_BOUNCER_PLAN_PLANID
-          - name: TRACKTOR_ANALYTICS_FULFILLMENTS
-          - name: APPS_KITKARTS_META_LASTEMAILSENT_VALUE
-          - name: APPS_CUSTOMIZERY_META_COUPONCODE_VALUE
-          - name: APPS_MESA_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_KITKARTS_BILLING_TRIALDAYS
-          - name: APPS_UPLOADERY_INSTALLEDAT
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_4
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_ENABLED
-          - name: APPS_TRACKTOR_CONTACTS_4_LASTNAME
-          - name: APPS_TRACKTOR_SUPPORT_DIDEIS
-          - name: APPS_MESA_BILLING_UPDATEDAT
-          - name: APPS_UPLOADERY_CONTACTS_0_LASTNAME
-          - name: APPS_BOUNCER_BILLING_CREATEDAT
-          - name: APPS_SMILE_CONTACTS_0_EMAIL
-          - name: APPS_TRACKTOR_META
-          - name: APPS_MESA_INSTALLEDAT
-          - name: APPS_MESA_META_SOURCE_VALUE
-          - name: APPS_MESA_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_MESA_CONTACTS_0_LASTNAME
-          - name: APPS_MESA_META
-          - name: APPS_BOUNCER_ISACTIVE
-          - name: APPS_MESA_CONTACTS_0_FIRSTNAME
-          - name: APPS_TRACKTOR_ORDERS_ELAPSED
-          - name: APPS_KITKARTS_PLAN_META
-          - name: SHOPIFYCREATEDAT
-          - name: APPS_FABLET_PLAN_PLANNAME
-          - name: APPS_COIN_UNINSTALLEDAT
-          - name: APPS_CUSTOMIZERY_BILLING_TRIALENDSAT
-          - name: APPS_CUSTOMIZERY_PLAN_ENTITLEMENTS
-          - name: APPS_UPLOADERY_BILLING_INTERVAL
-          - name: APPS_PAGESTUDIO_BILLING_TRIALENDSAT
-          - name: APPS_COIN_BILLING_TRIALENDSAT
-          - name: SUPPORT_LASTREPLYAGENT
-          - name: APPS_BOUNCER_CONTACTS_0_EMAIL
-          - name: WEBSITE
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_CHARGE_HARD_LIMIT_VALUE
-          - name: APPS_TRACKTOR_BILLING_METHOD
-          - name: COMPANY_NAME
-          - name: APPS_TRACKTOR_BILLING_TRIAL_ENDS_ON
-          - name: APPS_UPLOADERY_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_SMILE_PLAN_META
-          - name: APPS_CUSTOMIZERY_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_BLOGSTUDIO_META
-          - name: APPS_MESA_META_EXT_MESA_SUPPORT_REVIEW
-          - name: APPS_MESA_META_EXTMESAREVIEWSOLICIT_ENABLED
-          - name: APPS_MESA_SUPPORT_LASTSUPPORTCREATEDAT
-          - name: APPS_MESA_INSTALLED_AT
-          - name: APPS_BOUNCER_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_SMILE_BILLING_INTERVAL
-          - name: APPS_MESA_BILLING_PRICE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_ORDER_STATUSES_STATUS
-          - name: APPS_UPLOADERY_STATUS
-          - name: APPS_TRACKTOR_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_CUSTOMIZERY_BILLING_METHOD
-          - name: APPS_PAGESTUDIO_PLAN_PLANID
-          - name: APPS_SMILE_INSTALLEDAT
-          - name: APPS_MESA_SUPPORT_DONEEIS
-          - name: APPS_TRACKTOR_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_MULT_STORE_LICENSE_STATUS
-          - name: APPS_MESA_BILLING_USAGECHARGE_PREMIUMCAP
-          - name: ADDRESS_LATITUDE
-          - name: APPS_COIN_BILLING_INTERVAL
-          - name: SHOPIFY_PLAN_NAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_DEDICATED_SUPPORT_AVAILABLE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ORDERS_STATUS
-          - name: TRACKTOR_ANALYTICS_EXCEPTIONS
-          - name: APPS_MESA_PLAN_PLANNAME
-          - name: APPS_TRACKTOR_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_UPLOADERY_BILLING_CREATEDAT
-          - name: EMAIL
-          - name: APPS_KITKARTS_CONTACTS_0_EMAIL
-          - name: APPS_MESA_META_LAUNCHSESSIONDATE_VALUE
-          - name: ANALYTICS_CURRENCY
-          - name: APPS_MESA_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_MESA_STATUS
-          - name: APPS_KITKARTS_BILLING_METHOD
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ONBOARDING_AVAILABLE
-          - name: APPS_MESA_META_JEFF_ENABLED
-          - name: APPS_CUSTOMIZERY_SUPPORT_DIDEIS
-          - name: APPS_KITKARTS_BILLING_UPDATEDAT
-          - name: APPS_MESA_PLAN_CREATEDAT
-          - name: APPS_BLOGSTUDIO_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_TRACKTOR_META_ANALYTICSID_VALUE
-          - name: APPS_BLOGSTUDIO_META_COUPONCODE_VALUE
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_ADVANCED_REPORTING_STATUS
-          - name: APPS_SMILE_SUPPORT_DIDEIS
-          - name: APPS_BOUNCER_SUPPORT_DIDEIS
-          - name: APPS_TRACKTOR_CONTACTS_2_LASTNAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS
-          - name: APPS_UPLOADERY_META_EXTUPLOADERYREVIEWASKEIS_ENABLED
-          - name: APPS_MESA_META_MYNAME_VALUE
-          - name: APPS_BOUNCER_CONTACTS_0_LASTNAME
-          - name: APPS_MESA_META_EXT_JOHN_TEST_1_STATUS
-          - name: APPS_MESA_UNINSTALLEDAT
-          - name: CONTACTS_LIST_1_EMAIL
-          - name: APPS_SMILE_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_KITKARTS_CONTACTS_1_LASTNAME
-          - name: APPS_MESA_PLAN_PLAN_ID
-          - name: APPS_CUSTOMIZERY_CONTACTS_0_FIRSTNAME
-          - name: APPS_PAGESTUDIO_PLAN_ENTITLEMENTS
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_EXPORT_STATUS
-          - name: APPS_MESA_META_GOAL_VALUE
-          - name: APPS_BOUNCER_BILLING_TRIALENDSAT
-          - name: NAME
-          - name: APPS_BOUNCER_PLAN_CREATEDAT
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_ORDERS_AVAILABLE
-          - name: APPS_MESA_BILLING_CREATEDAT
-          - name: APPS_TRACKTOR_STATUS
-          - name: APPS_SMILE_BILLING_PRICE
-          - name: APPS_KITKARTS_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_TRACKTOR_CONTACTS_3_LASTNAME
-          - name: CONTEXT_LIBRARY_VERSION
-          - name: APPS_MESA_META_AUTOMATIONS_VALUE
-          - name: APPS_COIN_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_MESA_META_EXT_JOHN_TEST_1
-          - name: APPS_SMILE_PLAN_ENTITLEMENTS
-          - name: SHOPIFY_CREATEDAT
-          - name: APPS_BLOGSTUDIO_BILLING_TRIALENDSAT
-          - name: APPS_BLOGSTUDIO_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_CUSTOM_BRANDING_STATUS
-          - name: ADDRESS_POSTALCODE
-          - name: APPS_BLOGSTUDIO_PLAN_PLANNAME
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_BALANCEREMAINING
-          - name: APPS_MESA_META_LASTSUPPORTCREATEDAT
-          - name: CONTACTS_LIST_1_LASTNAME
-          - name: APPS_TRACKTOR_PLAN_META
-          - name: ADDRESS_CITY
-          - name: APPS_MESA_PLAN_META_ACTIONS_STARTSAT
-          - name: APPS_MESA_BILLING_USAGECHARGE_BALANCEREMAINING
-          - name: APPS_TRACKTOR_ORDERS_ENDS_AT
-          - name: APPS_PAGESTUDIO_META
-          - name: APPS_BLOGSTUDIO_BILLING_CREATEDAT
-          - name: APPS_UPLOADERY_BILLING_NAME
-          - name: APPS_COIN_META_COUPONCODE_VALUE
-          - name: APPS_KITKARTS_CONTACTS_0_LASTNAME
-          - name: SHOPIFY_CREATED_AT
-          - name: APPS_TRACKTOR_META_EXTTRACKTORREVIEWASK_ENABLED
-          - name: ADDRESS_STATE
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_CRON_VALUE
-          - name: APPS_KITKARTS_PLAN_ENTITLEMENTS
-          - name: APPS_BLOGSTUDIO_CONTACTS_0_FIRSTNAME
-          - name: APPS_BLOGSTUDIO_BILLING_PRICE
-          - name: APPS_MESA_META_TEMPLATES
-          - name: APPS_BLOGSTUDIO_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: TRACKTOR_ANALYTICS_AVERAGE_PRICE
-          - name: APPS_FABLET_ISACTIVE
-          - name: APPS_UPLOADERY_SUPPORT_DIDEIS
-          - name: APPS_CUSTOMIZERY_PLAN_PLANID
-          - name: SHOPIFY_THEME
-          - name: APPS_FABLET_SUPPORT_DIDEIS
-          - name: TRACKTOR_ANALYTICS_INSTALL_ORDERS_DELTA
-          - name: APPS_TRACKTOR_PLAN_PLANID
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_PRICE_PER_ACTION_VALUE
-          - name: APPS_CUSTOMIZERY_CONTACTS_0_LASTNAME
-          - name: APPS_SMILE_PLAN_PLANNAME
-          - name: APPS_TRACKTOR_CONTACTS_1_LASTNAME
-          - name: ADDRESS_STATECODE
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CHARGE_HARD_LIMIT_VALUE
-          - name: APPS_CUSTOMIZERY_BILLING_USAGECHARGE_ISENABLED
-          - name: APPS_BLOGSTUDIO_ISACTIVE
-          - name: APPS_KITKARTS_SUPPORT_DIDONBOARDINGSERVICE
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_BALANCECAP
-          - name: APPS_TRACKTOR_META_COUPONCODE_VALUE
-          - name: APPS_BLOGSTUDIO_SUPPORT_DIDEIS
-          - name: APPS_KITKARTS_CONTACTS_0_FIRSTNAME
-          - name: APPS_MESA_META_EXT_JOHN_IS_AWESOME_5
-          - name: APPS_FABLET_META
-          - name: APPS_TRACKTOR_PLAN_CREATED_AT
-          - name: APPS_MESA_PLAN_META_ACTIONS_ENDSAT
-          - name: APPS_TRACKTOR_INSTALLEDAT
-          - name: APPS_TRACKTOR_UNINSTALLEDAT_DATE_NUMBER_LONG
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_ONBOARDING_STATUS
-          - name: APPS_MESA_PLAN_META_ACTIONS_PERCENTELAPSED
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_PRICE_PER_ORDER_VALUE
-          - name: APPS_MESA_PLAN_PLANID
-          - name: APPS_TRACKTOR_BILLING_CREATED_AT
-          - name: APPS_CUSTOMIZERY_SUPPORT_DIDONBOARDING
-          - name: APPS_MESA_META_EXT_MESA_REVIEW_ASK_ENABLED
-          - name: APPS_BLOGSTUDIO_BILLING_USAGECHARGE_ISENABLED
-          - name: CONTACTS_HAS_MULTIPLE
-          - name: ACTIVE
-          - name: APPS_MESA_META_TEMPLATES_VALUE
-          - name: APPS_TRACKTOR_CONTACTS_2_FIRSTNAME
-          - name: APPS_CUSTOMIZERY_BILLING_PRICE
-          - name: APPS_KITKARTS_BILLING_CREATEDAT
-          - name: APPS_TRACKTOR_PLAN_CREATEDAT
-          - name: APPS_TRACKTOR_BILLING_CREATEDAT
-          - name: APPS_TRACKTOR_BILLING_USAGECHARGE_BALANCECAP
-          - name: APPS_TRACKTOR_ORDERS_STARTSAT
-          - name: APPS_TRACKTOR_BILLING_INTERVAL
-          - name: APPS_TRACKTOR_BILLING_PRICE
-          - name: APPS_BOUNCER_BILLING_PRICE
-          - name: RECEIVED_AT
-          - name: APPS_KITKARTS_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_UPLOADERY_CONTACTS_0_FIRSTNAME
-          - name: APPS_KITKARTS_STATUS
-          - name: APPS_BOUNCER_BILLING_METHOD
-          - name: APPS_TRACKTOR_META_EXTTRACKTOREIS_ENABLED
-          - name: APPS_MESA_META_ENABLEDTEMPLATES_VALUE
-          - name: APPS_MESA_SUPPORT_DIDEIS
-          - name: APPS_TRACKTOR_CONTACTS_4_FIRSTNAME
-          - name: APPS_SMILE_SHOPIFY_APPSTOREREVIEWAT
-          - name: APPS_BLOGSTUDIO_BILLING_INTERVAL
-          - name: APPS_MESA_META_EXT_TEST_JOHN_ENABLED
-          - name: APPS_MESA_META_EXT_JOHN_TEST_4_ENABLED
-          - name: APPS_TRACKTOR_PLAN_PLAN_ID
-          - name: APPS_MESA_META_ENABLEDAUTOMATIONS_VALUE
-          - name: APPS_PAGESTUDIO_PLAN_CREATEDAT
-          - name: APPS_CUSTOMIZERY_PLAN_PLANNAME
-          - name: LASTNAME
-          - name: APPS_FABLET_PLAN_CREATEDAT
-          - name: APPS_TRACKTOR_PLAN_META_ORDERS_ELAPSED
-          - name: APPS_TRACKTOR_BILLING_UPDATEDAT
-          - name: APPS_PAGESTUDIO_PLAN_META
-          - name: APP_CUSTOMIZERY_SUPPORT_REVIEWREQUESTEDAT
-          - name: APPS_MESA_META_ACTIONS_VALUE
-          - name: APPS_COIN_CONTACTS_0_LASTNAME
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_CHARGE_HARD_LIMIT_VALUE
-          - name: APPS_UPLOADERY_PLAN_PLANID
-          - name: APPS_CUSTOMIZERY_META_EXTCUSTOMIZERYREVIEWASK_ENABLED
-          - name: APPS_KITKARTS_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: CONTACTS_LIST_0_LASTNAME
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_CUSTOM_MAP_STYLES_AVAILABLE
-          - name: APPS_MESA_PLAN_ENTITLEMENTS_ACTIONS_AVAILABLE
-          - name: APPS_UPLOADERY_PLAN_ENTITLEMENTS
-          - name: SUPPORT_LASTREPLYAT
-          - name: APPS_BLOGSTUDIO_UNINSTALLEDAT
-          - name: ISACTIVE
-          - name: APPS_UPLOADERY_META
-          - name: APPS_TRACKTOR_META_HADLAUNCHSESSION_ENABLED
-          - name: META_0_ENABLED
-          - name: APPS_UPLAODERY_MESA_OPTIONSETS_VALUE
-          - name: APPS_MESA_PLAN_ENTITLEMENTS
-          - name: APPS_CUSTOMIZERY_UNINSTALLEDAT
-          - name: APPS_COIN_BILLING_CREATEDAT
-          - name: APPS_SMILE_ISACTIVE
-          - name: APPS_TRACKTOR_PLAN_META_ORDERS_ENDSAT
-          - name: APPS_COIN_PLAN_ENTITLEMENTS
-          - name: APPS_UPLOADERY_MESA_OPTIONSETS_VALUE
-          - name: APPS_BLOGSTUDIO_CONTACTS_0_LASTNAME
-          - name: APPS_MESA_BILLING_TRIALENDSAT
-          - name: UPDATEDAT
-          - name: APPS_PAGESTUDIO_SHOPIFY_APPSTOREREVIEWSCORE
-          - name: APPS_UPLOADERY_ISACTIVE
-          - name: META_ISNOTABLE_ENABLED
-          - name: APPS_TRACKTOR_PLAN_ENTITLEMENTS_MULT_STORE_LICENSE_AVAILABLE
-          - name: APPS_TRACKTOR_BILLING_USAGE_CHARGE_ENABLED_MULT_STORE_LICENSE_STATUS
-          - name: APPS_MESA_META_EXTMESAREVIEWASK_ENABLED
+            description: shop subdomain and unique identifier for the user.
+          - name: apps_mesa_meta_extmesaonboardreview_enabled
+          - name: meta
+          - name: apps_tracktor_plan_entitlements_api_status
+          - name: apps_pagestudio_meta_pages_enabled
+          - name: apps_mesa_billing_usage_charge_enabled
+          - name: apps_blogstudio_billing_updatedat
+          - name: apps_pagestudio_installedat
+          - name: apps_mesa_meta_ext_john_test_2
+          - name: apps_bouncer_billing_interval
+          - name: apps_tracktor_meta_exttracktorreviewaskeis_enabled
+          - name: apps_mesa_meta_ext_john_test_2_enabled
+          - name: apps_mesa_meta_ext_john_is_awesome
+          - name: apps_mesa_nps_score
+          - name: apps_customizery_meta_optionsets_value
+          - name: apps_tracktor_billing_usagecharge_enabled
+          - name: apps_blogstudio_status
+          - name: apps_mesa_support_didonboardingservice
+          - name: apps_tracktor_orders_percent_elapsed
+          - name: apps_mesa_contacts_0_email
+          - name: apps_customizery_mesa_optionsets_value
+          - name: apps_coin_billing_updatedat
+          - name: apps_tracktor_billing_trialendsat
+          - name: apps_mesa_meta_jeff_value
+          - name: meta_0_name
+          - name: apps_coin_meta
+          - name: apps_tracktor_plan_entitlements_api_available
+          - name: apps_pagestudio_billing_interval
+          - name: apps_mesa_meta_hadlaunchsession_enabled
+          - name: apps_tracktor_plan_entitlements_advanced_reporting_status
+          - name: apps_tracktor_is_active
+          - name: apps_mesa_meta_ext_john_test_3_enabled
+          - name: address_state_code
+          - name: apps_mesa_plan_plan_name
+          - name: apps_customizery_support_reviewrequestedat
+          - name: apps_coin_shopify_appstorereviewscore
+          - name: apps_tracktor_contacts_1_firstname
+          - name: apps_mesa_is_active
+          - name: apps_bouncer_shopify_appstorereviewat
+          - name: apps_tracktor_meta_entitlements_value
+          - name: apps_coin_contacts_0_firstname
+          - name: support_reviewrequestedat
+          - name: apps_tracktor_billing_usage_charge_enabled_api_status
+          - name: apps_tracktor_contacts_0_lastname
+          - name: apps_coin_shopify_appstorereviewat
+          - name: apps_uploadery_shopify_appstorereviewscore
+          - name: apps_coin_billing_trialdays
+          - name: apps_uploadery_billing_trialdays
+          - name: apps_tracktor_meta_analytics_id
+          - name: contacts_list_1_firstname
+          - name: apps_customizery_shopify_appstorereviewat
+          - name: apps_mesa_plan_entitlements_memory_value
+          - name: apps_tracktor_meta_analyticsid
+          - name: id_oid
+          - name: apps_coin_installedat
+          - name: apps_mesa_billing_usagecharge_enabled
+          - name: apps_mesa_meta_automations
+          - name: apps_pagestudio_support_dideis
+          - name: apps_uploadery_billing_usagecharge_isenabled
+          - name: apps_kitkarts_meta
+          - name: shopify_plandisplayname
+          - name: apps_uploadery_plan_createdat
+          - name: apps_tracktor_isactive_date_number_long
+          - name: address_country
+          - name: contacts_list_0_firstname
+          - name: apps_tracktor_plan_entitlements_export_available
+          - name: apps_customizery_plan_createdat
+          - name: apps_coin_plan_planname
+          - name: contacts_allemails
+          - name: apps_kitkarts_plan_createdat
+          - name: apps_bouncer_billing_updatedat
+          - name: apps_mesa_meta_actions
+          - name: apps_mesa_meta_lastsupportcreatedat_value
+          - name: apps_tracktor_contacts_0_email
+          - name: apps_mesa_billing_usagecharge_premiumpercentelapsed
+          - name: apps_customizery_installedat
+          - name: apps_customizery_billing_interval
+          - name: apps_tracktor_billing_usagecharge_balanceremaining
+          - name: first_name
+          - name: apps_mesa_plan_entitlements_rate_limit_value
+          - name: apps_tracktor_billing_trialdays
+          - name: apps_uploadery_billing_trialendsat
+          - name: apps_mesa_billing_usagecharge_balancecap
+          - name: apps_tracktor_billing_usage_charge_enabled
+          - name: address_countrycode
+          - name: apps_bouncer_status
+          - name: apps_tracktor_billing_usage_charge_enabled_custom_order_statuses_status
+          - name: apps_tracktor_plan_meta_orders_percentelapsed
+          - name: analytics_orders
+          - name: apps_smile_billing_usagecharge_isenabled
+          - name: apps_tracktor_plan_meta_orders_limit
+          - name: apps_tracktor_support_doneeis
+          - name: apps_kitkarts_billing_price
+          - name: tracktor_analytics_delivered
+          - name: apps_customizery_plan_meta
+          - name: apps_pagestudio_contacts_0_firstname
+          - name: contacts_list_0_email
+          - name: apps_mesa_meta_ext_mesaexttest_enabled
+          - name: apps_kitkarts_plan_planid
+          - name: apps_tracktor_billing_usage_charge_balance_cap
+          - name: apps_tracktor_plan_entitlements_price_per_order_value
+          - name: address_country_code
+          - name: apps_coin_status
+          - name: apps_tracktor_uninstalledat
+          - name: apps_blogstudio_installedat
+          - name: apps_coin_isactive
+          - name: apps_tracktor_billing_trial_days
+          - name: apps_pagestudio_billing_usagecharge_isenabled
+          - name: apps_mesa_plan_meta
+          - name: apps_blogstudio_plan_createdat
+          - name: apps_mesa_billing_trial_ends_on
+          - name: apps_kitkarts_support_dideis
+          - name: apps_tracktor_plan_entitlements_custom_order_statuses_available
+          - name: apps_kitkarts_contacts_1_firstname
+          - name: apps_pagestudio_contacts_0_lastname
+          - name: apps_mesa_meta_ext_john_test_1_enabled
+          - name: apps_uploadery_billing_method
+          - name: apps_fablet_installedat
+          - name: apps_bouncer_plan_planname
+          - name: apps_smile_meta
+          - name: contacts_all_emails
+          - name: apps_mesa_meta_extmesaexttest_enabled
+          - name: uuid_ts
+          - name: apps_tracktor_billing_usage_charge_enabled_dedicated_support_status
+          - name: apps_coin_plan_planid
+          - name: apps_kitkarts_installedat
+          - name: apps_mesa_meta_had_launch_session_value
+          - name: apps_mesa_meta_had_launch_session_enabled
+          - name: uuid
+          - name: apps_tracktor_plan_entitlements_premium_data_sources_available
+          - name: apps_bouncer_uninstalledat
+          - name: apps_coin_plan_createdat
+          - name: apps_customizery_meta_extinfiniteoptionsreviewaskeis_enabled
+          - name: apps_tracktor_billing_name
+          - name: apps_tracktor_support_done_eis
+          - name: apps_mesa_billing_interval
+          - name: apps_bouncer_installedat
+          - name: apps_tracktor_plan_entitlements_premium_data_sources_status
+          - name: apps_pagestudio_billing_createdat
+          - name: apps_tracktor_plan_entitlements_translate_available
+          - name: apps_uploadery_meta_optionsets_value
+          - name: apps_mesa_meta_couponcode_value
+          - name: apps_pagestudio_shopify_appstorereviewat
+          - name: apps_coin_billing_price
+          - name: apps_customizery_meta
+          - name: apps_tracktor_contacts_4_email
+          - name: apps_kitkarts_isactive
+          - name: apps_uploadery_plan_meta
+          - name: created_at
+          - name: apps_mesa_meta_ext_john_test_3
+          - name: apps_mesa_meta_had_launch_session1_enabled
+          - name: apps_mesa_plan_entitlements_support_value
+          - name: apps_smile_plan_createdat
+          - name: context_library_name
+          - name: apps_tracktor_plan_entitlements_custom_branding_status
+          - name: apps_pagestudio_plan_planname
+          - name: apps_tracktor_installed_at
+          - name: apps_kitkarts_plan_planname
+          - name: apps_tracktor_contacts_1_email
+          - name: tracktor_analytics_days_to_delivered
+          - name: shopify_inactiveat
+          - name: apps_uploadery_shopify_appstorereviewat
+          - name: apps_mesa_meta_activatedat_value
+          - name: shopify_plan_display_name
+          - name: apps_tracktor_contacts_2_email
+          - name: apps_kitkarts_contacts_1_email
+          - name: apps_smile_plan_planid
+          - name: apps_blogstudio_plan_entitlements
+          - name: last_name
+          - name: tracktor_analytics_sum_orders
+          - name: address_street
+          - name: address_postal_code
+          - name: apps_tracktor_shopify_appstorereviewat
+          - name: apps_bouncer_meta_extbouncerreviewask_enabled
+          - name: apps_pagestudio_support_reviewrequestedat
+          - name: analytics_sumprice
+          - name: apps_mesa_plan_entitlements_automations_value
+          - name: apps_tracktor_billing_usage_charge_balanceused
+          - name: apps_tracktor_billing_usage_charge_enabled_orders_status
+          - name: address_longitude
+          - name: apps_tracktor_plan_entitlements_onboarding_status
+          - name: apps_bouncer_shopify_appstorereviewscore
+          - name: apps_customizery_billing_trialdays
+          - name: apps_blogstudio_meta_articles_enabled
+          - name: apps_tracktor_plan_entitlements_custom_branding_available
+          - name: apps_pagestudio_meta_extpagestudioreviewask_enabled
+          - name: apps_mesa_plan_entitlements_log_retention_value
+          - name: apps_mesa_billing_name
+          - name: apps_mesa_shopify_appstorereviewat
+          - name: apps_customizery_meta_extcustomizeryreviewaskeis_enabled
+          - name: apps_uploadery_plan_planname
+          - name: apps_smile_contacts_0_lastname
+          - name: apps_customizery_billing_createdat
+          - name: apps_coin_billing_method
+          - name: apps_coin_plan_meta
+          - name: apps_mesa_isactive
+          - name: apps_tracktor_orders_starts_at
+          - name: apps_tracktor_plan_entitlements_custom_map_styles_status
+          - name: apps_bouncer_billing_trialdays
+          - name: apps_bouncer_plan_entitlements
+          - name: apps_mesa_support_done_eis
+          - name: apps_pagestudio_billing_updatedat
+          - name: apps_mesa_meta_ext_john_is_awesome_2
+          - name: apps_tracktor_billing_usagecharge_isenabled
+          - name: apps_pagestudio_billing_method
+          - name: apps_tracktor_billing_updated_at
+          - name: phone
+          - name: apps_customizery_status
+          - name: apps_mesa_plan_entitlements_actions_status
+          - name: apps_kitkarts_uninstalledat
+          - name: apps_customizery_isactive
+          - name: apps_customizery_contacts_0_email
+          - name: apps_pagestudio_isactive
+          - name: apps_smile_status
+          - name: apps_smile_uninstalledat
+          - name: apps_coin_billing_usagecharge_isenabled
+          - name: apps_blogstudio_billing_trialdays
+          - name: apps_uploadery_support_reviewrequestedat
+          - name: apps_smile_meta_extsmilereviewask_enabled
+          - name: apps_mesa_billing_usagecharge_balanceused
+          - name: apps_blogstudio_plan_planid
+          - name: apps_pagestudio_billing_trialdays
+          - name: apps_mesa_meta_is_enabled_enabled
+          - name: apps_kitkarts_billing_usagecharge_isenabled
+          - name: apps_coin_support_dideis
+          - name: apps_pagestudio_uninstalledat
+          - name: apps_blogstudio_plan_meta
+          - name: timezone
+          - name: apps_kitkarts_meta_method_value
+          - name: apps_tracktor_billing_trialendson
+          - name: apps_tracktor_meta_lookups_value
+          - name: apps_uploadery_billing_price
+          - name: apps_mesa_meta_activated_at_value
+          - name: apps_customizery_support_didonboardingservice
+          - name: apps_mesa_billing_usagecharge_premiumelapsed
+          - name: contacts_hasmultiple
+          - name: apps_tracktor_orders_endsat
+          - name: apps_mesa_billing_trial_ends_on_date_number_long
+          - name: apps_smile_support_didonboardingservice
+          - name: apps_tracktor_plan_entitlements_export_status
+          - name: apps_tracktor_billing_usagecharge_balanceused
+          - name: apps_uploadery_uninstalledat
+          - name: apps_uploadery_billing_updatedat
+          - name: apps_fablet_plan_meta
+          - name: apps_blogstudio_billing_method
+          - name: apps_tracktor_plan_entitlements_translate_status
+          - name: apps_kitkarts_billing_name
+          - name: apps_pagestudio_contacts_0_email
+          - name: updated_at
+          - name: apps_tracktor_billing_usage_charge_enabled_translate_status
+          - name: apps_pagestudio_billing_price
+          - name: apps_mesa_meta_ext_mesa_vip
+          - name: analytics_gmv
+          - name: apps_tracktor_billing_usage_charge_enabled_premium_data_sources_status
+          - name: apps_mesa_billing_trialdays
+          - name: apps_bouncer_meta
+          - name: apps_mesa_meta_myname2_value
+          - name: apps_fablet_plan_planid
+          - name: apps_kitkarts_billing_trialendsat
+          - name: apps_blogstudio_meta_extblogstudioreviewask_enabled
+          - name: apps_mesa_meta_test_enabled
+          - name: apps_bouncer_support_didonboardingservice
+          - name: apps_mesa_meta_ext_john_test_new_1_enabled
+          - name: apps_bouncer_contacts_0_firstname
+          - name: apps_tracktor_plan_plan_name
+          - name: apps_blogstudio_contacts_0_email
+          - name: apps_tracktor_contacts_3_firstname
+          - name: apps_tracktor_contacts_0_firstname
+          - name: apps_tracktor_plan_entitlements_dedicated_support_status
+          - name: apps_tracktor_contacts_3_email
+          - name: apps_uploadery_meta_couponcode_value
+          - name: apps_mesa_meta_ext_john_is_awesome_6
+          - name: apps_smile_billing_method
+          - name: tracktor_analytics_sum_price
+          - name: apps_fablet_billing_usagecharge_isenabled
+          - name: meta_is_notable_enabled
+          - name: apps_mesa_plan_entitlements_execution_time_value
+          - name: apps_smile_contacts_0_firstname
+          - name: apps_uploadery_contacts_0_email
+          - name: apps_tracktor_orders_percentelapsed
+          - name: apps_tracktor_isactive
+          - name: apps_tracktor_plan_entitlements_advanced_reporting_available
+          - name: apps_pagestudio_status
+          - name: apps_bouncer_plan_meta
+          - name: apps_mesa_meta_ext_john_is_awesome_3
+          - name: apps_coin_contacts_0_email
+          - name: apps_tracktor_billing_usage_charge_enabled_custom_map_styles_status
+          - name: apps_kitkarts_billing_interval
+          - name: apps_tracktor_plan_planname
+          - name: apps_mesa_plan_meta_actions_limit
+          - name: apps_customizery_billing_updatedat
+          - name: apps_uploadery_meta_extuploaderyreviewask_enabled
+          - name: firstname
+          - name: shopify_planname
+          - name: apps_fablet_status
+          - name: apps_coin_meta_extcoinreviewask_enabled
+          - name: apps_tracktor_plan_meta_orders_startsat
+          - name: apps_coin_meta_extcoinreviewaskeis_enabled
+          - name: apps_smile_support_reviewrequestedat
+          - name: apps_mesa_billing_method
+          - name: createdat
+          - name: apps_mesa_plan_meta_actions_elapsed
+          - name: apps_bouncer_plan_planid
+          - name: tracktor_analytics_fulfillments
+          - name: apps_kitkarts_meta_lastemailsent_value
+          - name: apps_customizery_meta_couponcode_value
+          - name: apps_mesa_billing_usagecharge_isenabled
+          - name: apps_kitkarts_billing_trialdays
+          - name: apps_uploadery_installedat
+          - name: apps_mesa_meta_ext_john_is_awesome_4
+          - name: apps_mesa_meta_ext_john_is_awesome_enabled
+          - name: apps_tracktor_contacts_4_lastname
+          - name: apps_tracktor_support_dideis
+          - name: apps_mesa_billing_updatedat
+          - name: apps_uploadery_contacts_0_lastname
+          - name: apps_bouncer_billing_createdat
+          - name: apps_smile_contacts_0_email
+          - name: apps_tracktor_meta
+          - name: apps_mesa_installedat
+          - name: apps_mesa_meta_source_value
+          - name: apps_mesa_support_reviewrequestedat
+          - name: apps_mesa_contacts_0_lastname
+          - name: apps_mesa_meta
+          - name: apps_bouncer_isactive
+          - name: apps_mesa_contacts_0_firstname
+          - name: apps_tracktor_orders_elapsed
+          - name: apps_kitkarts_plan_meta
+          - name: shopifycreatedat
+          - name: apps_fablet_plan_planname
+          - name: apps_coin_uninstalledat
+          - name: apps_customizery_billing_trialendsat
+          - name: apps_customizery_plan_entitlements
+          - name: apps_uploadery_billing_interval
+          - name: apps_pagestudio_billing_trialendsat
+          - name: apps_coin_billing_trialendsat
+          - name: support_lastreplyagent
+          - name: apps_bouncer_contacts_0_email
+          - name: website
+          - name: apps_tracktor_billing_usage_charge_enabled_charge_hard_limit_value
+          - name: apps_tracktor_billing_method
+          - name: company_name
+          - name: apps_tracktor_billing_trial_ends_on
+          - name: apps_uploadery_support_didonboardingservice
+          - name: apps_smile_plan_meta
+          - name: apps_customizery_shopify_appstorereviewscore
+          - name: apps_blogstudio_meta
+          - name: apps_mesa_meta_ext_mesa_support_review
+          - name: apps_mesa_meta_extmesareviewsolicit_enabled
+          - name: apps_mesa_support_lastsupportcreatedat
+          - name: apps_mesa_installed_at
+          - name: apps_bouncer_billing_usagecharge_isenabled
+          - name: apps_smile_billing_interval
+          - name: apps_mesa_billing_price
+          - name: apps_tracktor_plan_entitlements_custom_order_statuses_status
+          - name: apps_uploadery_status
+          - name: apps_tracktor_support_didonboardingservice
+          - name: apps_customizery_billing_method
+          - name: apps_pagestudio_plan_planid
+          - name: apps_smile_installedat
+          - name: apps_mesa_support_doneeis
+          - name: apps_tracktor_support_reviewrequestedat
+          - name: apps_tracktor_plan_entitlements_mult_store_license_status
+          - name: apps_mesa_billing_usagecharge_premiumcap
+          - name: address_latitude
+          - name: apps_coin_billing_interval
+          - name: shopify_plan_name
+          - name: apps_tracktor_plan_entitlements_dedicated_support_available
+          - name: apps_tracktor_plan_entitlements_orders_status
+          - name: tracktor_analytics_exceptions
+          - name: apps_mesa_plan_planname
+          - name: apps_tracktor_shopify_appstorereviewscore
+          - name: apps_uploadery_billing_createdat
+          - name: email
+          - name: apps_kitkarts_contacts_0_email
+          - name: apps_mesa_meta_launchsessiondate_value
+          - name: analytics_currency
+          - name: apps_mesa_shopify_appstorereviewscore
+          - name: apps_mesa_status
+          - name: apps_kitkarts_billing_method
+          - name: apps_tracktor_plan_entitlements_onboarding_available
+          - name: apps_mesa_meta_jeff_enabled
+          - name: apps_customizery_support_dideis
+          - name: apps_kitkarts_billing_updatedat
+          - name: apps_mesa_plan_createdat
+          - name: apps_blogstudio_support_reviewrequestedat
+          - name: apps_tracktor_meta_analyticsid_value
+          - name: apps_blogstudio_meta_couponcode_value
+          - name: apps_tracktor_billing_usage_charge_enabled_advanced_reporting_status
+          - name: apps_smile_support_dideis
+          - name: apps_bouncer_support_dideis
+          - name: apps_tracktor_contacts_2_lastname
+          - name: apps_tracktor_plan_entitlements
+          - name: apps_uploadery_meta_extuploaderyreviewaskeis_enabled
+          - name: apps_mesa_meta_myname_value
+          - name: apps_bouncer_contacts_0_lastname
+          - name: apps_mesa_meta_ext_john_test_1_status
+          - name: apps_mesa_uninstalledat
+          - name: contacts_list_1_email
+          - name: apps_smile_shopify_appstorereviewscore
+          - name: apps_kitkarts_contacts_1_lastname
+          - name: apps_mesa_plan_plan_id
+          - name: apps_customizery_contacts_0_firstname
+          - name: apps_pagestudio_plan_entitlements
+          - name: apps_tracktor_billing_usage_charge_enabled_export_status
+          - name: apps_mesa_meta_goal_value
+          - name: apps_bouncer_billing_trialendsat
+          - name: name
+          - name: apps_bouncer_plan_createdat
+          - name: apps_tracktor_plan_entitlements_orders_available
+          - name: apps_mesa_billing_createdat
+          - name: apps_tracktor_status
+          - name: apps_smile_billing_price
+          - name: apps_kitkarts_shopify_appstorereviewat
+          - name: apps_tracktor_contacts_3_lastname
+          - name: context_library_version
+          - name: apps_mesa_meta_automations_value
+          - name: apps_coin_support_reviewrequestedat
+          - name: apps_mesa_meta_ext_john_test_1
+          - name: apps_smile_plan_entitlements
+          - name: shopify_createdat
+          - name: apps_blogstudio_billing_trialendsat
+          - name: apps_blogstudio_shopify_appstorereviewat
+          - name: apps_tracktor_billing_usage_charge_enabled_custom_branding_status
+          - name: address_postalcode
+          - name: apps_blogstudio_plan_planname
+          - name: apps_tracktor_billing_usage_charge_balanceremaining
+          - name: apps_mesa_meta_lastsupportcreatedat
+          - name: contacts_list_1_lastname
+          - name: apps_tracktor_plan_meta
+          - name: address_city
+          - name: apps_mesa_plan_meta_actions_startsat
+          - name: apps_mesa_billing_usagecharge_balanceremaining
+          - name: apps_tracktor_orders_ends_at
+          - name: apps_pagestudio_meta
+          - name: apps_blogstudio_billing_createdat
+          - name: apps_uploadery_billing_name
+          - name: apps_coin_meta_couponcode_value
+          - name: apps_kitkarts_contacts_0_lastname
+          - name: shopify_created_at
+          - name: apps_tracktor_meta_exttracktorreviewask_enabled
+          - name: address_state
+          - name: apps_mesa_plan_entitlements_cron_value
+          - name: apps_kitkarts_plan_entitlements
+          - name: apps_blogstudio_contacts_0_firstname
+          - name: apps_blogstudio_billing_price
+          - name: apps_mesa_meta_templates
+          - name: apps_blogstudio_shopify_appstorereviewscore
+          - name: tracktor_analytics_average_price
+          - name: apps_fablet_isactive
+          - name: apps_uploadery_support_dideis
+          - name: apps_customizery_plan_planid
+          - name: shopify_theme
+          - name: apps_fablet_support_dideis
+          - name: tracktor_analytics_install_orders_delta
+          - name: apps_tracktor_plan_planid
+          - name: apps_mesa_plan_entitlements_price_per_action_value
+          - name: apps_customizery_contacts_0_lastname
+          - name: apps_smile_plan_planname
+          - name: apps_tracktor_contacts_1_lastname
+          - name: address_statecode
+          - name: apps_tracktor_plan_entitlements_charge_hard_limit_value
+          - name: apps_customizery_billing_usagecharge_isenabled
+          - name: apps_blogstudio_isactive
+          - name: apps_kitkarts_support_didonboardingservice
+          - name: apps_tracktor_billing_usage_charge_balancecap
+          - name: apps_tracktor_meta_couponcode_value
+          - name: apps_blogstudio_support_dideis
+          - name: apps_kitkarts_contacts_0_firstname
+          - name: apps_mesa_meta_ext_john_is_awesome_5
+          - name: apps_fablet_meta
+          - name: apps_tracktor_plan_created_at
+          - name: apps_mesa_plan_meta_actions_endsat
+          - name: apps_tracktor_installedat
+          - name: apps_tracktor_uninstalledat_date_number_long
+          - name: apps_tracktor_billing_usage_charge_enabled_onboarding_status
+          - name: apps_mesa_plan_meta_actions_percentelapsed
+          - name: apps_tracktor_billing_usage_charge_enabled_price_per_order_value
+          - name: apps_mesa_plan_planid
+          - name: apps_tracktor_billing_created_at
+          - name: apps_customizery_support_didonboarding
+          - name: apps_mesa_meta_ext_mesa_review_ask_enabled
+          - name: apps_blogstudio_billing_usagecharge_isenabled
+          - name: contacts_has_multiple
+          - name: active
+          - name: apps_mesa_meta_templates_value
+          - name: apps_tracktor_contacts_2_firstname
+          - name: apps_customizery_billing_price
+          - name: apps_kitkarts_billing_createdat
+          - name: apps_tracktor_plan_createdat
+          - name: apps_tracktor_billing_createdat
+          - name: apps_tracktor_billing_usagecharge_balancecap
+          - name: apps_tracktor_orders_startsat
+          - name: apps_tracktor_billing_interval
+          - name: apps_tracktor_billing_price
+          - name: apps_bouncer_billing_price
+          - name: received_at
+          - name: apps_kitkarts_support_reviewrequestedat
+          - name: apps_uploadery_contacts_0_firstname
+          - name: apps_kitkarts_status
+          - name: apps_bouncer_billing_method
+          - name: apps_tracktor_meta_exttracktoreis_enabled
+          - name: apps_mesa_meta_enabledtemplates_value
+          - name: apps_mesa_support_dideis
+          - name: apps_tracktor_contacts_4_firstname
+          - name: apps_smile_shopify_appstorereviewat
+          - name: apps_blogstudio_billing_interval
+          - name: apps_mesa_meta_ext_test_john_enabled
+          - name: apps_mesa_meta_ext_john_test_4_enabled
+          - name: apps_tracktor_plan_plan_id
+          - name: apps_mesa_meta_enabledautomations_value
+          - name: apps_pagestudio_plan_createdat
+          - name: apps_customizery_plan_planname
+          - name: lastname
+          - name: apps_fablet_plan_createdat
+          - name: apps_tracktor_plan_meta_orders_elapsed
+          - name: apps_tracktor_billing_updatedat
+          - name: apps_pagestudio_plan_meta
+          - name: app_customizery_support_reviewrequestedat
+          - name: apps_mesa_meta_actions_value
+          - name: apps_coin_contacts_0_lastname
+          - name: apps_mesa_plan_entitlements_charge_hard_limit_value
+          - name: apps_uploadery_plan_planid
+          - name: apps_customizery_meta_extcustomizeryreviewask_enabled
+          - name: apps_kitkarts_shopify_appstorereviewscore
+          - name: contacts_list_0_lastname
+          - name: apps_tracktor_plan_entitlements_custom_map_styles_available
+          - name: apps_mesa_plan_entitlements_actions_available
+          - name: apps_uploadery_plan_entitlements
+          - name: support_lastreplyat
+          - name: apps_blogstudio_uninstalledat
+          - name: isactive
+          - name: apps_uploadery_meta
+          - name: apps_tracktor_meta_hadlaunchsession_enabled
+          - name: meta_0_enabled
+          - name: apps_uplaodery_mesa_optionsets_value
+          - name: apps_mesa_plan_entitlements
+          - name: apps_customizery_uninstalledat
+          - name: apps_coin_billing_createdat
+          - name: apps_smile_isactive
+          - name: apps_tracktor_plan_meta_orders_endsat
+          - name: apps_coin_plan_entitlements
+          - name: apps_uploadery_mesa_optionsets_value
+          - name: apps_blogstudio_contacts_0_lastname
+          - name: apps_mesa_billing_trialendsat
+          - name: updatedat
+          - name: apps_pagestudio_shopify_appstorereviewscore
+          - name: apps_uploadery_isactive
+          - name: meta_isnotable_enabled
+          - name: apps_tracktor_plan_entitlements_mult_store_license_available
+          - name: apps_tracktor_billing_usage_charge_enabled_mult_store_license_status
+          - name: apps_mesa_meta_extmesareviewask_enabled
+      - name: plan_changes
+        identifier: shoppad_planchange

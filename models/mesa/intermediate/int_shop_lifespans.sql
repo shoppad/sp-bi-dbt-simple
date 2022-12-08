@@ -17,6 +17,15 @@ charge_dates AS (
     GROUP BY 1
 ),
 
+plan_dates AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS first_dt,
+        MAX(dt) AS last_dt
+    FROM {{ ref('int_mesa_shop_plan_days') }}
+    GROUP BY 1
+),
+
 shop_dates AS (
     SELECT
         shop_subdomain,
@@ -54,6 +63,9 @@ combined_dates AS (
         UNION ALL
         SELECT *
         FROM custom_app_revenue
+        UNION ALL
+        SELECT *
+        FROM plan_dates
     )
     GROUP BY 1
 ),

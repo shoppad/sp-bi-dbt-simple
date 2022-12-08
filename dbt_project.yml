@@ -36,6 +36,19 @@ vars:
     ]
   activation_workflow_run_count: 50
   start_date: "2018-01-01"
+  ugly_segment_fields:
+    [
+      uuid_ts,
+      context_library_name,
+      context_library_version,
+      event,
+      event_text,
+      sent_at,
+      received_at,
+      handle,
+      method,
+      original_timestamp,
+    ]
   segment:
     segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
 
@@ -118,6 +131,8 @@ models:
 
     mesa_segment:
       staging:
+        +schema: support
+      intermediate:
         +schema: support
 tests:
   shoppad:
