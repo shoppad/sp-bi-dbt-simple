@@ -29,7 +29,7 @@ shop_calendar AS (
         shop_subdomain,
         dt,
         CASE
-            WHEN NOT(shop_trial_end_dates.dt IS NULL OR dt <= shop_trial_end_dates.dt)
+            WHEN (shop_trial_end_dates.dt IS NOT NULL AND dt > shop_trial_end_dates.dt)
                 THEN COALESCE(daily_plan_revenue, 0)
             ELSE 0
             END AS daily_plan_revenue

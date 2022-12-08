@@ -39,7 +39,7 @@ shops AS (
 plan_upgrade_dates AS (
     SELECT
         shop_subdomain,
-        MIN(timestamp)::date as plan_upgrade_date
+        MIN(timestamp)::DATE as plan_upgrade_date
     FROM {{ ref('stg_mesa_flow_events') }}
     WHERE event_id IN ('plan_upgrade', 'plan_select')
     GROUP BY 1
@@ -48,7 +48,7 @@ plan_upgrade_dates AS (
 final AS (
     SELECT
         *,
-        TO_TIMESTAMP(billing:plan:trial_ends::NUMERIC)::DATE AS trial_end_dt,
+        TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall
     FROM shops
     LEFT JOIN install_dates USING (shop_subdomain)
