@@ -25,10 +25,20 @@ activation_dates AS (
         1
 ),
 
+launch_session_dates AS (
+    SELECT
+        shop_subdomain,
+        meta_attribs.value:value::DATE AS launch_session_date
+    FROM {{ ref('stg_shops') }},
+        LATERAL FLATTEN(input => meta) AS meta_attribs
+    WHERE meta_attribs.value:name = 'launchsessiondate'
+),
+
 final AS (
     SELECT *
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
+    LEFT JOIN launch_session_dates USING (shop_subdomain)
 )
 
 SELECT * FROM final

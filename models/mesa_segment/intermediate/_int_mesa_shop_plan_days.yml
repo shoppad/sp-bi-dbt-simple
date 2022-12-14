@@ -5,3 +5,6 @@ models:
       - name: DT
       - name: SHOP_SUBDOMAIN
       - name: DAILY_PLAN_REVENUE
+      - name: MESA_PLAN
+      - name: IS_SHOPIFY_ZOMBIE_PLAN
+      - name: SHOPIFY_PLAN

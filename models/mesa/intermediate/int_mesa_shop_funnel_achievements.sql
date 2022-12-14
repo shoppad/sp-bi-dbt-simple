@@ -1,6 +1,9 @@
 WITH
 shops AS (
-    SELECT * FROM {{ ref('int_shops') }}
+    SELECT
+        shop_subdomain,
+        first_installed_at_pt
+    FROM {{ ref('int_shops') }}
 ),
 
 funnel_steps AS (
@@ -22,6 +25,13 @@ workflow_achievements AS (
         action AS key,
         'mesa_flow_events' AS source
     FROM {{ ref('int_mesa_flow_achievements') }}
+    UNION ALL
+    SELECT
+        shop_subdomain,
+        first_installed_at_pt AS achieved_at_pt,
+        'installed_app' AS key,
+        'hardcoded_in_dbt' AS source
+    FROM shops
 ),
 
 funnel_achievements AS (

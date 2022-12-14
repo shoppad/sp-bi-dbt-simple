@@ -27,7 +27,6 @@ vars:
   "dbt_date:time_zone": "America/Los_Angeles"
   etl_fields:
     [
-      "CREATED_AT",
       "__HEVO__DATABASE_NAME",
       "__HEVO__INGESTED_AT",
       "__HEVO__LOADED_AT",
@@ -46,7 +45,6 @@ vars:
       sent_at,
       received_at,
       handle,
-      method,
       original_timestamp,
     ]
   segment:

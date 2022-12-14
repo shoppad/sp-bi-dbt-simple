@@ -1,16 +1,15 @@
-WITH raw_plan_changes AS (
+WITH raw_mesa_plan_changes AS (
     SELECT
-        id AS plan_change_id,
+        id AS mesa_plan_change_id,
         user_id AS shop_subdomain,
-        CASE
+        COALESCE(CASE
             WHEN price NOT IN ('hybrid', 'usage')
                 THEN REPLACE(price, ',', '')::NUMERIC
-        END AS price,
+        END, 0) AS price,
         {{ pacific_timestamp('timestamp') }} AS changed_at_pt,
         date_trunc('day', changed_at_pt)::DATE AS changed_on_pt,
-        {{ var('ugly_segment_fields') | join(',\n       ') }},
         * EXCLUDE (user_id, id, price, timestamp, {{ var('ugly_segment_fields') | join(', ') }})
-    FROM {{ source('php_segment', 'plan_changes') }}
+    FROM {{ source('php_segment', 'mesa_plan_changes') }}
     WHERE handle = 'mesa'
 ),
 
@@ -22,7 +21,7 @@ shops AS (
 final AS (
     SELECT *
     FROM shops
-    LEFT JOIN raw_plan_changes USING (shop_subdomain)
+    INNER JOIN raw_mesa_plan_changes USING (shop_subdomain)
 
 )
 

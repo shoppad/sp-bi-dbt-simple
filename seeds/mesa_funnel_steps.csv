@@ -1,4 +1,5 @@
 name, key, step_order, source
+"Installed the App",installed_app, 1,hardcoded_in_dbt
 "Added a Step to a Workflow",create_new_workflow_action_click, 2,workflow_events
 "Created a Workflow",create, 3,workflow_events
 "Installed a Template",install_template, 3,workflow_events

@@ -19,11 +19,9 @@ models:
       - name: entitlements
       - name: referral
         description: "[fill]"
-      - name: method
       - name: meta
         description: a field used by account services to record onboarding sessions.
       - name: handle
-      - name: timestamp
       - name: first_installed_at_pt
         tests:
           - not_null
@@ -60,4 +58,5 @@ models:
         description: The week of the Shop's first app installation.
       - name: cohort_month
         description: The month of the Shop's first app installation.
-      - name: TRIAL_END_DT
+      - name: trial_end_dt
+        description: The date the Shops trial ended.

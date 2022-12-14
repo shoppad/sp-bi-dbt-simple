@@ -1,6 +1,19 @@
-{%- set source_table = source('mesa_mongo', 'shops') -%}
-
 WITH
+raw_shops AS (
+    SELECT * EXCLUDE (uuid),
+        uuid AS shop_subdomain
+    FROM {{ source('mesa_mongo', 'shops') }}
+    WHERE NOT(__hevo__marked_deleted)
+),
+
+trimmed_shops AS (
+    {% set exclude = ['_id', '_created_at', 'timestamp', 'method'] + var('etl_fields') -%}
+
+    SELECT * EXCLUDE ({{ exclude | join(', ') }}),
+        _created_at AS created_at
+    FROM raw_shops
+),
+
 staff_subdomains AS (
     SELECT shop_subdomain
     FROM {{ ref('staff_subdomains') }}
@@ -8,32 +21,49 @@ staff_subdomains AS (
 
 install_dates AS (
     SELECT
-        uuid::string AS shop_subdomain,
-        {{ pacific_timestamp('MIN(_created_at)') }} AS first_installed_at_pt,
-        {{ pacific_timestamp('MAX(_created_at)') }} AS latest_installed_at_pt,
+        shop_subdomain,
+        {{ pacific_timestamp('MIN(created_at)') }} AS first_installed_at_pt,
+        {{ pacific_timestamp('MAX(created_at)') }} AS latest_installed_at_pt,
         date_trunc('week', first_installed_at_pt)::DATE AS cohort_week,
         date_trunc('month', first_installed_at_pt)::DATE AS cohort_month
-    FROM {{ source_table }}
-    WHERE NOT(__hevo__marked_deleted)
+    FROM trimmed_shops
     GROUP BY 1
 ),
 
-uninstall_dates AS (
+uninstall_data_points AS (
     SELECT
         id AS shop_subdomain,
         apps_mesa_uninstalledat AS uninstalled_at_pt -- NOTE: This timestamp is already in PST
     FROM {{ source('php_segment', 'users') }}
+    UNION ALL
+    SELECT
+        shop_subdomain,
+        {{ pacific_timestamp('uninstalled_at_pt') }} AS uninstalled_at_pt
+    FROM {{ ref('stg_mesa_uninstalls') }}
+),
+
+uninstall_dates AS (
+    SELECT
+        shop_subdomain,
+        MAX(uninstalled_at_pt) AS uninstalled_at_pt
+    FROM uninstall_data_points
+    GROUP BY 1
+),
+
+shop_metas AS (
+    SELECT
+        shop_subdomain,
+        ARRAY_UNION_AGG(meta) AS aggregated_meta
+    FROM trimmed_shops
+    GROUP BY 1
 ),
 
 shops AS (
-    SELECT
-        {{ groomed_column_list(source_table, except=['_id', '_created_at', 'uuid','group']) | join(',\n      ') }},
-        uuid::string AS shop_subdomain
-    FROM {{ source_table }}
+    SELECT * EXCLUDE ("META")
+    FROM trimmed_shops
     WHERE NOT(shop_subdomain IN (SELECT * FROM staff_subdomains))
-        AND NOT(__hevo__marked_deleted)
         AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY _created_at DESC) = 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
 ),
 
 plan_upgrade_dates AS (
@@ -47,10 +77,12 @@ plan_upgrade_dates AS (
 
 final AS (
     SELECT
-        *,
+        * EXCLUDE (created_at, "GROUP", aggregated_meta),
+        shop_metas.aggregated_meta AS meta,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall
     FROM shops
+    LEFT JOIN shop_metas USING (shop_subdomain)
     LEFT JOIN install_dates USING (shop_subdomain)
     LEFT JOIN uninstall_dates USING (shop_subdomain)
     LEFT JOIN plan_upgrade_dates USING (shop_subdomain)

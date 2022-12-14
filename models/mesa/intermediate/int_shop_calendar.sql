@@ -11,7 +11,7 @@ shop_plan_days AS (
        shop_subdomain,
        dt,
        daily_plan_revenue
-    FROM {{ ref('int_mesa_shop_plan_days') }}
+    FROM {{ ref('int_mesa_shop_plan_days') }} g
 ),
 
 shop_lifespans AS (

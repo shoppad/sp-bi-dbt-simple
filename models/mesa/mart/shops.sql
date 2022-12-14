@@ -105,6 +105,7 @@ final AS (
         NOT(activation_date_pt IS NULL) AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
         {{ datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
+        {{ datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
         'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||
             shop_subdomain ||
             '/mesa' AS backdoor_url,

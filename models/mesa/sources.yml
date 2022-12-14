@@ -715,5 +715,9 @@ sources:
           - name: apps_tracktor_plan_entitlements_mult_store_license_available
           - name: apps_tracktor_billing_usage_charge_enabled_mult_store_license_status
           - name: apps_mesa_meta_extmesareviewask_enabled
-      - name: plan_changes
+      - name: mesa_plan_changes
         identifier: shoppad_planchange
+      - name: shopify_plan_changes
+        identifier: shopify_planchange
+      - name: app_uninstalls
+        identifier: shoppad_uninstall
