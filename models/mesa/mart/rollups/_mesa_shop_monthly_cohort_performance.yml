@@ -1,6 +1,8 @@
 version: 2
 models:
   - name: mesa_shop_monthly_cohort_performance
+    description: |
+      This model calculates the funnel performance of the monthly cohorts of Shops.
     columns:
       - name: cohort_month
         description: The month of the Shop's first app installation.

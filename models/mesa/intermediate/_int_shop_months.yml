@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: int_shop_months
+    columns:
+      - name: MONTH
+      - name: SHOP_SUBDOMAIN
+      - name: INC_AMOUNT
+      - name: FIRST_MONTH

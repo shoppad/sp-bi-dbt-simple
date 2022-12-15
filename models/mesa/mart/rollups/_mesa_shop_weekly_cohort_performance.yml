@@ -1,6 +1,8 @@
 version: 2
 models:
   - name: mesa_shop_weekly_cohort_performance
+    description: |
+      This model calculates the funnel performance of the weekly cohorts of Shop installs.
     columns:
       - name: cohort_week
         description: The week of the Shop's first app installation.

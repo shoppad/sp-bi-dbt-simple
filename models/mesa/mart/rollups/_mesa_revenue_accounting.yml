@@ -1,0 +1,50 @@
+version: 2
+models:
+  - name: mesa_revenue_accounting
+    columns:
+      - name: month
+        tests:
+          - unique
+          - not_null
+      - name: rev
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Total Revenue
+      - name: retained
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Retained Revenue
+      - name: new
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: New Shop Revenue
+      - name: expansion
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Additional Revenue from Existing Shops
+      - name: resurrected
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Revenue Gain from Resurrected Shops
+      - name: contraction
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Revenue Lost from Existing Shops
+      - name: churned
+        tests:
+          - not_null
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Revenue Lost from Churned Shops

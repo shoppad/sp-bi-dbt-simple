@@ -56,3 +56,4 @@ models:
         description: The month of the Shop's first app installation.
       - name: TRIAL_END_DT
       - name: LAUNCH_SESSION_DATE
+      - name: HAS_HAD_LAUNCH_SESSION

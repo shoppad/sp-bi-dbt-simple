@@ -56,7 +56,6 @@ final AS (
             ELSE billing:plan:interval
         END::STRING AS plan_interval,
         billing:plan_price::STRING AS plan_price,
-        {{ pacific_timestamp('billing:plan:created_at::STRING') }} AS created_at_pt,
         billing:plan:balance_used::STRING AS balance_used,
         billing:plan_type::STRING AS plan_type,
         IFF(plan_price = '', '0', IFF(plan_interval = 'annual', plan_price / 365, plan_price / 30)) AS daily_plan_revenue

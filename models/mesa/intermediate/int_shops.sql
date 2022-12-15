@@ -34,11 +34,21 @@ launch_session_dates AS (
     WHERE meta_attribs.value:name = 'launchsessiondate'
 ),
 
+boolean_launch_sessions AS (
+  SELECT
+        shop_subdomain,
+        meta_attribs.value:value = 'enabled' AS has_had_launch_session
+    FROM {{ ref('stg_shops') }},
+        LATERAL FLATTEN(input => meta) AS meta_attribs
+    WHERE meta_attribs.value:name = 'hadlaunchsession'
+),
+
 final AS (
     SELECT *
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
+    LEFT JOIN boolean_launch_sessions USING (shop_subdomain)
 )
 
 SELECT * FROM final

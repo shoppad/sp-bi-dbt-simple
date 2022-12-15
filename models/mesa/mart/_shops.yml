@@ -1,7 +1,9 @@
 version: 2
 models:
   - name: shops
-    description: formatted, production-ready shops.
+    description: Formatted, production-ready Shops.
+    meta:
+      metabase.caveats: This table combines all the install records of `M3_MESA` into one Shop record.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
@@ -77,16 +79,19 @@ models:
         description: "[fill]"
       - name: balance_remaining
         description: "[fill]"
-      - name: orders_initial_count
-        description: the 30-day order count volume at the time of app installation.
       - name: start_date_pt
         description: "[fill]"
       - name: end_date_pt
         description: "[fill]"
+      - name: orders_initial_count
+        description: the 30-day order count volume at the time of app installation.
+        meta:
+          metabase.display_name: Initial Orders Count
       - name: revenue_initial_total
         description: the 30-day gmv of the shop at the time of installation.
-      - name: created_at_pt
-        description: "[fill]"
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Initial Revenue / GMV
       - name: trial_ends_pt
         description: the date the initial billing trial period ends.
       - name: chargebee_id
@@ -101,10 +106,13 @@ models:
         description: the code-friendly shortcode of the current mesa plan.
       - name: revenue_current_total
         description: the current 30-day gmv of the shop.
+        meta:
+          metabase.display_name: Current Revenue / GMV
+          metabase.semantic_type: type/Currency
       - name: plan_interval
         description: the frequency of the billing plan interval.
       - name: trial_days
-        description: the initial lenght of the trial period.
+        description: the initial length of the trial period.
       - name: is_builder_wizard_completed
         description: "[fill]"
       - name: hotjar_url

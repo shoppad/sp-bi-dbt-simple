@@ -1,6 +1,11 @@
 version: 2
 models:
   - name: mesa_shop_days
+    description: >
+      The "DAU" table. This table contains a row for each day that a shop has some kind of "usage" (e.g. a workflow run, a plan charge, etc.) in the system. This table is used to calculate metrics like "daily active shops" and "daily active shops by cohort".
+    meta:
+      metabase.caveats: >
+        This table contains records for non-paying Shops. A record is created if they run a workflow *or* if they have a plan charge or anything else interesting.
     tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list:
@@ -59,7 +64,7 @@ models:
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/currency
+          metabase.semantic_type: type/Currency
       - name: workflow_runs_count
         description: The number of Workflow Run attempts that have been started.
         tests:

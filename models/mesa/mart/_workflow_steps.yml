@@ -1,6 +1,10 @@
 version: 2
 models:
   - name: workflow_steps
+    description: This table contains the individual Steps of a Workflow.
+    meta:
+      metabase.caveats: |
+        Some records are for Deleted Workflows, so be sure to filter on is_deleted.
     columns:
       - name: workflow_step_id
         tests:

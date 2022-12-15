@@ -1,6 +1,9 @@
 version: 2
 models:
   - name: mesa_charges
+    meta:
+      metabase.display_name: Mesa Usage Charges
+    description: Records of usage charges for Mesa Shops.
     columns:
       - name: shop_subdomain
         tests:

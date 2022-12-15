@@ -1,6 +1,11 @@
 version: 2
 models:
   - name: workflows
+    description: |
+      This model contains information about individual Workflows.
+    meta:
+      metabase.caveats: |
+        Some records are for Deleted Workflows, so be sure to filter on is_deleted.
     columns:
       - name: workflow_id
         tests:

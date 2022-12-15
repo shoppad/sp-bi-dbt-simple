@@ -1,6 +1,9 @@
 version: 2
 models:
   - name: mesa_growth_accounting
+    description: User Growth Accounting for Mesa
+    meta:
+      metabase.display_name: Mesa Shop Growth Accounting
     columns:
       - name: month
         description: The month of the User Growth Accounting.
