@@ -243,3 +243,7 @@ models:
         description: Whether the shop has had a launch session with customer success.
         tests:
           - not_null
+      - name: revenue_current_total_tier
+        description: The tier of the shop's current revenue.
+        meta:
+          metabase.display_name: Current Revenue Tier/Bucket
