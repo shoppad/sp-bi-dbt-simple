@@ -2,11 +2,28 @@ version: 2
 models:
   - name: workflow_steps
     columns:
-      - name: WORKFLOW_STEP_ID
-      - name: SHOP_SUBDOMAIN
-      - name: INTEGRATION_APP
-      - name: WORKFLOW_ID
-      - name: STEP_TYPE
-      - name: STEP_WEIGHT
-      - name: POSITION_IN_WORKFLOW
-      - name: IS_DELETED
+      - name: workflow_step_id
+        tests:
+          - unique
+          - not_null
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - relationships:
+              to: ref('shops')
+              field: shop_subdomain
+      - name: integration_app
+      - name: workflow_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('workflows')
+              field: workflow_id
+      - name: step_type
+        tests:
+          - not_null
+      - name: step_weight
+      - name: position_in_workflow
+      - name: is_deleted
+        tests:
+          - not_null
