@@ -3,40 +3,45 @@ models:
   - name: mesa_growth_accounting
     columns:
       - name: month
-        description: The month of the revenue accounting.
+        description: The month of the User Growth Accounting.
         tests:
           - unique
       - name: mau
-        description: The number of paying users in the month.
+        description: The number of paying Shops in the month.
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Number
+          metabase.display_name: Monthly Active Shops
+          # metabase.semantic_type: nil
 
       - name: retained
-        description: The amount of revenue attributed to pre-existing customers before the period.
+        description: The amount of pre-existing paying Shops that previously paid before the period.
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Currency
+          metabase.display_name: Retained Shops
+          # metabase.semantic_type: nil
 
       - name: new
-        description: The amount of revenue attributed to new customers this period.
+        description: The amount of new paying Shops this period.
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Currency
+          metabase.display_name: New Active Shops
+          # metabase.semantic_type: nil
 
       - name: resurrected
-        description: The amount of revenue attributed to customers who were not active in the last period.
+        description: The amount of pre-existing paying Shops this period who were not active in the last period.
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Currency
+          metabase.display_name: Resurrected Shops
+          # metabase.semantic_type: nil
 
       - name: churned
-        description: The amount of revenue lost in the period from customers paying in the last period.
+        description: The amount of Shops paying in the last period who didn't pay this period.
         tests:
           - not_null
         meta:
-          metabase.semantic_type: type/Currency
+          metabase.display_name: Churned Shops
+          # metabase.semantic_type: nil

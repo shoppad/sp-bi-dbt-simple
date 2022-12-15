@@ -5,13 +5,13 @@
 WITH dau AS (
     -- This part of the query can be pretty much anything.
     -- The only requirement is that it have three columns:
-    --   dt, shop_subdomain, inc_amt
+    --   dt, shop_subdomain, inc_amount
     -- Where dt is a date and shop_subdomain is some unique identifier for a user.
     -- Each dt-shop_subdomain pair should be unique in this table.
-    -- inc_amt represents the amount of value that this user created ON dt.
+    -- inc_amount represents the amount of value that this user created ON dt.
     -- The most common CASE is
-    --   inc_amt = incremental revenue FROM the user ON dt
-    -- If you want to do L28 growth accounting, user inc_amt=1.
+    --   inc_amount = incremental revenue FROM the user ON dt
+    -- If you want to do L28 growth accounting, user inc_amount=1.
     -- The version here derives everything FROM the tutorial.yammer_events
     -- data set provided for free BY Mode.
     -- If you edit just this part to represent your data, the rest
@@ -21,18 +21,16 @@ WITH dau AS (
     SELECT
         shop_subdomain,
         dt,
-        SUM(inc_amount) AS inc_amt
+        inc_amount
     FROM {{ ref('mesa_shop_days') }}
-    GROUP by
-        1,
-        2
+    WHERE is_active
 ),
 
 mau AS (
     SELECT
         shop_subdomain,
         date_trunc('month', dt) AS month,
-        sum(inc_amt) AS inc_amt
+        sum(inc_amount) AS inc_amount
     FROM dau
     GROUP BY
         1,
@@ -56,20 +54,20 @@ mau_decorated AS (
     SELECT
         mau.month,
         mau.shop_subdomain,
-        mau.inc_amt,
+        mau.inc_amount,
         first_dt.first_month
     FROM mau
-    INNER JOIN first_dt ON (mau.shop_subdomain = first_dt.shop_subdomain) and mau.inc_amt > 0
+    INNER JOIN first_dt ON (mau.shop_subdomain = first_dt.shop_subdomain) and mau.inc_amount > 0
 ),
 
 -- This is MAU growth accounting. Note that this does not require any
--- information about inc_amt. As discussed in the articles, these
+-- information about inc_amount. As discussed in the articles, these
 -- quantities satisfy some identities:
 -- MAU(t) = retained(t) + new(t) + resurrected(t)
 -- MAU(t - 1 month) = retained(t) + churned(t)
 mau_growth_accounting AS (
     SELECT
-        coalesce(mau_decorated.month, dateadd(month, 1, last_month.month)) AS month,
+        coalesce(mau_decorated.month, dateadd(month, 1, last_month.month))::DATE AS month,
         count(distinct mau_decorated.shop_subdomain) AS mau,
         count(distinct CASE WHEN last_month.shop_subdomain is not NULL THEN mau_decorated.shop_subdomain END) AS retained,
         count(distinct CASE WHEN mau_decorated.first_month = mau_decorated.month THEN mau_decorated.shop_subdomain END) AS new,
@@ -84,11 +82,10 @@ mau_growth_accounting AS (
         and mau_decorated.month = dateadd(month, 1, last_month.month)
         )
     GROUP BY 1
-    ORDER BY 1
 )
 
 -- For MAU growth accounting use this
 SELECT *
 FROM mau_growth_accounting
 WHERE month <= date_trunc('month', CURRENT_DATE())
-ORDER BY 1 ASC
+ORDER BY month DESC
