@@ -6,7 +6,6 @@ WITH
         SELECT
             DISTINCT uuid AS shop_subdomain,
             TRUE as has_{{ app }}
-        {# FROM {{ ref('stg_' + app + '_shops') }} #}
         FROM {{ source('mongo_sync',  app + '_shops') }}
     ),
 {% endfor %}

@@ -43,12 +43,23 @@ boolean_launch_sessions AS (
     WHERE meta_attribs.value:name = 'hadlaunchsession'
 ),
 
+conversion_rates AS (
+    SELECT
+        currency,
+        in_usd
+    FROM {{ ref('currency_conversion_rates') }}
+),
+
 final AS (
-    SELECT *
+    SELECT * EXCLUDE (revenue_current_total, revenue_initial_total, in_usd),
+    revenue_initial_total * in_usd AS revenue_initial_total_usd,
+    revenue_current_total * in_usd AS revenue_current_total_usd
+
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
     LEFT JOIN boolean_launch_sessions USING (shop_subdomain)
+    LEFT JOIN conversion_rates USING (currency)
 )
 
 SELECT * FROM final

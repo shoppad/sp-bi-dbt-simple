@@ -114,24 +114,24 @@ final AS (
         IFNULL(has_had_launch_session, NOT(launch_session_date IS NULL)) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
         CASE
-            WHEN revenue_current_total < 100 THEN 100
-            WHEN revenue_current_total < 1000 THEN 1000
-            WHEN revenue_current_total < 10000 THEN 10000
-            WHEN revenue_current_total < 50000 THEN 50000
-            WHEN revenue_current_total < 100000 THEN 100000
-            WHEN revenue_current_total < 250000 THEN 250000
-            WHEN revenue_current_total < 500000 THEN 500000
-            WHEN revenue_current_total < 750000 THEN 750000
-            WHEN revenue_current_total < 1000000 THEN 1000000
-            WHEN revenue_current_total < 2000000 THEN 2000000
-            WHEN revenue_current_total < 5000000 THEN 5000000
-            WHEN revenue_current_total < 10000000 THEN 10000000
-            WHEN revenue_current_total < 20000000 THEN 20000000
-            WHEN revenue_current_total < 50000000 THEN 50000000
-            WHEN revenue_current_total < 100000000 THEN 100000000
-            WHEN revenue_current_total < 200000000 THEN 200000000
-            WHEN revenue_current_total < 500000000 THEN 500000000
-            WHEN revenue_current_total < 1000000000 THEN 1000000000
+            WHEN revenue_current_total_usd < 100 THEN 100
+            WHEN revenue_current_total_usd < 1000 THEN 1000
+            WHEN revenue_current_total_usd < 10000 THEN 10000
+            WHEN revenue_current_total_usd < 50000 THEN 50000
+            WHEN revenue_current_total_usd < 100000 THEN 100000
+            WHEN revenue_current_total_usd < 250000 THEN 250000
+            WHEN revenue_current_total_usd < 500000 THEN 500000
+            WHEN revenue_current_total_usd < 750000 THEN 750000
+            WHEN revenue_current_total_usd < 1000000 THEN 1000000
+            WHEN revenue_current_total_usd < 2000000 THEN 2000000
+            WHEN revenue_current_total_usd < 5000000 THEN 5000000
+            WHEN revenue_current_total_usd < 10000000 THEN 10000000
+            WHEN revenue_current_total_usd < 20000000 THEN 20000000
+            WHEN revenue_current_total_usd < 50000000 THEN 50000000
+            WHEN revenue_current_total_usd < 100000000 THEN 100000000
+            WHEN revenue_current_total_usd < 200000000 THEN 200000000
+            WHEN revenue_current_total_usd < 500000000 THEN 500000000
+            WHEN revenue_current_total_usd < 1000000000 THEN 1000000000
         END AS revenue_current_total_tier,
 
         'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||

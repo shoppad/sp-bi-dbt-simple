@@ -87,7 +87,7 @@ models:
         description: The 30-day order count volume at the time of app installation.
         meta:
           metabase.display_name: Initial Orders Count
-      - name: revenue_initial_total
+      - name: revenue_initial_total_usd
         description: The 30-day gmv of the shop at the time of installation.
         meta:
           metabase.semantic_type: type/Currency
@@ -104,7 +104,7 @@ models:
         description: "[fill]"
       - name: plan_id
         description: The code-friendly shortcode of the current mesa plan.
-      - name: revenue_current_total
+      - name: revenue_current_total_usd
         description: The current 30-day gmv of the shop.
         meta:
           metabase.display_name: Current Revenue / GMV

@@ -22,8 +22,6 @@ models:
           - not_null
           - unique
         description: The foreign key for the Shop.
-      - name: revenue_initial_total
-        description: The 30-day gmv of the shop at the time of installation.
       - name: orders_current_count
         description: The current monthly order volume of the shop.
       - name: orders_initial_count
@@ -36,8 +34,6 @@ models:
         description: "[fill]"
       - name: latest_installed_at_pt
         description: The most recent app installation date.
-      - name: revenue_current_total
-        description: The current 30-day gmv of the shop.
       - name: meta
         description: a field used by account services to record onboarding sessions.
       - name: is_builder_wizard_completed
@@ -57,3 +53,6 @@ models:
       - name: TRIAL_END_DT
       - name: LAUNCH_SESSION_DATE
       - name: HAS_HAD_LAUNCH_SESSION
+      - name: REVENUE_INITIAL_TOTAL_USD
+      - name: REVENUE_CURRENT_TOTAL_USD
+      - name: EXCHANGE_RATE_AT

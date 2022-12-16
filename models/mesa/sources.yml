@@ -100,6 +100,21 @@ sources:
       - name: tracktor_shops
         identifier: m3_tracktor
 
+  - name: economy_data
+    description: Snowflake Marketplace economy data used for things like currency conversion rates.
+    database: economy_data_atlas
+    schema: economy
+    loader: Snowflake
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: currency_conversion_rates
+        identifier: exratescc2018
+
   - name: mesa_segment
     description: events and objects sent to snowflake via segment.com.
     database: mongo
