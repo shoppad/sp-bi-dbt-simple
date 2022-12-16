@@ -41,4 +41,4 @@ shop_calendar AS (
 )
 
 SELECT *
-FROM shop_plan_days
+FROM shop_calendar
