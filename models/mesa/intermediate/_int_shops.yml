@@ -8,6 +8,11 @@ models:
       - name: currency
         tests:
           - not_null
+          - relationships_proportion:
+              to: ref('currency_conversion_rates')
+              warn_if: ">5"
+              error_if: ">15"
+              field: currency
         description: The financial currency used by the shop with its customers.
       - name: install_status
         tests:

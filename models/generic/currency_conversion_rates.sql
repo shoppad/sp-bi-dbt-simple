@@ -6,7 +6,6 @@ FROM {{ source('economy_data', 'currency_conversion_rates') }}
 WHERE "Indicator Name" = 'Close'
     AND "Frequency" = 'D'
     AND "Currency Unit" = 'USD'
-    AND "Currency Exchange" = 'Real-time FX'
 QUALIFY ROW_NUMBER() OVER (PARTITION BY "Currency Name" ORDER BY "Date" DESC) = 1
 UNION ALL
 SELECT
