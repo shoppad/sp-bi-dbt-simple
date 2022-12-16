@@ -42,4 +42,3 @@ shop_calendar AS (
 
 SELECT *
 FROM shop_plan_days
-WHERE shop_subdomain = 'mud-wtr'
