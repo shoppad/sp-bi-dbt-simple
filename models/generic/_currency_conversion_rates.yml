@@ -1,0 +1,7 @@
+version: 2
+models:
+  - name: currency_conversion_rates
+    columns:
+      - name: CURRENCY
+      - name: IN_USD
+      - name: EXCHANGE_RATE_AT
