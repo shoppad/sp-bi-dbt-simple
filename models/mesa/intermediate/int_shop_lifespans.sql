@@ -73,10 +73,11 @@ combined_dates AS (
 final AS (
     SELECT
         shop_subdomain,
-        first_dt,
-        last_dt,
-        {{ datediff('first_dt', 'last_dt', 'day') }} + 1 AS lifespan_length
+        combined_dates.first_dt,
+        LEAST(shop_dates.last_dt, combined_dates.last_dt) AS last_dt,
+        {{ datediff('combined_dates.first_dt', 'LEAST(shop_dates.last_dt, combined_dates.last_dt)', 'day') }} + 1 AS lifespan_length
     FROM combined_dates
+    LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.
 )
 
 SELECT *

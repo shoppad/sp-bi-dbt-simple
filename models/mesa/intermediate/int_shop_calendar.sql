@@ -29,9 +29,9 @@ shop_calendar AS (
         shop_subdomain,
         dt,
         CASE
-            WHEN (shop_trial_end_dates.dt IS NOT NULL AND dt > shop_trial_end_dates.dt)
-                THEN COALESCE(daily_plan_revenue, 0)
-            ELSE 0
+            WHEN (shop_trial_end_dates.dt IS NOT NULL AND dt < shop_trial_end_dates.dt)
+                THEN 0
+            ELSE COALESCE(daily_plan_revenue, 0)
             END AS daily_plan_revenue
     FROM shop_lifespans
     INNER JOIN calendar_dates
@@ -41,4 +41,5 @@ shop_calendar AS (
 )
 
 SELECT *
-FROM shop_calendar
+FROM shop_plan_days
+WHERE shop_subdomain = 'mud-wtr'
