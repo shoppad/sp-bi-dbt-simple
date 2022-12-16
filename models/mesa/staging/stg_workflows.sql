@@ -1,7 +1,7 @@
 WITH
 source_workflows as (
 
-    select * from {{ source('mesa_mongo', 'workflows') }}
+    select * from {{ source('mongo_sync', 'workflows') }}
 
 ),
 

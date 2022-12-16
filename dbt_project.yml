@@ -132,6 +132,8 @@ models:
         +schema: support
       intermediate:
         +schema: support
+    other_apps:
+      +schema: support
 tests:
   shoppad:
     mesa:

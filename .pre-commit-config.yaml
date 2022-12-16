@@ -18,7 +18,7 @@ repos:
         files: ^models/mesa/mart
         args: ["--test-cnt", "1", "--"]
       - id: check-model-columns-have-desc
-        files: ^models/mesa/mart
+        #files: ^models/mesa/mart
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0

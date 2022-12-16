@@ -27,7 +27,7 @@ first_step_runs AS (
         COALESCE(metadata:child_fails, 0) AS child_failure_count,
         updated_at,
         metadata:is_test AS is_test_run
-    FROM {{ source('mesa_mongo', 'tasks') }}
+    FROM {{ source('mongo_sync', 'tasks') }}
     WHERE
         NOT(__hevo__marked_deleted)
         AND metadata:trigger:trigger_type = 'input'

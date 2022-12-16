@@ -32,7 +32,7 @@ formatted_install_pageviews AS (
 ),
 
 raw_install_events AS (
-    SELECT * FROM {{ source('mesa_mongo', 'mesa_install_events') }}
+    SELECT * FROM {{ source('mongo_sync', 'mesa_install_events') }}
 ),
 
 formatted_install_events AS (

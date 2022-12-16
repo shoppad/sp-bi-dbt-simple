@@ -1,6 +1,6 @@
 WITH workflow_steps AS (
     SELECT *
-    FROM {{ source('mesa_mongo', 'workflow_steps') }}
+    FROM {{ source('mongo_sync', 'workflow_steps') }}
 
 ),
 

@@ -11,6 +11,8 @@ models:
           column_list:
             - dt
             - shop_subdomain
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 100000
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.

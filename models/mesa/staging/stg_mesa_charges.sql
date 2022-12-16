@@ -8,7 +8,7 @@ charges AS (
         *,
         _id AS charge_id,
         uuid AS shop_subdomain
-    FROM {{ source('mesa_mongo', 'mesa_charges') }}
+    FROM {{ source('mongo_sync', 'mesa_charges') }}
 ),
 
 final AS (

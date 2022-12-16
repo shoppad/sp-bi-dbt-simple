@@ -12,7 +12,7 @@ models:
           - unique
         description: The foreign key for the Shop.
       - name: status
-        description: the usage status of the shop.
+        description: The usage status of the shop.
       - name: billing
       - name: scopes
       - name: themes
@@ -25,11 +25,11 @@ models:
       - name: first_installed_at_pt
         tests:
           - not_null
-        description: the effective created at for the shop.
+        description: The effective created at for the shop.
       - name: latest_installed_at_pt
         tests:
           - not_null
-        description: the most recent app installation date.
+        description: The most recent app installation date.
       - name: mongoid
       - name: analytics
       - name: webhooks
@@ -46,17 +46,17 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
-        description: the timestamp of the latest uninstallation of the app.
+        description: The timestamp of the latest uninstallation of the app.
       - name: minutes_until_uninstall
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
-        description: the minutes between initial install and the latest uninstall.
+        description: The minutes between initial install and the latest uninstall.
       - name: plan_upgrade_date
-        description: the date of the first plan upgrade action.
+        description: The date of the first plan upgrade action.
       - name: cohort_week
         description: The week of the Shop's first app installation.
       - name: cohort_month
         description: The month of the Shop's first app installation.
       - name: trial_end_dt
-        description: The date the Shops trial ended.
+        description: The date the Shop's trial ended.

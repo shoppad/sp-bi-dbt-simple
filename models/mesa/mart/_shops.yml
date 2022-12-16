@@ -16,29 +16,29 @@ models:
       - name: first_installed_at_pt
         tests:
           - not_null
-        description: the effective created at for the shop.
+        description: The effective created at for the shop.
       - name: currency
         tests:
           - not_null
-        description: the financial currency used by the shop with its customers.
+        description: The financial currency used by the shop with its customers.
       - name: workflows_successfully_run_count
         tests:
           - not_null
-        description: the number of workflow runs that have completed without error.
+        description: The number of workflow runs that have completed without error.
       - name: shopify_plan_name
-        description: the shopify plan used by the shop.
+        description: The shopify plan used by the shop.
       - name: install_status
-        description: the current mesa app installation status of the shop.
+        description: The current mesa app installation status of the shop.
       - name: status
-        description: the usage status of the shop.
+        description: The usage status of the shop.
       - name: referral
         description: "[fill]"
       - name: meta
         description: a field used by account services to record onboarding sessions.
       - name: latest_installed_at_pt
-        description: the most recent app installation date.
+        description: The most recent app installation date.
       - name: billing_method_name
-        description: the method used to charge the shop for their subscription & usage.
+        description: The method used to charge the shop for their subscription & usage.
       - name: billing_overage_bucket_start_date_pt
         description: "[fill]"
       - name: billing_overage_bucket_end_date_pt
@@ -48,23 +48,23 @@ models:
       - name: billing_overage_last_count
         description: "[fill]"
       - name: daily_plan_revenue
-        description: the amount of revenue from plan charges for this day.
+        description: The amount of revenue from plan charges for this day.
       - name: price_per_action
         description: "[fill]"
       - name: activation_date_pt
-        description: the date the shop achieved the current definition of activated.
+        description: The date the shop achieved the current definition of activated.
       - name: is_activated
         description: whether the shop has achieved activation.
       - name: templates_installed_count
-        description: the number of templates the shop has installed as a workflow.
+        description: The number of templates the shop has installed as a workflow.
       - name: balance_used
         description: "[fill]"
       - name: shopify_id
-        description: the official shopify identifier for the shop.
+        description: The official shopify identifier for the shop.
       - name: orders_current_count
-        description: the current monthly order volume of the shop.
+        description: The current monthly order volume of the shop.
       - name: plan_price
-        description: the current mesa plan's monthly cost.
+        description: The current mesa plan's monthly cost.
       - name: plan_used
         description: "[fill]"
       - name: percent_complete
@@ -72,7 +72,7 @@ models:
       - name: billing_on_pt
         description: "[fill]"
       - name: plan_name
-        description: the mesa plan the shop is currently subscribed to.
+        description: The mesa plan the shop is currently subscribed to.
       - name: percent_used
         description: "[fill]"
       - name: overlimit_date_pt
@@ -84,35 +84,35 @@ models:
       - name: end_date_pt
         description: "[fill]"
       - name: orders_initial_count
-        description: the 30-day order count volume at the time of app installation.
+        description: The 30-day order count volume at the time of app installation.
         meta:
           metabase.display_name: Initial Orders Count
       - name: revenue_initial_total
-        description: the 30-day gmv of the shop at the time of installation.
+        description: The 30-day gmv of the shop at the time of installation.
         meta:
           metabase.semantic_type: type/Currency
           metabase.display_name: Initial Revenue / GMV
       - name: trial_ends_pt
-        description: the date the initial billing trial period ends.
+        description: The date the initial billing trial period ends.
       - name: chargebee_id
-        description: the id of the chargebee account if used for billing.
+        description: The id of the chargebee account if used for billing.
       - name: billing_updated_at_pt
-        description: the timestamp the billing information was updated at in pt.
+        description: The timestamp the billing information was updated at in pt.
       - name: plan_type
         description: "[fill]"
       - name: days_complete
         description: "[fill]"
       - name: plan_id
-        description: the code-friendly shortcode of the current mesa plan.
+        description: The code-friendly shortcode of the current mesa plan.
       - name: revenue_current_total
-        description: the current 30-day gmv of the shop.
+        description: The current 30-day gmv of the shop.
         meta:
           metabase.display_name: Current Revenue / GMV
           metabase.semantic_type: type/Currency
       - name: plan_interval
-        description: the frequency of the billing plan interval.
+        description: The frequency of the billing plan interval.
       - name: trial_days
-        description: the initial length of the trial period.
+        description: The initial length of the trial period.
       - name: is_builder_wizard_completed
         description: "[fill]"
       - name: hotjar_url
@@ -120,69 +120,63 @@ models:
       - name: backdoor_url
         description: a direct link to the shop's backdoor ui.
       - name: minutes_using_app
-        description:
-          the total minutes between the first and last pageview inside the
-          app.
+        description: The total minutes between the first and last pageview inside the app.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
               config:
                 where: first_installed_at_pt > '2020-12-18'
       - name: workflow_runs_count
-        description: the number of workflow run attempts that have been started.
+        description: The number of Workflow Run attempts that have been started.
         tests:
           - not_null
       - name: last_seen_in_app_at_pt
-        description: the timestamp of the last pageview inside the pap.
+        description: The timestamp of the last pageview inside the pap.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
       - name: workflow_run_success_count
-        description: the number of workflow run attempts that have completed successfully.
+        description: The number of Workflow Run attempts that have completed successfully.
         tests:
           - not_null
       - name: minutes_until_uninstall
-        description: the minutes between initial install and the latest uninstall.
+        description: The minutes between initial install and the latest uninstall.
       - name: first_seen_in_app_at_pt
-        description: the timestamp of the first pageview within the app.
+        description: The timestamp of the first pageview within the app.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
       - name: workflow_runs_rolling_thirty_day_count
-        description:
-          the number of successful workflow run attempts initiated in the last
-          30 days.
+        description: The number of successful workflow run attempts initiated in the last 30 days.
         tests:
           - not_null
       - name: days_to_activation
-        description: the number of days from first install to activation.
+        description: The number of days from first install to activation.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.02
       - name: workflow_runs_rolling_year_count
-        description:
-          the number of successful workflow run attempts initiated in the last
-          365 days.
+        description: The number of successful workflow run attempts initiated in the last 365 days.
       - name: uninstalled_at_pt
-        description: the timestamp of the latest uninstallation of the app.
+        description: The timestamp of the latest uninstallation of the app.
       - name: plan_upgrade_date
-        description: the date of the first plan upgrade action.
+        description: The date of the first plan upgrade action.
       - name: acquisition_campaign
-        description: the campaign that the shop was acquired through.
+        description: The campaign that the shop was acquired through.
       - name: acquisition_content
-        description: the content that the shop was acquired through.
+        description: The content that the shop was acquired through.
       - name: acquisition_first_page_path
-        description: the first page path that the shop was acquired through.
+        description: The first page path that the shop was acquired through.
       - name: acquisition_referrer
-        description: the referrer that the shop was acquired through.
+        description: The referrer that the shop was acquired through.
       - name: acquisition_medium
-        description: the medium that the shop was acquired through.
+        description: The medium that the shop was acquired through.
       - name: acquisition_source
-        description: the source that the shop was acquired through.
+        description: The source that the shop was acquired through.
       - name: acquisition_source_medium
-        description: the source & medium that the shop was acquired through.
+        description: The source & medium that the shop was acquired through.
       - name: funnel_phase
-        description: the top-level step in the funnel that the shop is currently in.
+        description: The top-level step in the funnel that the shop is currently in.
         tests:
           - not_null
       - name: has_a_workflow
@@ -190,7 +184,7 @@ models:
         tests:
           - not_null
       - name: max_funnel_step_achieved_at_pt
-        description: the timestamp of the latest funnel step achieved in pt.
+        description: The timestamp of the latest funnel step achieved in pt.
         tests:
           - not_null
       - name: has_enabled_a_workflow
@@ -202,11 +196,11 @@ models:
         tests:
           - not_null
       - name: max_funnel_step
-        description: the numeric value of latest funnel step achieved.
+        description: The numeric value of latest funnel step achieved.
         tests:
           - not_null
       - name: max_funnel_step_name
-        description: the name of the latest funnel step achieved.
+        description: The name of the latest funnel step achieved.
         tests:
           - not_null
       - name: cohort_month
@@ -214,31 +208,25 @@ models:
         tests:
           - not_null
       - name: total_revenue
-        description:
-          the total revenue generated by users who first installed in the given
-          week.
+        description: The total revenue generated by users who first installed in the given week.
         tests:
           - not_null
       - name: workflows_enabled_current_count
-        description: the number of currently enabled workflows for the shop.
+        description: The number of currently enabled workflows for the shop.
         tests:
           - not_null
       - name: workflows_current_count
-        description:
-          the number of total workflows currently created on the shop (enabled
-          or disabled).
+        description: The number of total workflows currently created on the shop (enabled or disabled).
         tests:
           - not_null
       - name: trial_end_dt
-        description: The date the shops trial ended.
+        description: The date the Shop's trial ended.
       - name: launch_session_date
-        description: the date of the launch session with customer success.
+        description: The date of the launch session with customer success.
       - name: days_from_launch_session_to_activation
         description: The number of days from launch to activation. (May be negative.)
         meta:
-          metabase.caveats:
-            This number may be negative if they activated before the launch
-            session.
+          metabase.caveats: This number may be negative if they activated before the launch session.
       - name: has_had_launch_session
         description: Whether the shop has had a launch session with customer success.
         tests:
@@ -247,3 +235,21 @@ models:
         description: The tier of the shop's current revenue.
         meta:
           metabase.display_name: Current Revenue Tier/Bucket
+      - name: has_uploadery
+        description: Whether the Shop has an account for tihs app.
+      - name: has_tracktor
+        description: Whether the Shop has an account for tihs app.
+      - name: has_blog_studio
+        description: Whether the Shop has an account for tihs app.
+      - name: has_kitkarts
+        description: Whether the Shop has an account for tihs app.
+      - name: has_smile
+        description: Whether the Shop has an account for tihs app.
+      - name: has_bouncer
+        description: Whether the Shop has an account for tihs app.
+      - name: has_page_studio
+        description: Whether the Shop has an account for tihs app.
+      - name: has_coin
+        description: Whether the Shop has an account for tihs app.
+      - name: has_infinite_options
+        description: Whether the Shop has an account for tihs app.

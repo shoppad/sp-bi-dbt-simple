@@ -35,7 +35,6 @@ models:
       - name: BALANCE_REMAINING
       - name: START_DATE_PT
       - name: END_DATE_PT
-      - name: CREATED_AT_PT
       - name: TRIAL_ENDS_PT
       - name: CHARGEBEE_ID
       - name: PLAN_TYPE

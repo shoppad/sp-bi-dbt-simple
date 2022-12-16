@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: mesa_mongo
+  - name: mongo_sync
     description: imports of mongo db into snowflake json objects
     database: mongo
     schema: public
@@ -29,7 +29,7 @@ sources:
 
       - name: workflow_steps
         identifier: m3_mesa_triggers
-        description: the individual steps of a workflow, including the step name, type, and the workflow it belongs to.
+        description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
 
       - name: tasks
         description: individual step execution records with integration app, execution time, payload server response and more.
@@ -45,7 +45,7 @@ sources:
           - name: created_at
             description: do not use. this column is sometimes null.
           - name: _created_at
-            description: the time the task was created.
+            description: The time the task was created.
             tests:
               - not_null
 
@@ -60,11 +60,11 @@ sources:
               - unique
               - not_null
           - name: _created_at
-            description: the time the shop account was created by installing the app.
+            description: The time the shop account was created by installing the app.
             tests:
               - not_null
           - name: uuid
-            description: the shopify subdomain of the shop account.
+            description: The shopify subdomain of the shop account.
             tests:
               - not_null
 
@@ -81,6 +81,24 @@ sources:
               - not_null
       - name: mesa_install_events
         identifier: m3_mesa_installs
+      - name: blog_studio_shops
+        identifier: m3_blogstudio
+      - name: bouncer_shops
+        identifier: m3_bouncer
+      - name: coin_shops
+        identifier: m3_coin
+      - name: smile_shops
+        identifier: m3_smile
+      - name: kitkarts_shops
+        identifier: m3_kitkarts
+      - name: infinite_options_shops
+        identifier: m3_customizery_shops
+      - name: page_studio_shops
+        identifier: m3_pagestudio
+      - name: uploadery_shops
+        identifier: m3_uploadery_shops
+      - name: tracktor_shops
+        identifier: m3_tracktor
 
   - name: mesa_segment
     description: events and objects sent to snowflake via segment.com.
