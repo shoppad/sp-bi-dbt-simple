@@ -30,7 +30,12 @@ shop_dates AS (
     SELECT
         shop_subdomain,
         first_installed_at_pt::date AS first_dt,
-        IFNULL(uninstalled_at_pt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }})::date AS last_dt
+        CASE
+            WHEN uninstalled_at_pt IS NULL OR status = 'active'
+                THEN {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}
+        ELSE
+            uninstalled_at_pt
+        END::DATE AS last_dt
     FROM {{ ref('stg_shops') }}
 ),
 
@@ -73,8 +78,8 @@ combined_dates AS (
 final AS (
     SELECT
         shop_subdomain,
-        combined_dates.first_dt,
-        LEAST(shop_dates.last_dt, combined_dates.last_dt) AS last_dt,
+        combined_dates.first_dt::DATE,
+        LEAST(shop_dates.last_dt, combined_dates.last_dt)::DATE AS last_dt,
         {{ datediff('combined_dates.first_dt', 'LEAST(shop_dates.last_dt, combined_dates.last_dt)', 'day') }} + 1 AS lifespan_length
     FROM combined_dates
     LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.
