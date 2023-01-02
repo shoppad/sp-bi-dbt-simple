@@ -8,10 +8,10 @@ shop_trial_end_dates AS (
 
 shop_plan_days AS (
     SELECT
-       shop_subdomain,
-       dt,
-       daily_plan_revenue
-    FROM {{ ref('int_mesa_shop_plan_days') }} g
+        shop_subdomain,
+        dt,
+        daily_plan_revenue
+    FROM {{ ref('int_mesa_shop_plan_days') }}
 ),
 
 shop_lifespans AS (
@@ -32,7 +32,7 @@ shop_calendar AS (
             WHEN (shop_trial_end_dates.dt IS NOT NULL AND dt < shop_trial_end_dates.dt)
                 THEN 0
             ELSE COALESCE(daily_plan_revenue, 0)
-            END AS daily_plan_revenue
+        END AS daily_plan_revenue
     FROM shop_lifespans
     INNER JOIN calendar_dates
         ON dt BETWEEN first_dt AND last_dt

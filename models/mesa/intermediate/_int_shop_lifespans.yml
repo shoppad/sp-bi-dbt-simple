@@ -10,7 +10,15 @@ models:
       - name: shop_subdomain
         tests:
           - unique
+          - dbt_expectations.expect_column_to_exist
+
         description: The foreign key for the Shop.
       - name: first_dt
+        tests:
+          - dbt_expectations.expect_column_to_exist
       - name: last_dt
+        tests:
+          - dbt_expectations.expect_column_to_exist
       - name: LIFESPAN_LENGTH
+        tests:
+          - dbt_expectations.expect_column_to_exist
