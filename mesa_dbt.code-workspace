@@ -18,13 +18,10 @@
     "[sql]": {
         "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
     },
-    "dbt.previewPanel.displayLocation": "vertical",
     "files.associations": {
       "*.sql": "jinja-sql",
       "*.yml": "jinja-yaml"
     },
-    "sqlfluff.executablePath": "",
-    "dbt-formatter.lowerWords": false,
     "sqlfluff.format.enabled": true,
     "sqlfluff.suppressNotifications": false,
     "cSpell.words": [
@@ -40,6 +37,7 @@
       "hevo",
       "hotjar",
       "IFNULL",
+      "INITCAP",
       "INSTALLEDAT",
       "LISTAGG",
       "metabase",
@@ -61,7 +59,8 @@
     "blockman.n02EachCharFrameWidth": 0,
     "blockman.n04Sub01ColorComboPresetForDarkTheme": "Classic Dark Oppo (Gradients)",
     "blockman.n04Sub04RightSideBaseOfBlocks": "Rightmost Edge Of Inner Content",
-    "blockman.n17CustomColorOfFocusedBlock": ""
+    "blockman.n17CustomColorOfFocusedBlock": "",
+    "todo-tree.filtering.excludeGlobs": ["target/", "logs/", ".git/"]
   },
   "extensions": {
       "recommendations": [
@@ -75,8 +74,7 @@
         "bastienboutonnet.vscode-dbt",
         "dorzey.vscode-dbt-language",
         "fivetran.dbt-language-server"
-      ],
-      "todo-tree.excludeGlobs": ["target/", "logs/", ".git/"]
+      ]
   },
 
   "editor.quickSuggestions": {

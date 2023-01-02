@@ -2,7 +2,7 @@
 templater = dbt
 dialect = snowflake
 exclude_rules = L010, L027, L030, L032
-verbose = 1
+verbose = 0
 
 [sqlfluff:templater:dbt]
 project_dir = /Users/jon/Projects/mesa_dbt
