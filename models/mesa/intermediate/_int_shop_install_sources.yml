@@ -12,4 +12,10 @@ models:
       - name: acquisition_first_page_path
       - name: acquisition_source
       - name: acquisition_medium
+        tests:
+          - not_null:
+              config:
+                where: shop_subdomain IN ('hotrocksjewelry', 'hydromony')
+          - dbt_expectations.expect_column_values_to_not_be_in_set:
+              value_set: [""]
       - name: acquisition_source_medium
