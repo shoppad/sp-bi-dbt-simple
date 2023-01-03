@@ -16,7 +16,7 @@ SELECT
     automation AS workflow_id,
     trigger_type AS step_type,
     weight AS step_weight,
-    ROW_NUMBER() OVER (PARTITION BY workflow_id, step_type ORDER BY weight) as position_in_workflow,
-    __hevo__marked_deleted AS is_deleted
+    __hevo__marked_deleted AS is_deleted,
+    ROW_NUMBER() OVER (PARTITION BY workflow_id, step_type ORDER BY weight) as position_in_workflow
 FROM workflow_steps
 LEFT JOIN workflows ON workflow_steps.automation = workflows.workflow_id

@@ -4,18 +4,41 @@ models:
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 2000
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('int_shops')
     columns:
       - name: shop_subdomain
+        tests:
+          - not_null
+        description: The foreign key for the Shop.
       - name: acquisition_campaign
+        description: The campaign that the shop was acquired through.
       - name: acquisition_content
+        description: The content that the shop was acquired through.
       - name: acquisition_referrer
+        description: The referrer that the shop was acquired through.
       - name: acquisition_first_page_path
+        description: The first page path that the shop was acquired through.
       - name: acquisition_source
+        description: The source that the shop was acquired through.
       - name: acquisition_medium
         tests:
           - not_null:
               config:
                 where: shop_subdomain IN ('hotrocksjewelry', 'hydromony')
           - dbt_expectations.expect_column_values_to_not_be_in_set:
-              value_set: [""]
+              value_set:
+                - ""
+        description: The medium that the shop was acquired through.
       - name: acquisition_source_medium
+        description: The source & medium that the shop was acquired through.
+      - name: is_blog_referral
+        tests:
+          - not_null
+        description:
+          Whether the Shop was referred/entered the marketing site by a blog
+          post.
+      - name: acquisition_template
+        description:
+          The template the Shop intended to use when they first installed the
+          app.

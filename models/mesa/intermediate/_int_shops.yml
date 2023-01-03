@@ -55,9 +55,13 @@ models:
         description: The week of the Shop's first app installation.
       - name: cohort_month
         description: The month of the Shop's first app installation.
-      - name: TRIAL_END_DT
-      - name: LAUNCH_SESSION_DATE
-      - name: HAS_HAD_LAUNCH_SESSION
-      - name: REVENUE_INITIAL_TOTAL_USD
-      - name: REVENUE_CURRENT_TOTAL_USD
-      - name: EXCHANGE_RATE_AT
+      - name: trial_end_dt
+        description: The date the Shop's trial ended.
+      - name: launch_session_date
+        description: The date of the launch session with customer success.
+      - name: has_had_launch_session
+        description: whether the shop has had a launch session with customer success.
+      - name: revenue_initial_total_usd
+        description: The 30-day gmv of the shop at the time of installation.
+      - name: revenue_current_total_usd
+        description: The current 30-day gmv of the shop.

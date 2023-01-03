@@ -1,9 +1,9 @@
 version: 2
 models:
   - name: shops
-    description: Formatted, production-ready Shops.
+    description: formatted, production-ready shops.
     meta:
-      metabase.caveats: This table combines all the install records of `M3_MESA` into one Shop record.
+      metabase.caveats: this table combines all the install records of `m3_mesa` into one shop record.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
@@ -86,12 +86,12 @@ models:
       - name: orders_initial_count
         description: The 30-day order count volume at the time of app installation.
         meta:
-          metabase.display_name: Initial Orders Count
+          metabase.display_name: initial orders count
       - name: revenue_initial_total_usd
         description: The 30-day gmv of the shop at the time of installation.
         meta:
-          metabase.semantic_type: type/Currency
-          metabase.display_name: Initial Revenue / GMV
+          metabase.semantic_type: type/currency
+          metabase.display_name: initial revenue / gmv
       - name: trial_ends_pt
         description: The date the initial billing trial period ends.
       - name: chargebee_id
@@ -107,8 +107,8 @@ models:
       - name: revenue_current_total_usd
         description: The current 30-day gmv of the shop.
         meta:
-          metabase.display_name: Current Revenue / GMV
-          metabase.semantic_type: type/Currency
+          metabase.display_name: current revenue / gmv
+          metabase.semantic_type: type/currency
       - name: plan_interval
         description: The frequency of the billing plan interval.
       - name: trial_days
@@ -118,7 +118,7 @@ models:
       - name: hotjar_url
         description: a direct link to the user's hotjar sessions.
       - name: backdoor_url
-        description: a direct link to the shop's backdoor ui.
+        description: a direct link to the Shop's backdoor ui.
       - name: minutes_using_app
         description: The total minutes between the first and last pageview inside the app.
         tests:
@@ -127,7 +127,7 @@ models:
               config:
                 where: first_installed_at_pt > '2020-12-18'
       - name: workflow_runs_attempted_count
-        description: The number of Workflow Run attempts that have been started.
+        description: The number of workflow run attempts that have been started.
         tests:
           - not_null
       - name: last_seen_in_app_at_pt
@@ -136,7 +136,7 @@ models:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
       - name: workflow_run_success_count
-        description: The number of Workflow Run attempts that have completed successfully.
+        description: The number of workflow run attempts that have completed successfully.
         tests:
           - not_null
       - name: minutes_until_uninstall
@@ -224,32 +224,60 @@ models:
       - name: launch_session_date
         description: The date of the launch session with customer success.
       - name: days_from_launch_session_to_activation
-        description: The number of days from launch to activation. (May be negative.)
+        description: The number of days from launch to activation. (may be negative.)
         meta:
-          metabase.caveats: This number may be negative if they activated before the launch session.
+          metabase.caveats: this number may be negative if they activated before the launch session.
       - name: has_had_launch_session
-        description: Whether the shop has had a launch session with customer success.
+        description: whether the shop has had a launch session with customer success.
         tests:
           - not_null
       - name: revenue_current_total_tier
-        description: The tier of the shop's current revenue.
+        description: The tier of the Shop's current revenue.
         meta:
-          metabase.display_name: Current Revenue Tier/Bucket
+          metabase.display_name: current revenue tier/bucket
       - name: has_uploadery
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_tracktor
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_blog_studio
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_kitkarts
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_smile
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_bouncer
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_page_studio
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_coin
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
       - name: has_infinite_options
-        description: Whether the Shop has an account for tihs app.
+        description: whether the shop has an account for this app.
+        tests:
+          - not_null
+      - name: acquisition_template
+        description: The template the Shop intended to use when they first installed the app.
+      - name: is_blog_referral
+        description: Whether the Shop was referred/entered the marketing site by a blog post.
+        tests:
+          - not_null
+      - name: workflows_attempted_count
+        description: The number of workflow attempts that have been started.
+        tests:
+          - not_null

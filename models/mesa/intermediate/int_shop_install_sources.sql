@@ -117,7 +117,8 @@ final AS (
             )
         ) AS acquisition_source_medium,
         COALESCE(acquisition_first_page_path ILIKE '/blog/%', FALSE) AS is_blog_referral
-    FROM combined_install_sources
+    FROM shops
+    LEFT JOIN combined_install_sources USING (shop_subdomain)
     LEFT JOIN referrer_mapping
         ON combined_install_sources.referrer_host = referrer_mapping.host
 )
