@@ -60,7 +60,16 @@
     "blockman.n04Sub01ColorComboPresetForDarkTheme": "Classic Dark Oppo (Gradients)",
     "blockman.n04Sub04RightSideBaseOfBlocks": "Rightmost Edge Of Inner Content",
     "blockman.n17CustomColorOfFocusedBlock": "",
-    "todo-tree.filtering.excludeGlobs": ["target/", "logs/", ".git/"]
+    "todo-tree.filtering.excludeGlobs": [
+      "target/",
+      "logs/",
+      "**/.git/*"
+    ],
+    "todo-tree.general.debug": true,
+    "todo-tree.general.enableFileWatcher": true,
+    "todo-tree.general.showActivityBarBadge": true,
+    "todo-tree.general.showIconsInsteadOfTagsInStatusBar": false,
+    "todo-tree.general.statusBar": "tags"
   },
   "extensions": {
       "recommendations": [

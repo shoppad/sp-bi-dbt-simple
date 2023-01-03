@@ -24,8 +24,8 @@ install_dates AS (
         shop_subdomain,
         {{ pacific_timestamp('MIN(created_at)') }} AS first_installed_at_pt,
         {{ pacific_timestamp('MAX(created_at)') }} AS latest_installed_at_pt,
-        date_trunc('week', first_installed_at_pt)::DATE AS cohort_week,
-        date_trunc('month', first_installed_at_pt)::DATE AS cohort_month
+        DATE_TRUNC('week', first_installed_at_pt)::DATE AS cohort_week,
+        DATE_TRUNC('month', first_installed_at_pt)::DATE AS cohort_month
     FROM trimmed_shops
     GROUP BY 1
 ),
@@ -35,6 +35,7 @@ uninstall_data_points AS (
         id AS shop_subdomain,
         apps_mesa_uninstalledat AS uninstalled_at_pt -- NOTE: This timestamp is already in PST
     FROM {{ source('php_segment', 'users') }}
+
     UNION ALL
     SELECT
         shop_subdomain,

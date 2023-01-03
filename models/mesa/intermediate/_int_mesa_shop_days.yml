@@ -1,66 +1,68 @@
 version: 2
 models:
-- name: int_mesa_shop_days
-  columns:
-  - name: shop_subdomain
-    tests:
-    - not_null
-    - relationships:
-        to: ref('int_shops')
-        field: shop_subdomain
-        config:
-          where: NOT(shop_subdomain ILIKE '%dev%')
-    description: The foreign key for the Shop.
-  - name: dt
-    tests:
-    - not_null
-    - dbt_utils.accepted_range:
-        max_value: current_date()
-    description: The calendar date of the shop day.
-  - name: workflow_runs_count
-    tests:
-    - not_null
-    description: The number of Workflow Run attempts that have been started.
-  - name: workflow_runs_success_count
-    tests:
-    - not_null
-    description: The number of workflow runs that succeeded on this day.
-  - name: workflow_success_percent
-    tests:
-    - not_null
-    description: The percentage of workflow runs that succeeded on this day.
-  - name: billed_count
-    tests:
-    - not_null
-    description: '[Fill]'
-  - name: daily_usage_revenue
-    tests:
-    - not_null
-    description: The amount of revenue from usage charges for this day.
-  - name: workflow_runs_rolling_thirty_day_count
-    tests:
-    - not_null
-    description: The number of successful workflow run attempts initiated in the last
-      30 days.
-  - name: workflow_runs_rolling_year_count
-    tests:
-    - not_null
-    description: The number of successful workflow run attempts initiated in the last
-      365 days.
-  - name: is_active
-    tests:
-    - not_null
-    description: Whether the shop is considered active on this day.
-  - name: mesa_shop_days_id
-    tests:
-    - not_null
-    - unique
-    description: Unique identifier for each row
-  - name: daily_plan_revenue
-    description: The amount of revenue from plan charges for this day.
-  - name: inc_amount
-    description: The revenue attributed to this shop for this day.
-  - name: cohort_month
-    description: The month of the Shop's first app installation.
-  - name: cohort_week
-    description: The week of the Shop's first app installation.
+  - name: int_mesa_shop_days
+    columns:
+      - name: shop_subdomain
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_shops')
+              field: shop_subdomain
+              config:
+                where: NOT(shop_subdomain ILIKE '%dev%')
+        description: The foreign key for the Shop.
+      - name: dt
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              max_value: current_date()
+        description: The calendar date of the shop day.
+      - name: workflow_runs_attempted_count
+        tests:
+          - not_null
+        description: The number of Workflow Run attempts that have been started.
+      - name: workflow_runs_success_count
+        tests:
+          - not_null
+        description: The number of workflow runs that succeeded on this day.
+      - name: workflow_success_percent
+        tests:
+          - not_null
+        description: The percentage of workflow runs that succeeded on this day.
+      - name: billed_count
+        tests:
+          - not_null
+        description: "[Fill]"
+      - name: daily_usage_revenue
+        tests:
+          - not_null
+        description: The amount of revenue from usage charges for this day.
+      - name: workflow_runs_rolling_thirty_day_count
+        tests:
+          - not_null
+        description:
+          The number of successful workflow run attempts initiated in the last
+          30 days.
+      - name: workflow_runs_rolling_year_count
+        tests:
+          - not_null
+        description:
+          The number of successful workflow run attempts initiated in the last
+          365 days.
+      - name: is_active
+        tests:
+          - not_null
+        description: Whether the shop is considered active on this day.
+      - name: mesa_shop_days_id
+        tests:
+          - not_null
+          - unique
+        description: Unique identifier for each row
+      - name: daily_plan_revenue
+        description: The amount of revenue from plan charges for this day.
+      - name: inc_amount
+        description: The revenue attributed to this shop for this day.
+      - name: cohort_month
+        description: The month of the Shop's first app installation.
+      - name: cohort_week
+        description: The week of the Shop's first app installation.

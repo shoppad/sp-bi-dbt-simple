@@ -35,9 +35,9 @@ daily_workflow_run_counts AS (
     SELECT
         shop_subdomain,
         dt,
-        COALESCE(COUNT(workflow_runs.*), 0) AS workflow_runs_count,
+        COALESCE(COUNT(workflow_runs.*), 0) AS workflow_runs_attempted_count,
         COALESCE(COUNT_IF(workflow_runs.is_successful), 0) AS workflow_runs_success_count,
-        COALESCE((workflow_runs_success_count / NULLIF(workflow_runs_count, 0)), 0) AS workflow_success_percent
+        COALESCE((workflow_runs_success_count / NULLIF(workflow_runs_attempted_count, 0)), 0) AS workflow_success_percent
     FROM shop_calendar
     LEFT JOIN workflow_runs USING (shop_subdomain, dt)
     GROUP BY
@@ -90,7 +90,7 @@ year_workflow_counts AS (
 final AS (
     SELECT
         *,
-        {{ dbt_utils.generate_surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
+        {{- dbt_utils.generate_surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
         daily_plan_revenue + daily_usage_revenue AS inc_amount,
         inc_amount > 0 OR workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }} AS is_active
     FROM shop_calendar

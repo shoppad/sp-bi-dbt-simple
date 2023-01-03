@@ -89,7 +89,7 @@ workflow_saves AS (
         COALESCE(
             COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND properties_workflow_id = workflow_id),
             0)
-        AS save_count, {# TODO: Which event_ids do we want to count? #}
+        AS save_count,
         save_count > 0 AS has_edited_or_saved_workflow
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
@@ -102,7 +102,6 @@ workflow_enables AS (
     SELECT
         workflow_id,
         COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id = properties_workflow_id), 0) AS enable_count,
-        {# TODO: Which event_ids do we want to count? #}
         enable_count > 0 AS has_enabled_workflow
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)

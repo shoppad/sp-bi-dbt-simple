@@ -126,7 +126,7 @@ models:
               at_least: 0.7
               config:
                 where: first_installed_at_pt > '2020-12-18'
-      - name: workflow_runs_count
+      - name: workflow_runs_attempted_count
         description: The number of Workflow Run attempts that have been started.
         tests:
           - not_null

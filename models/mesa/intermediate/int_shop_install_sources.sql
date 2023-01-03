@@ -33,7 +33,6 @@ raw_install_events AS (
 ),
 
 formatted_install_pageviews AS (
-    {# TODO: Don't count a session after first-install #}
     SELECT
         shop_subdomain,
         {{ pacific_timestamp('tstamp') }} AS tstamp_pt,

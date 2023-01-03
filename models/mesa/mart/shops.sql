@@ -26,7 +26,6 @@ workflow_counts AS (
         shop_subdomain,
         COUNT(DISTINCT workflows.workflow_id) AS workflows_current_count,
         COUNT_IF(workflows.is_enabled) AS workflows_enabled_current_count,
-        COUNT_IF(workflows.first_successful_run_at_pt IS NOT NULL) AS workflows_successfully_run_count, {# TODO: This needs to be based on events or workflow_runs as Workflows will get deleted. #}
         COUNT(DISTINCT workflows.template_name) AS templates_installed_count
     FROM shops
     LEFT JOIN workflows USING (shop_subdomain)
@@ -34,16 +33,29 @@ workflow_counts AS (
         1
 ),
 
+
 workflow_run_counts AS (
     SELECT
         shop_subdomain,
-        COALESCE(SUM(run_attempt_count), 0) AS workflow_runs_count,
-        COALESCE(SUM(run_success_count), 0) AS workflow_run_success_count
+        COALESCE(COUNT(DISTINCT workflow_id), 0) AS workflows_attempted_count,
+        COALESCE(COUNT(workflow_runs.workflow_run_id), 0) AS workflow_runs_attempted_count
     FROM shops
-    LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
-    GROUP BY
-        1
+    LEFT JOIN {{ ref('workflow_runs') }} USING (shop_subdomain)
+    GROUP BY 1
 ),
+
+successful_workflow_run_counts AS (
+    SELECT
+        shops.shop_subdomain,
+        COALESCE(COUNT(workflow_run_id), 0) AS workflow_run_success_count,
+        COALESCE(COUNT(DISTINCT workflow_id), 0) AS workflows_successfully_run_count
+    FROM shops
+    LEFT JOIN {{ ref('workflow_runs') }}
+        ON shops.shop_subdomain = workflow_runs.shop_subdomain
+            AND workflow_runs.run_status = 'success'
+    GROUP BY 1
+),
+
 
 constellation_app_presences AS (
     SELECT *
@@ -55,12 +67,12 @@ app_pageview_bookend_times AS (
         user_id AS shop_subdomain,
         {{ pacific_timestamp('MIN(tstamp)') }} AS first_seen_in_app_at_pt,
         {{ pacific_timestamp('MAX(tstamp)') }} AS last_seen_in_app_at_pt,
-        {{ datediff('first_seen_in_app_at_pt', 'last_seen_in_app_at_pt', 'minute') }} AS minutes_using_app
+        SUM(duration_in_s) / 60 AS minutes_using_app
     FROM {{ ref('segment_web_page_views__sessionized') }}
+    LEFT JOIN {{ ref('segment_web_sessions') }} USING (session_id)
     WHERE page_url_host = 'app.getmesa.com'
     GROUP BY 1
 ),
-{# TODO: Change minutes_using_app to SUM() all session lengths. #}
 
 yesterdays AS (
     SELECT *
@@ -85,11 +97,16 @@ install_sources AS (
 max_funnel_steps AS (
     SELECT
         shop_subdomain,
-        name AS max_funnel_step_name,
         achieved_at_pt AS max_funnel_step_achieved_at_pt,
         step_order AS max_funnel_step,
+        CASE
+            WHEN activation_date_pt IS NOT NULL
+                THEN '7-Activated'
+            ELSE
+                (step_order || '-' || name)
+        END AS max_funnel_step_name,
         COALESCE(step_order, 0) >= 3 AS has_a_workflow,
-        COALESCE(step_order, 0) >=6 AS has_enabled_a_workflow
+        COALESCE(step_order, 0) >= 6 AS has_enabled_a_workflow
     FROM shops
     LEFT JOIN {{ ref('int_mesa_shop_funnel_achievements') }} USING (shop_subdomain)
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY step_order DESC) = 1
@@ -148,6 +165,7 @@ final AS (
     LEFT JOIN price_per_actions USING (shop_subdomain)
     LEFT JOIN workflow_counts USING (shop_subdomain)
     LEFT JOIN workflow_run_counts USING (shop_subdomain)
+    LEFT JOIN successful_workflow_run_counts USING (shop_subdomain)
     LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
     LEFT JOIN current_rolling_counts USING (shop_subdomain)
     LEFT JOIN install_sources USING (shop_subdomain)

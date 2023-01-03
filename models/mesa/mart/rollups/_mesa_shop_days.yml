@@ -67,7 +67,7 @@ models:
           - not_null
         meta:
           metabase.semantic_type: type/Currency
-      - name: workflow_runs_count
+      - name: workflow_runs_attempted_count
         description: The number of Workflow Run attempts that have been started.
         tests:
           - not_null
