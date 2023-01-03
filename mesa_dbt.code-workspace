@@ -78,11 +78,11 @@
         "koszti.snowflake-driver-for-sqltools",
         "wayou.vscode-todo-highlight",
         "gruntfuggly.todo-tree",
-        "z3z1ma.vscode-dbt-power-user-osmosis",
         "henriblancke.vscode-dbt-formatter",
         "bastienboutonnet.vscode-dbt",
         "dorzey.vscode-dbt-language",
-        "fivetran.dbt-language-server"
+        "fivetran.dbt-language-server",
+        "innoverio.vscode-dbt-power-user"
       ]
   },
 
