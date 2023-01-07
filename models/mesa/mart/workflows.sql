@@ -36,7 +36,8 @@ workflow_counts AS (
         COUNT(
             DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
             {# ?: is is_successful appropriate here? Do failed filter runs result in something besides success? #}
-        ) AS run_success_count
+        ) AS run_success_count,
+        run_success_count / NULLIF(run_attempt_count, 0) AS run_success_percent
     FROM workflows
     LEFT JOIN workflow_steps USING (workflow_id)
     LEFT JOIN workflow_runs USING (workflow_id)
@@ -61,6 +62,7 @@ test_counts AS (
         ) AS first_successful_test_at_pt,
         COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_attempt_count,
         COALESCE(COUNT_IF(test_runs.is_successful), 0) AS test_success_count,
+        test_success_count / NULLIF(test_attempt_count, 0) AS test_success_percent,
         test_attempt_count > 0 AS has_test_attempted_workflow,
         test_success_count > 0 AS has_test_succeeded_workflow
     FROM workflows
