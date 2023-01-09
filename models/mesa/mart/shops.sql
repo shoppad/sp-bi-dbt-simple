@@ -112,10 +112,10 @@ max_funnel_steps AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY step_order DESC) = 1
 ),
 
-total_revenue AS (
+total_ltv_revenue AS (
     SELECT
         shop_subdomain,
-        COALESCE(SUM(inc_amount), 0) AS total_revenue
+        COALESCE(SUM(inc_amount), 0) AS total_ltv_revenue
     FROM shops
     LEFT JOIN {{ ref('mesa_shop_days') }} USING (shop_subdomain)
     GROUP BY 1
@@ -131,25 +131,25 @@ final AS (
         IFNULL(has_had_launch_session, NOT(launch_session_date IS NULL)) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
         CASE
-            WHEN revenue_current_total_usd < 100 THEN 100
-            WHEN revenue_current_total_usd < 1000 THEN 1000
-            WHEN revenue_current_total_usd < 10000 THEN 10000
-            WHEN revenue_current_total_usd < 50000 THEN 50000
-            WHEN revenue_current_total_usd < 100000 THEN 100000
-            WHEN revenue_current_total_usd < 250000 THEN 250000
-            WHEN revenue_current_total_usd < 500000 THEN 500000
-            WHEN revenue_current_total_usd < 750000 THEN 750000
-            WHEN revenue_current_total_usd < 1000000 THEN 1000000
-            WHEN revenue_current_total_usd < 2000000 THEN 2000000
-            WHEN revenue_current_total_usd < 5000000 THEN 5000000
-            WHEN revenue_current_total_usd < 10000000 THEN 10000000
-            WHEN revenue_current_total_usd < 20000000 THEN 20000000
-            WHEN revenue_current_total_usd < 50000000 THEN 50000000
-            WHEN revenue_current_total_usd < 100000000 THEN 100000000
-            WHEN revenue_current_total_usd < 200000000 THEN 200000000
-            WHEN revenue_current_total_usd < 500000000 THEN 500000000
-            WHEN revenue_current_total_usd < 1000000000 THEN 1000000000
-        END AS revenue_current_total_tier,
+            WHEN shopify_shop_gmv_current_total_usd < 100 THEN 100
+            WHEN shopify_shop_gmv_current_total_usd < 1000 THEN 1000
+            WHEN shopify_shop_gmv_current_total_usd < 10000 THEN 10000
+            WHEN shopify_shop_gmv_current_total_usd < 50000 THEN 50000
+            WHEN shopify_shop_gmv_current_total_usd < 100000 THEN 100000
+            WHEN shopify_shop_gmv_current_total_usd < 250000 THEN 250000
+            WHEN shopify_shop_gmv_current_total_usd < 500000 THEN 500000
+            WHEN shopify_shop_gmv_current_total_usd < 750000 THEN 750000
+            WHEN shopify_shop_gmv_current_total_usd < 1000000 THEN 1000000
+            WHEN shopify_shop_gmv_current_total_usd < 2000000 THEN 2000000
+            WHEN shopify_shop_gmv_current_total_usd < 5000000 THEN 5000000
+            WHEN shopify_shop_gmv_current_total_usd < 10000000 THEN 10000000
+            WHEN shopify_shop_gmv_current_total_usd < 20000000 THEN 20000000
+            WHEN shopify_shop_gmv_current_total_usd < 50000000 THEN 50000000
+            WHEN shopify_shop_gmv_current_total_usd < 100000000 THEN 100000000
+            WHEN shopify_shop_gmv_current_total_usd < 200000000 THEN 200000000
+            WHEN shopify_shop_gmv_current_total_usd < 500000000 THEN 500000000
+            WHEN shopify_shop_gmv_current_total_usd < 1000000000 THEN 1000000000
+        END AS shopify_shop_gmv_current_total_tier,
 
         'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||
             shop_subdomain ||
@@ -170,7 +170,7 @@ final AS (
     LEFT JOIN current_rolling_counts USING (shop_subdomain)
     LEFT JOIN install_sources USING (shop_subdomain)
     LEFT JOIN max_funnel_steps USING (shop_subdomain)
-    LEFT JOIN total_revenue USING (shop_subdomain)
+    LEFT JOIN total_ltv_revenue USING (shop_subdomain)
     LEFT JOIN constellation_app_presences USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )

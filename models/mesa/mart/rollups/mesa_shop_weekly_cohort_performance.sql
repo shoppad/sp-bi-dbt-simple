@@ -8,7 +8,7 @@ workflow_setup_counts AS (
     SELECT
         cohort_week,
         COUNT(*) AS cohort_size,
-        SUM(total_revenue) AS total_revenue,
+        SUM(total_ltv_revenue) AS total_ltv_revenue,
         COUNT_IF(has_a_workflow) AS has_a_workflow_count,
         COUNT_IF(has_enabled_a_workflow) AS has_enabled_a_workflow_count,
         COUNT_IF(is_activated) AS is_activated_count,
@@ -25,10 +25,10 @@ final AS (
 
     SELECT
         *,
-        total_revenue / NULLIF(cohort_size, 0) AS lifetime_value_installed,
-        total_revenue / NULLIF(has_a_workflow_count, 0) AS lifetime_value_has_a_workflow,
-        total_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
-        total_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated
+        total_ltv_revenue / NULLIF(cohort_size, 0) AS lifetime_value_installed,
+        total_ltv_revenue / NULLIF(has_a_workflow_count, 0) AS lifetime_value_has_a_workflow,
+        total_ltv_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
+        total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated
     FROM workflow_setup_counts
 )
 

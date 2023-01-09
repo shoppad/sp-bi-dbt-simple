@@ -27,9 +27,9 @@ models:
           - not_null
           - unique
         description: The foreign key for the Shop.
-      - name: orders_current_count
+      - name: shopify_shop_orders_current_count
         description: The current monthly order volume of the shop.
-      - name: orders_initial_count
+      - name: shopify_shop_orders_initial_count
         description: The 30-day order count volume at the time of app installation.
       - name: first_installed_at_pt
         tests:
@@ -61,7 +61,15 @@ models:
         description: The date of the launch session with customer success.
       - name: has_had_launch_session
         description: whether the shop has had a launch session with customer success.
-      - name: revenue_initial_total_usd
+      - name: shopify_shop_gmv_initial_total_usd
         description: The 30-day gmv of the shop at the time of installation.
-      - name: revenue_current_total_usd
-        description: The current 30-day gmv of the shop.
+      - name: shopify_shop_gmv_current_total_usd
+        description: the current 30-day gmv of the shop.
+      - name: shopify_shop_created_at_pt
+        description: The timestamp of the Shopify Shop's creation.
+      - name: age_of_store_at_install_in_weeks
+        description: The age (in weeks) of the store at the initial install.
+      - name: age_of_store_at_install_bucket
+        description: The bucket of the Shop's age at install.
+      - name: age_of_store_at_install_in_days
+        description: The age (in days) of the store at the initial install.

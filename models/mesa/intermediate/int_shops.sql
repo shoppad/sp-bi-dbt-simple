@@ -6,12 +6,24 @@ decorated_shops AS (
         {{ groomed_column_list(source_table, except=columns_to_skip)  | join(",\n       ") }},
         shopify:plan_name::string AS shopify_plan_name,
         shopify:currency::string AS currency,
+        {{ pacific_timestamp('cast(shopify:created_at AS TIMESTAMP_LTZ)') }} AS shopify_shop_created_at_pt,
         status AS install_status,
-        analytics:initial:orders_count AS orders_initial_count,
-        analytics:initial:orders_gmv AS revenue_initial_total,
-        analytics:orders:count AS orders_current_count,
-        analytics:orders:gmv AS revenue_current_total,
-        wizard:builder:step = 'complete' AS is_builder_wizard_completed
+        analytics:initial:orders_count AS shopify_shop_orders_initial_count,
+        analytics:initial:orders_gmv AS shopify_shop_gmv_initial_total,
+        analytics:orders:count AS shopify_shop_orders_current_count,
+        analytics:orders:gmv AS shopify_shop_gmv_current_total,
+        wizard:builder:step = 'complete' AS is_builder_wizard_completed,
+        {{ datediff('shopify_shop_created_at_pt', 'first_installed_at_pt', 'day') }} AS age_of_store_at_install_in_days,
+        {{ datediff('shopify_shop_created_at_pt', 'first_installed_at_pt', 'week') }} AS age_of_store_at_install_in_weeks,
+        CASE
+            WHEN age_of_store_at_install_in_days = 0 THEN '1-First Day'
+            WHEN age_of_store_at_install_in_days < 7 THEN '2-First Week'
+            WHEN age_of_store_at_install_in_days < 30 THEN '3-First Month'
+            WHEN age_of_store_at_install_in_days < 90 THEN '4-First Quarter'
+            WHEN age_of_store_at_install_in_days < 180 THEN '5-First Half'
+            WHEN age_of_store_at_install_in_days < 365 THEN '6-First Year'
+            ELSE '7-After First Year'
+            END AS age_of_store_at_install_bucket
     FROM {{ source_table }}
 ),
 
@@ -51,10 +63,10 @@ conversion_rates AS (
 ),
 
 final AS (
-    SELECT * EXCLUDE (revenue_current_total, revenue_initial_total, in_usd),
-    revenue_initial_total * in_usd AS revenue_initial_total_usd,
-    revenue_current_total * in_usd AS revenue_current_total_usd
-
+    SELECT
+        * EXCLUDE (shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd),
+        shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
+        shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
