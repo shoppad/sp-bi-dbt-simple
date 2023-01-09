@@ -4,4 +4,4 @@ dbt-osmosis>=0.9.7
 sqlfluff
 dbt-metabase
 pre-commit
-# sqlfluff-templater-dbt==1.3.2
+sqlfluff-templater-dbt>=1.4.5
