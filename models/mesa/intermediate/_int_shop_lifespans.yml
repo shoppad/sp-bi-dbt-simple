@@ -16,9 +16,11 @@ models:
       - name: first_dt
         tests:
           - dbt_expectations.expect_column_to_exist
+          - not_null
       - name: last_dt
         tests:
           - dbt_expectations.expect_column_to_exist
+          - not_null
       - name: LIFESPAN_LENGTH
         tests:
           - dbt_expectations.expect_column_to_exist

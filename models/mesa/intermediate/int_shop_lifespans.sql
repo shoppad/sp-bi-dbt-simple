@@ -44,7 +44,7 @@ custom_app_revenue AS (
     SELECT
         shop_subdomain,
         first_dt,
-        COALESCE(last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}) AS last_dt
+        COALESCE(last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }})::DATE AS last_dt
         {# TODO: Add start/end dates to custom apps. #}
         {# ?: Some custom apps can't connect to real stores. This probably means some Workflows aren't being attributed to a Store either. #}
     FROM {{ ref('custom_app_daily_revenues') }}
