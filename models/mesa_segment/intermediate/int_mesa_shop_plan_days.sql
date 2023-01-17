@@ -34,7 +34,7 @@ mesa_plan_calendar_dates AS (
             WHEN mesa_plan_changes.mesa_plan_interval = 'annual'
                 THEN mesa_plan_changes.mesa_plan_interval_price / 365
             WHEN mesa_plan_changes.mesa_plan_interval = 'monthly'
-                THEN mesa_plan_changes.mesa_plan_interval_price / 30
+                THEN mesa_plan_changes.mesa_plan_interval_price / DAY(LAST_DAY(calendar_dates.dt))
         END AS daily_plan_revenue
     FROM mesa_plan_changes
     LEFT JOIN mesa_plan_changes AS next_plan_changes
