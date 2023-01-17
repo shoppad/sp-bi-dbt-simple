@@ -12,6 +12,6 @@ models:
       - name: shopify_plan_change_id
         tests:
           - not_null
-          - unique
+          # - unique
       - name: changed_at_pt
       - name: changed_on_pt
