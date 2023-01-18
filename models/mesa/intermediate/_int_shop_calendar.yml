@@ -18,3 +18,5 @@ models:
       - name: daily_plan_revenue
         tests:
           - not_null
+      - name: MESA_PLAN
+      - name: SHOPIFY_PLAN

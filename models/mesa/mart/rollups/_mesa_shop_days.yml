@@ -84,3 +84,7 @@ models:
         description: The week of the Shop's first app installation.
         tests:
           - not_null
+      - name: mesa_plan
+        description: The Mesa billing plan the Shop was on that day.
+      - name: shopify_plan
+        description: The Shopify plan the Shop was on that day.
