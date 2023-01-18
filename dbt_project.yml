@@ -81,7 +81,6 @@ models:
     mesa:
       mart:
         step_runs:
-          +materialized: incremental
           +on_schema_change: "sync_all_columns"
           +cluster_by: ["shop_subdomain"]
           +unique_key: step_run_id
@@ -117,6 +116,7 @@ models:
         # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
         stg_step_runs:
+          +materialized: incremental
           +on_schema_change: "sync_all_columns"
           +unique_key: step_run_id
           +cluster_by: ["workflow_run_id"]
