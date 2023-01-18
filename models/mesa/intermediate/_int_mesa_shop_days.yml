@@ -1,6 +1,11 @@
 version: 2
 models:
   - name: int_mesa_shop_days
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1
+          config:
+            where: shop_subdomain = 'dev-emson' AND daily_plan_revenue > 0
     columns:
       - name: shop_subdomain
         tests:
@@ -9,7 +14,7 @@ models:
               to: ref('int_shops')
               field: shop_subdomain
               config:
-                where: NOT(shop_subdomain ILIKE '%dev%')
+                where: mesa_plan != 'custom-app'
         description: The foreign key for the Shop.
       - name: dt
         tests:

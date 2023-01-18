@@ -44,8 +44,8 @@ custom_app_revenue AS (
     SELECT
         shop_subdomain,
         first_dt,
-        COALESCE(last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }})::DATE AS last_dt
-        {# TODO: Add start/end dates to custom apps. #}
+        last_dt
+        {# TODO: Add start/end dates to custom apps seed file. #}
         {# ?: Some custom apps can't connect to real stores. This probably means some Workflows aren't being attributed to a Store either. #}
     FROM {{ ref('custom_app_daily_revenues') }}
 
@@ -79,11 +79,11 @@ final AS (
     SELECT
         shop_subdomain,
         combined_dates.first_dt::DATE AS first_dt,
-        CASE WHEN shop_dates.last_dt > combined_dates.last_dt OR shop_dates.last_dt IS NULL
-            THEN combined_dates.last_dt
-            ELSE shop_dates.last_dt
-        END::DATE AS last_dt,
-        {{ datediff('combined_dates.first_dt', 'LEAST(shop_dates.last_dt, combined_dates.last_dt)', 'day') }} + 1 AS lifespan_length
+        LEAST(
+                COALESCE(combined_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE),
+                COALESCE(shop_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE)
+            ) AS last_dt,
+        {{ datediff('first_dt', 'COALESCE(last_dt, ' ~ pacific_timestamp('CURRENT_TIMESTAMP()') ~ ')::DATE', 'day') }} + 1 AS lifespan_length
     FROM combined_dates
     LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.
 )

@@ -84,27 +84,57 @@ custom_app_daily_revenue_dates AS (
     SELECT
         shop_subdomain,
         dt,
-        custom_daily_plan_revenue
+        custom_daily_plan_revenue,
+        'custom-app' AS mesa_plan,
+        custom_daily_plan_revenue AS mesa_plan_interval_price,
+        'day' AS mesa_plan_interval
     FROM custom_app_daily_revenue
     INNER JOIN calendar_dates
-        ON calendar_dates.dt BETWEEN custom_app_daily_revenue.first_dt AND custom_app_daily_revenue.last_dt
+        ON calendar_dates.dt
+            BETWEEN custom_app_daily_revenue.first_dt
+                AND COALESCE(custom_app_daily_revenue.last_dt, {{ pacific_timestamp('current_timestamp()') }}::DATE )
 ),
+
+{# combined_revenue_dates AS (
+
+
+    SELECT
+        shop_subdomain,
+        dt,
+        daily_plan_revenue,
+        mesa_plan,
+        mesa_plan_interval_price,
+        mesa_plan_interval
+    FROM mesa_plan_calendar_dates
+    UNION ALL
+    SELECT
+        shop_subdomain,
+        dt,
+        custom_daily_plan_revenue AS daily_plan_revenue,
+        'custom-app' AS mesa_plan,
+        custom_daily_plan_revenue AS mesa_plan_interval_price,
+        'day' AS mesa_plan_interval
+    FROM custom_app_daily_revenue_dates
+
+), #}
 
 final AS (
     SELECT
         dt,
-        mesa_plan_calendar_dates.shop_subdomain,
-        IFF(
-            is_zombie OR (trial_end_dt IS NOT NULL AND dt <= trial_end_dt),
-            0,
-            daily_plan_revenue + COALESCE(custom_daily_plan_revenue, 0)) AS daily_plan_revenue,
-        mesa_plan,
+        shop_subdomain,
+        COALESCE(
+            IFF(
+                is_zombie OR (trial_end_dt IS NOT NULL AND dt <= trial_end_dt),
+                0,
+                daily_plan_revenue), 0) +
+            COALESCE(custom_daily_plan_revenue, 0) AS daily_plan_revenue,
+        COALESCE(mesa_plan_calendar_dates.mesa_plan, custom_app_daily_revenue_dates.mesa_plan) AS mesa_plan,
         shopify_plan,
         COALESCE(is_zombie, FALSE) AS is_shopify_zombie_plan
     FROM mesa_plan_calendar_dates
+    FULL OUTER JOIN custom_app_daily_revenue_dates USING (shop_subdomain, dt)
     LEFT JOIN shop_trial_end_dts USING (shop_subdomain)
     LEFT JOIN shopify_plan_calendar_dates USING (shop_subdomain, dt)
-    LEFT JOIN custom_app_daily_revenue_dates USING (shop_subdomain, dt)
 )
 
 SELECT *

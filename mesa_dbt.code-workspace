@@ -51,7 +51,7 @@
       "tstamp",
       "UNINSTALLEDAT"
     ],
-    "dbt.queryLimit": 250,
+    "dbt.queryLimit": 1500,
     "dbt.queryPreview.queryLimit": 250,
     "sqlfluff.osmosis.enabled": false,
     "files.trimTrailingWhitespace": true,
