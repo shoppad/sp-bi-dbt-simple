@@ -79,7 +79,10 @@ final AS (
     SELECT
         shop_subdomain,
         combined_dates.first_dt::DATE AS first_dt,
-        LEAST(shop_dates.last_dt, combined_dates.last_dt)::DATE AS last_dt,
+        CASE WHEN shop_dates.last_dt > combined_dates.last_dt OR shop_dates.last_dt IS NULL
+            THEN combined_dates.last_dt
+            ELSE shop_dates.last_dt
+        END::DATE AS last_dt,
         {{ datediff('combined_dates.first_dt', 'LEAST(shop_dates.last_dt, combined_dates.last_dt)', 'day') }} + 1 AS lifespan_length
     FROM combined_dates
     LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.
