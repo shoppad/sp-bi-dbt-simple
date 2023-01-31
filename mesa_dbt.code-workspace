@@ -10,7 +10,7 @@
     "sqlfluff.dialect": "snowflake",
     "sqlfluff.rules": [],
     "sqlfluff.linter.run": "onSave",
-    "sqlfluff.experimental.format.executeInTerminal": true,
+    "sqlfluff.experimental.format.executeInTerminal": false,
     "editor.formatOnSave": false,
     "dbt.queryTemplate": "select * from ({query}) as osmosis_query limit {limit}",
     "sqlfluff.excludeRules": ["L010", "L030", "L032"],
@@ -51,7 +51,7 @@
       "tstamp",
       "UNINSTALLEDAT"
     ],
-    "dbt.queryLimit": 1500,
+    "dbt.queryLimit": 500,
     "dbt.queryPreview.queryLimit": 250,
     "sqlfluff.osmosis.enabled": false,
     "files.trimTrailingWhitespace": true,

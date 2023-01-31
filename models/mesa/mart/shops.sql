@@ -121,6 +121,11 @@ total_ltv_revenue AS (
     GROUP BY 1
 ),
 
+shop_infos AS (
+    SELECT *
+    FROM {{ ref('stg_shop_infos') }}
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session),
@@ -172,6 +177,7 @@ final AS (
     LEFT JOIN max_funnel_steps USING (shop_subdomain)
     LEFT JOIN total_ltv_revenue USING (shop_subdomain)
     LEFT JOIN constellation_app_presences USING (shop_subdomain)
+    LEFT JOIN shop_infos USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
