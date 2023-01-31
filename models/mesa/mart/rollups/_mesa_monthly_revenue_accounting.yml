@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: mesa_revenue_accounting
+  - name: mesa_monthly_revenue_accounting
     columns:
       - name: month
         tests:

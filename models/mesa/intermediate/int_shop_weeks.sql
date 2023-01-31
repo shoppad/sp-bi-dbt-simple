@@ -24,13 +24,13 @@ WITH dau AS (
         inc_amount
     FROM {{ ref('int_mesa_shop_days') }}
     WHERE is_active
-        AND inc_amount > 0
+    AND inc_amount > 0
 ),
 
-mau AS (
+wau AS (
     SELECT
         shop_subdomain,
-        date_trunc('month', dt) AS month,
+        date_trunc('week', dt) AS week,
         sum(inc_amount) AS inc_amount
     FROM dau
     GROUP BY
@@ -45,20 +45,19 @@ first_dt AS (
     SELECT
         shop_subdomain,
         min(dt) AS first_dt,
-        date_trunc('week', min(dt)) AS first_week,
-        date_trunc('month', min(dt)) AS first_month
+        date_trunc('week', min(dt)) AS first_week
     FROM dau
     GROUP BY 1
 ),
 
-mau_decorated AS (
+wau_decorated AS (
     SELECT
-        mau.month,
-        mau.shop_subdomain,
-        mau.inc_amount,
-        first_dt.first_month
-    FROM mau
-    INNER JOIN first_dt ON (mau.shop_subdomain = first_dt.shop_subdomain) and mau.inc_amount > 0
+        wau.week,
+        wau.shop_subdomain,
+        wau.inc_amount,
+        first_dt.first_week
+    FROM wau
+    INNER JOIN first_dt ON (wau.shop_subdomain = first_dt.shop_subdomain) and wau.inc_amount > 0
 )
 
-SELECT * FROM mau_decorated
+SELECT * FROM wau_decorated
