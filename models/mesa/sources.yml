@@ -101,6 +101,7 @@ sources:
         identifier: m3_tracktor
       - name: shop_infos
         identifier: m3_shoppad_domains
+        freshness: null
 
   - name: economy_data
     description: Snowflake Marketplace economy data used for things like currency conversion rates.
