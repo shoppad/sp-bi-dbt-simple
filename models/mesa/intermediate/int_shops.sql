@@ -7,6 +7,7 @@ decorated_shops AS (
         shopify:plan_name::string AS shopify_plan_name,
         shopify:currency::string AS currency,
         {{ pacific_timestamp('cast(shopify:created_at AS TIMESTAMP_LTZ)') }} AS shopify_shop_created_at_pt,
+        shopify:country::STRING AS shopify_shop_country,
         status AS install_status,
         analytics:initial:orders_count AS shopify_shop_orders_initial_count,
         analytics:initial:orders_gmv AS shopify_shop_gmv_initial_total,

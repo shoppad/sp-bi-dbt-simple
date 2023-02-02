@@ -310,5 +310,9 @@ models:
         description: The percentile of the Shop's rank pulled in from Store Leads.
       - name: shop_estimated_sales
         description: The estimated monthly sales pulled in from Store Leads.
+        meta:
+          metabase.semantic_type: type/Currency
       - name: shop_monthly_app_spend
         description: The estimated amount the Shop spends on Shopify apps (pulled in from Store Leads).
+        meta:
+          metabase.semantic_type: type/Currency
