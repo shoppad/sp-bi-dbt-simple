@@ -316,3 +316,5 @@ models:
         description: The estimated amount the Shop spends on Shopify apps (pulled in from Store Leads).
         meta:
           metabase.semantic_type: type/Currency
+      - name: shop_country
+        description: The country of the Shop provided by the Shopify API.
