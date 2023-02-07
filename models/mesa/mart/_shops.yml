@@ -306,7 +306,7 @@ models:
         description: The first top-level category of the Shop pulled in from Store Leads.
         meta:
           metabase.display_name: Shopify Shop Product Top-Level Category (Store Leads)
-      - name: shop_features
+      - name: store_leads_features
         description: A list of the Shop features pulled in from Store Leads.
         meta:
           metabase.display_name: Shopify Shop Features (Store Leads)
@@ -335,3 +335,17 @@ models:
           metabase.display_name: Monthly App Spend (Store Leads)
       - name: shopify_shop_country
         description: The country of the Shop provided by the Shopify API.
+      - name: store_leads_estimated_monthly_sales_bucket
+        description: The bucket of the Shop's estimated monthly sales pulled in from Store Leads.
+        meta:
+          metabase.display_name: Estimated Monthly Sales Bucket (Store Leads)
+      - name: income_rolling_thirty_day_total
+        description: The ShopPad revenue attributed to the Shop from Mesa in the last 30 days.
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Last 30-Day Income
+      - name: income_rolling_year_total
+        description: The ShopPad revenue attributed to the Shop from Mesa in the last year.
+        meta:
+          metabase.semantic_type: type/Currency
+          metabase.display_name: Last Year Income

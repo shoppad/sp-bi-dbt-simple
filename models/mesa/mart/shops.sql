@@ -84,7 +84,9 @@ current_rolling_counts AS (
     SELECT
         shop_subdomain,
         COALESCE(workflow_runs_rolling_thirty_day_count, 0) AS workflow_runs_rolling_thirty_day_count,
-        COALESCE(workflow_runs_rolling_year_count, 0) AS workflow_runs_rolling_year_count
+        COALESCE(workflow_runs_rolling_year_count, 0) AS workflow_runs_rolling_year_count,
+        COALESCE(income_rolling_thirty_day_total, 0) AS income_rolling_thirty_day_total,
+        COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total
     FROM shops
     LEFT JOIN yesterdays USING (shop_subdomain)
 ),
@@ -110,6 +112,12 @@ max_funnel_steps AS (
     FROM shops
     LEFT JOIN {{ ref('int_mesa_shop_funnel_achievements') }} USING (shop_subdomain)
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY step_order DESC) = 1
+),
+
+last_thirty_day_revenues AS (
+    SELECT *
+    FROM {{ ref('mesa_shop_days') }}
+    WHERE dt >= {{ pacific_timestamp('CURRENT_DATE()') }}::date - INTERVAL '31 days' -- 30 days + 1 day since current day isn't recorded.
 ),
 
 total_ltv_revenue AS (

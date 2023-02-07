@@ -50,11 +50,11 @@ models:
         tests:
           - not_null
       - name: workflow_runs_rolling_thirty_day_count
-        description: The number of successful workflow run attempts initiated in the last 30 days.
+        description: The number of successful workflow run attempts initiated in the last 30 days as of this day.
         tests:
           - not_null
       - name: workflow_runs_rolling_year_count
-        description: The number of successful workflow run attempts initiated in the last 365 days.
+        description: The number of successful workflow run attempts initiated in the last year as of this day.
         tests:
           - not_null
       - name: daily_plan_revenue
@@ -88,3 +88,11 @@ models:
         description: The Mesa billing plan the Shop was on that day.
       - name: shopify_plan
         description: The Shopify plan the Shop was on that day.
+      - name: income_rolling_year_total
+        description: The total revenue from this shop in the last year as of this day.
+        tests:
+          - not_null
+      - name: income_rolling_thirty_day_total
+        description: The total revenue from this shop in the last 30 days as of this day.
+        tests:
+          - not_null

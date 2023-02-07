@@ -23,34 +23,7 @@
       "*.yml": "jinja-yaml"
     },
     "sqlfluff.format.enabled": true,
-    "sqlfluff.suppressNotifications": false,
-    "cSpell.words": [
-      "authtoken",
-      "AUTOMATIONS",
-      "builtins",
-      "chargebee",
-      "CONCAT",
-      "dateadd",
-      "datediff",
-      "datepart",
-      "getmesa",
-      "hevo",
-      "hotjar",
-      "IFNULL",
-      "INITCAP",
-      "INSTALLEDAT",
-      "LISTAGG",
-      "metabase",
-      "mongoid",
-      "overlimit",
-      "pageview",
-      "referer",
-      "sessionized",
-      "shoppad",
-      "templater",
-      "tstamp",
-      "UNINSTALLEDAT"
-    ],
+    "sqlfluff.suppressNotifications": true,
     "dbt.queryLimit": 500,
     "dbt.queryPreview.queryLimit": 250,
     "sqlfluff.osmosis.enabled": false,
@@ -824,7 +797,55 @@
         "name": "yamllint",
         "url": "https://github.com/adrienverge/yamllint"
       }
-    }
+    },
+    "editor.formatOnPaste": false,
+    "cSpell.words": [
+      "authtoken",
+      "AUTOMATIONS",
+      "blockman",
+      "builtins",
+      "chargebee",
+      "CONCAT",
+      "dateadd",
+      "datediff",
+      "datepart",
+      "getmesa",
+      "hevo",
+      "hotjar",
+      "IFNULL",
+      "INITCAP",
+      "INSTALLEDAT",
+      "LISTAGG",
+      "metabase",
+      "mongoid",
+      "overlimit",
+      "pageview",
+      "referer",
+      "sessionized",
+      "shoppad",
+      "templater",
+      "tstamp",
+      "UNINSTALLEDAT"
+    ],
+    "cSpell.language": "en,en-US",
+    "cSpell.enableFiletypes": [
+      "jinja",
+      "jinja-md",
+      "jinja-sql",
+      "jinja-yaml",
+      "sql"
+    ],
+    "cSpell.customDictionaries": {
+      "custom-dictionary-workspace": {
+        "name": "custom-dictionary-workspace",
+        "path": "${workspaceFolder:mesa_dbt}/.cspell/custom-dictionary-workspace.txt",
+        "addWords": true,
+        "scope": "workspace"
+      }
+    },
+    "cSpell.ignoreWords": [
+      "cachable"
+    ]
   },
   "extensions": {
       "recommendations": [

@@ -72,7 +72,7 @@ thirty_day_workflow_counts AS (
         COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_runs_rolling_thirty_day_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
-    WHERE dt BETWEEN DATEADD(day, -30, dt) AND dt
+    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(day, -30, shop_calendar.dt) AND shop_calendar.dt
     GROUP BY 1, 2
 ),
 
@@ -83,7 +83,29 @@ year_workflow_counts AS (
         SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_runs_rolling_year_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
-    WHERE dt BETWEEN DATEADD(day, -365, dt) AND dt
+    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(year, -1, shop_calendar.dt) AND shop_calendar.dt
+    GROUP BY 1, 2
+),
+
+thirty_day_revenue_totals AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        COALESCE(SUM(daily_plan_revenue + daily_usage_revenue), 0) AS income_rolling_thirty_day_total
+    FROM shop_calendar
+    LEFT JOIN daily_charges USING (shop_subdomain)
+    WHERE daily_charges.dt BETWEEN DATEADD(day, -30, shop_calendar.dt) AND shop_calendar.dt
+    GROUP BY 1, 2
+),
+
+year_revenue_totals AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        COALESCE(SUM(daily_plan_revenue + daily_usage_revenue), 0) AS income_rolling_year_total
+    FROM shop_calendar
+    LEFT JOIN daily_charges USING (shop_subdomain)
+    WHERE daily_charges.dt BETWEEN DATEADD(year, -1, shop_calendar.dt) AND shop_calendar.dt
     GROUP BY 1, 2
 ),
 
@@ -99,6 +121,8 @@ final AS (
     LEFT JOIN thirty_day_workflow_counts USING (shop_subdomain, dt)
     LEFT JOIN year_workflow_counts USING (shop_subdomain, dt)
     LEFT JOIN shop_cohort_dates USING (shop_subdomain)
+    LEFT JOIN thirty_day_revenue_totals USING (shop_subdomain, dt)
+    LEFT JOIN year_revenue_totals USING (shop_subdomain, dt)
 )
 
 SELECT * FROM final
