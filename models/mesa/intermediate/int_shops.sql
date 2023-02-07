@@ -26,21 +26,9 @@ decorated_shops AS (
             WHEN age_of_store_at_install_in_days <= 547 THEN '7-First 18 Months (After First Year)'
             WHEN age_of_store_at_install_in_days <= 730 THEN '8-First 2 Years (After 18 Months)'
             ELSE '9-2nd Year+'
-            END AS age_of_store_at_install_bucket,
-        CASE
-            WHEN store_leads_estimated_monthly_sales < 1000 THEN 'A-Under $1,000'
-            WHEN store_leads_estimated_monthly_sales < 5000 THEN 'B-$1,000-$5,000'
-            WHEN store_leads_estimated_monthly_sales < 10000 THEN 'C-$5,000-$10,000'
-            WHEN store_leads_estimated_monthly_sales < 25000 THEN 'D-$10,000-$25,000'
-            WHEN store_leads_estimated_monthly_sales < 50000 THEN 'E-$25,000-$50,000'
-            WHEN store_leads_estimated_monthly_sales < 100000 THEN 'F-$50,000-$100,000'
-            WHEN store_leads_estimated_monthly_sales < 250000 THEN 'G-$100,000-$250,000'
-            WHEN store_leads_estimated_monthly_sales < 500000 THEN 'H-$250,000-$500,000'
-            WHEN store_leads_estimated_monthly_sales < 1000000 THEN 'I-$500,000-$1,000,000'
-            WHEN store_leads_estimated_monthly_sales < 2500000 THEN 'J-$1,000,000-$2,500,000'
-            ELSE 'K-$2,500,000+'
-            END AS store_leads_estimated_monthly_sales_bucket
+            END AS age_of_store_at_install_bucket
     FROM {{ source_table }}
+    WHERE shopify_plan_name NOT IN ('staff', 'staff_business')
 ),
 
 activation_dates AS (
