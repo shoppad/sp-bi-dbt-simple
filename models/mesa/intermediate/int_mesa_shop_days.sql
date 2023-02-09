@@ -54,14 +54,23 @@ charges AS (
     FROM {{ ref('stg_mesa_charges') }}
 ),
 
+legacy_DAUs AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        daily_usage_revenue
+    FROM {{ ref('stg_legacy_DAUs') }}
+),
+
 daily_charges AS (
     SELECT
         shop_subdomain,
         dt,
-        COALESCE(SUM(billed_count), 0) AS billed_count,
-        COALESCE(SUM(billed_amount), 0) AS daily_usage_revenue
+        COALESCE(SUM(charges.billed_count), 0) AS billed_count,
+        COALESCE(SUM(COALESCE(charges.billed_amount, legacy_DAUs.daily_usage_revenue)), 0) AS daily_usage_revenue
     FROM shop_calendar
     LEFT JOIN charges USING (dt, shop_subdomain)
+    LEFT JOIN legacy_DAUs USING (dt, shop_subdomain)
     GROUP BY 1, 2
 ),
 

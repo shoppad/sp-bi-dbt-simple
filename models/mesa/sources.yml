@@ -102,6 +102,9 @@ sources:
       - name: shop_infos
         identifier: m3_shoppad_domains
         freshness: null
+      - name: legacy_DAUs
+        identifier: sp_mesa_dau
+        freshness: null
 
   - name: economy_data
     description: Snowflake Marketplace economy data used for things like currency conversion rates.

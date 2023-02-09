@@ -28,7 +28,6 @@ decorated_shops AS (
             ELSE '9-2nd Year+'
             END AS age_of_store_at_install_bucket
     FROM {{ source_table }}
-    WHERE shopify_plan_name NOT IN ('staff', 'staff_business')
 ),
 
 activation_dates AS (

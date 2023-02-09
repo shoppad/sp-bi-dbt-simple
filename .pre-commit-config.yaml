@@ -1,6 +1,6 @@
 repos:
-  - repo: https://github.com/datacoves/pre-commit-dbt
-    rev: v2.0.0
+  - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+    rev: v1.0.0
     hooks:
       - id: dbt-docs-generate
       - id: check-script-semicolon
@@ -8,9 +8,9 @@ repos:
       - id: check-model-has-properties-file
       - id: check-script-has-no-table-name
         files: ^models
-      # - id: unify-column-description
-      - id: check-column-name-contract
-        args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+      - id: unify-column-description
+      # - id: check-column-name-contract
+      #  args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
       - id: check-model-has-all-columns
         name: Check columns - mart
         files: ^models/mesa/mart

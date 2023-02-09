@@ -4,6 +4,8 @@ raw_shops AS (
         uuid AS shop_subdomain
     FROM {{ source('mongo_sync', 'shops') }}
     WHERE NOT(__hevo__marked_deleted)
+        AND shopify:plan_name NOT IN ('staff', 'staff_business')
+
 ),
 
 trimmed_shops AS (
