@@ -327,7 +327,7 @@ models:
         description: The estimated monthly sales pulled in from Store Leads.
         meta:
           metabase.semantic_type: type/Currency
-          metabase.display_name: Estimated Shope Sales (Store Leads)
+          metabase.display_name: Estimated Shop Sales (Store Leads)
       - name: store_leads_monthly_app_spend
         description: The estimated amount the Shop spends on Shopify apps (pulled in from Store Leads).
         meta:
