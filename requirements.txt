@@ -1,4 +1,4 @@
-dbt-snowflake~=1.4.0
+dbt-snowflake~=1.4.1
 dbt-rpc
 dbt-osmosis>=0.9.7
 sqlfluff
