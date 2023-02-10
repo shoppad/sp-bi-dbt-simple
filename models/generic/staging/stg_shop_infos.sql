@@ -20,6 +20,6 @@ SELECT
     COALESCE(LOWER(ARRAY_TO_STRING(store_leads_features, '')) ILIKE '%recharge%', FALSE) AS store_leads_has_recharge,
     platform_rank::NUMERIC AS store_leads_platform_rank,
     platform_rank_percentile::NUMERIC AS store_leads_platform_rank_percentile,
-    estimated_sales::NUMERIC / 1200 AS store_leads_estimated_monthly_sales,
+    1.0 * estimated_sales::NUMERIC / 100 AS store_leads_estimated_monthly_sales,
     monthly_app_spend::NUMERIC AS store_leads_monthly_app_spend
 FROM flattened_table
