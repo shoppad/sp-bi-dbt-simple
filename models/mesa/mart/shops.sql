@@ -37,7 +37,7 @@ workflow_counts AS (
 workflow_run_counts AS (
     SELECT
         shop_subdomain,
-        COALESCE(COUNT(DISTINCT workflow_id), 0) AS workflows_attempted_count,
+        COALESCE(COUNT(DISTINCT workflow_id), 0) AS unique_workflows_attempted_count,
         COALESCE(COUNT(workflow_runs.workflow_run_id), 0) AS workflow_runs_attempted_count
     FROM shops
     LEFT JOIN {{ ref('workflow_runs') }} USING (shop_subdomain)
@@ -48,7 +48,7 @@ successful_workflow_run_counts AS (
     SELECT
         shops.shop_subdomain,
         COALESCE(COUNT(workflow_run_id), 0) AS workflow_run_success_count,
-        COALESCE(COUNT(DISTINCT workflow_id), 0) AS workflows_successfully_run_count
+        COALESCE(COUNT(DISTINCT workflow_id), 0) AS unique_workflows_successfully_run_count
     FROM shops
     LEFT JOIN {{ ref('workflow_runs') }}
         ON shops.shop_subdomain = workflow_runs.shop_subdomain

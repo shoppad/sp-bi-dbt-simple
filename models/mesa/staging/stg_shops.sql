@@ -61,6 +61,13 @@ shop_metas AS (
     GROUP BY 1
 ),
 
+custom_apps AS (
+    SELECT
+        shop_subdomain,
+        TRUE AS is_custom_app
+    FROM {{ ref('custom_app_daily_revenues') }}
+),
+
 shops AS (
     SELECT * EXCLUDE ("META")
     FROM trimmed_shops
@@ -80,11 +87,13 @@ plan_upgrade_dates AS (
 
 final AS (
     SELECT
-        * EXCLUDE (created_at, "GROUP", aggregated_meta),
+        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app),
         shop_metas.aggregated_meta AS meta,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
-        IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall
+        IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall,
+        COALESCE(is_custom_app, FALSE) AS is_custom_app
     FROM shops
+    FULL OUTER JOIN custom_apps USING (shop_subdomain)
     LEFT JOIN shop_metas USING (shop_subdomain)
     LEFT JOIN install_dates USING (shop_subdomain)
     LEFT JOIN uninstall_dates USING (shop_subdomain)

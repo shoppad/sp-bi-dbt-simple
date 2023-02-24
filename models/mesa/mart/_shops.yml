@@ -21,7 +21,7 @@ models:
         tests:
           - not_null
         description: The financial currency used by the shop with its customers.
-      - name: workflows_successfully_run_count
+      - name: unique_workflows_successfully_run_count
         tests:
           - not_null
         description: The number of workflow runs that have completed without error.
@@ -282,7 +282,7 @@ models:
         description: Whether the Shop was referred/entered the marketing site by a blog post.
         tests:
           - not_null
-      - name: workflows_attempted_count
+      - name: unique_workflows_attempted_count
         description: The number of workflow attempts that have been started.
         tests:
           - not_null
@@ -349,3 +349,7 @@ models:
         meta:
           metabase.semantic_type: type/Currency
           metabase.display_name: Last Year Income
+      - name: is_custom_app
+        description: Whether the Shop is a custom application with custom pricing not billed through the Shopify system.
+        tests:
+          - not_null
