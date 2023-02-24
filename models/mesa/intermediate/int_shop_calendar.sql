@@ -42,4 +42,3 @@ shop_calendar AS (
 
 SELECT *
 FROM shop_calendar
-WHERE shop_subdomain = 'modern-times-beer'
