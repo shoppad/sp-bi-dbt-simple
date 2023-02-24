@@ -2,7 +2,8 @@ WITH
 shop_trial_end_dates AS (
     SELECT
         shop_subdomain,
-        trial_end_dt AS dt
+        trial_end_dt AS dt,
+        is_custom_app
     FROM {{ ref('stg_shops') }}
 ),
 
@@ -26,7 +27,7 @@ shop_calendar AS (
         shop_subdomain,
         dt,
         CASE
-            WHEN (shop_trial_end_dates.dt IS NOT NULL AND dt < shop_trial_end_dates.dt)
+            WHEN (NOT(is_custom_app) AND shop_trial_end_dates.dt IS NOT NULL AND dt < shop_trial_end_dates.dt)
                 THEN 0
             ELSE COALESCE(daily_plan_revenue, 0)
         END AS daily_plan_revenue,
@@ -41,3 +42,4 @@ shop_calendar AS (
 
 SELECT *
 FROM shop_calendar
+WHERE shop_subdomain = 'modern-times-beer'
