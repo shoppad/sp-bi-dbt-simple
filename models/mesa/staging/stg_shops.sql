@@ -21,14 +21,26 @@ staff_subdomains AS (
     FROM {{ ref('staff_subdomains') }}
 ),
 
+custom_apps AS (
+    SELECT
+        shop_subdomain,
+        TRUE AS is_custom_app,
+        'Custom App' AS install_status,
+        PARSE_JSON('{"plan_name": "None (Custom App)", "currency": "USD"}') AS shopify,
+        first_dt,
+        last_dt
+    FROM {{ ref('custom_app_daily_revenues') }}
+),
+
 install_dates AS (
     SELECT
         shop_subdomain,
-        {{ pacific_timestamp('MIN(created_at)') }} AS first_installed_at_pt,
-        {{ pacific_timestamp('MAX(created_at)') }} AS latest_installed_at_pt,
+        {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }} AS first_installed_at_pt,
+        {{ pacific_timestamp('MAX(COALESCE(created_at, first_dt))') }} AS latest_installed_at_pt,
         DATE_TRUNC('week', first_installed_at_pt)::DATE AS cohort_week,
         DATE_TRUNC('month', first_installed_at_pt)::DATE AS cohort_month
     FROM trimmed_shops
+    FULL OUTER JOIN custom_apps USING (shop_subdomain)
     GROUP BY 1
 ),
 
@@ -43,6 +55,12 @@ uninstall_data_points AS (
         shop_subdomain,
         {{ pacific_timestamp('uninstalled_at_pt') }} AS uninstalled_at_pt
     FROM {{ ref('stg_mesa_uninstalls') }}
+
+    UNION ALL
+    SELECT
+        shop_subdomain,
+        last_dt AS uninstalled_at_pt
+    FROM custom_apps
 ),
 
 uninstall_dates AS (
@@ -59,13 +77,6 @@ shop_metas AS (
         ARRAY_UNION_AGG(meta) AS aggregated_meta
     FROM trimmed_shops
     GROUP BY 1
-),
-
-custom_apps AS (
-    SELECT
-        shop_subdomain,
-        TRUE AS is_custom_app
-    FROM {{ ref('custom_app_daily_revenues') }}
 ),
 
 shops AS (
@@ -87,8 +98,9 @@ plan_upgrade_dates AS (
 
 final AS (
     SELECT
-        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app),
+        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app, first_dt, last_dt, shopify),
         shop_metas.aggregated_meta AS meta,
+        COALESCE(shops.shopify, custom_apps.shopify) AS shopify,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall,
         COALESCE(is_custom_app, FALSE) AS is_custom_app
