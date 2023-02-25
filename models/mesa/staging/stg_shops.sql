@@ -25,7 +25,7 @@ custom_apps AS (
     SELECT
         shop_subdomain,
         TRUE AS is_custom_app,
-        'Custom App' AS install_status,
+        'Custom App' AS status,
         PARSE_JSON('{"plan_name": "None (Custom App)", "currency": "USD"}') AS shopify,
         first_dt,
         last_dt
@@ -98,7 +98,8 @@ plan_upgrade_dates AS (
 
 final AS (
     SELECT
-        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app, first_dt, last_dt, shopify),
+        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app, first_dt, last_dt, shopify, status),
+        COALESCE(shops.status, custom_apps.status) AS status,
         shop_metas.aggregated_meta AS meta,
         COALESCE(shops.shopify, custom_apps.shopify) AS shopify,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
