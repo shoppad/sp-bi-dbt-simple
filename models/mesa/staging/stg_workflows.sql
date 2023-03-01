@@ -34,6 +34,7 @@ final AS (
         key,
         tags,
         enabled AS is_enabled,
+        is_deleted,
         {# source AS first_step_app, #}
         {# destination AS last_step_app, TODO: Change to use Steps https://shoppad.slack.com/archives/D01UTNZKM6D/p1667343343556039 #}
         template AS template_name,

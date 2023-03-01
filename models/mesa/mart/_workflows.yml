@@ -18,7 +18,7 @@ models:
               field: shop_subdomain
               to: ref('shops')
       - name: template_name
-        description: The Shop-provided name of the template the workflow originated from.
+        description: The name of the template the workflow originated from.
 
       - name: title
         description: The title of the workflow.
@@ -127,5 +127,9 @@ models:
           - not_null
       - name: page_view_count
         description: The number of times the workflow has been viewed.
+        tests:
+          - not_null
+      - name: is_deleted
+        description: Whether the workflow has been deleted by the Shop.
         tests:
           - not_null

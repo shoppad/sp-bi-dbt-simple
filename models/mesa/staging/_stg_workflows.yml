@@ -14,7 +14,6 @@ models:
               to: ref('stg_shops')
       - name: template_name
         description: The name of the template the workflow originated from.
-
       - name: SHOP_SUBDOMAIN
       - name: TITLE
       - name: IS_PREMIUM
@@ -24,3 +23,5 @@ models:
       - name: IS_ENABLED
       - name: UPDATED_AT_PT
       - name: CREATED_AT_PT
+      - name: is_deleted
+        description: Whether the workflow has been deleted by the Shop.
