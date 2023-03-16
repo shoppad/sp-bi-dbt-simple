@@ -134,6 +134,22 @@ shop_infos AS (
     FROM {{ ref('stg_shop_infos') }}
 ),
 
+cohort_average_current_shop_gmv AS (
+    SELECT
+        cohort_month,
+        AVG(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
+    FROM {{ ref('int_shops') }}
+    GROUP BY 1
+),
+
+cohort_average_initial_shop_gmv AS (
+    SELECT
+        cohort_month,
+        AVG(shopify_shop_gmv_initial_total_usd) AS avg_initial_gmv_usd
+    FROM {{ ref('int_shops') }}
+    GROUP BY 1
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session),
@@ -143,6 +159,8 @@ final AS (
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
         IFNULL(has_had_launch_session, NOT(launch_session_date IS NULL)) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
+        shopify_shop_gmv_current_total_usd / NULLIF(avg_current_gmv_usd, 0) AS shopify_shop_gmv_current_cohort_avg_percent,
+        shopify_shop_gmv_initial_total_usd / NULLIF(avg_initial_gmv_usd, 0) AS shopify_shop_gmv_initial_cohort_avg_percent,
         CASE
             WHEN shopify_shop_gmv_current_total_usd < 100 THEN 100
             WHEN shopify_shop_gmv_current_total_usd < 1000 THEN 1000
@@ -199,6 +217,8 @@ final AS (
     LEFT JOIN total_ltv_revenue USING (shop_subdomain)
     LEFT JOIN constellation_app_presences USING (shop_subdomain)
     LEFT JOIN shop_infos USING (shop_subdomain)
+    LEFT JOIN cohort_average_current_shop_gmv USING (cohort_month)
+    LEFT JOIN cohort_average_initial_shop_gmv USING (cohort_month)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

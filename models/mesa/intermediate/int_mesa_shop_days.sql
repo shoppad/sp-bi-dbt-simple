@@ -123,7 +123,7 @@ final AS (
         *,
         {{- dbt_utils.generate_surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
         daily_plan_revenue + daily_usage_revenue AS inc_amount,
-        inc_amount > 0 OR workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }} AS is_active
+        (workflow_runs_rolling_year_count >= 10) AND (inc_amount > 0 OR workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }}) AS is_active
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
     LEFT JOIN daily_charges USING (shop_subdomain, dt)
