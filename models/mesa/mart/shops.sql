@@ -136,10 +136,8 @@ shop_infos AS (
 
 cohort_average_current_shop_gmv AS (
     SELECT
-        cohort_month,
         AVG(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
     FROM {{ ref('int_shops') }}
-    GROUP BY 1
 ),
 
 cohort_average_initial_shop_gmv AS (
@@ -152,7 +150,7 @@ cohort_average_initial_shop_gmv AS (
 
 final AS (
     SELECT
-        * EXCLUDE (has_had_launch_session),
+        * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
         NOT(activation_date_pt IS NULL) AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
 
@@ -217,7 +215,7 @@ final AS (
     LEFT JOIN total_ltv_revenue USING (shop_subdomain)
     LEFT JOIN constellation_app_presences USING (shop_subdomain)
     LEFT JOIN shop_infos USING (shop_subdomain)
-    LEFT JOIN cohort_average_current_shop_gmv USING (cohort_month)
+    LEFT JOIN cohort_average_current_shop_gmv
     LEFT JOIN cohort_average_initial_shop_gmv USING (cohort_month)
     WHERE billing_accounts.plan_name IS NOT NULL
 )

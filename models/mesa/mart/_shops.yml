@@ -353,3 +353,11 @@ models:
         description: Whether the Shop is a custom application with custom pricing not billed through the Shopify system.
         tests:
           - not_null
+      - name: shopify_shop_gmv_initial_cohort_avg_percent
+        description: The percent comparison of the Shop's initial revenue compared to its cohort.
+        meta:
+          metabase.display_name: Shopify Shop GMV Compared to Cohort Avg (Install)
+      - name: shopify_shop_gmv_current_cohort_avg_percent
+        description: The percent comparison of the Shop's current revenue compared to all other Shops.
+        meta:
+          metabase.display_name: Shopify Shop GMV Compared to All Avg (Current)
