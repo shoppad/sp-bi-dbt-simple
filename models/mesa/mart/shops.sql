@@ -157,8 +157,8 @@ final AS (
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
         IFNULL(has_had_launch_session, NOT(launch_session_date IS NULL)) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
-        shopify_shop_gmv_current_total_usd / NULLIF(avg_current_gmv_usd, 0) AS shopify_shop_gmv_current_cohort_avg_percent,
-        shopify_shop_gmv_initial_total_usd / NULLIF(avg_initial_gmv_usd, 0) AS shopify_shop_gmv_initial_cohort_avg_percent,
+        shopify_shop_gmv_current_total_usd / NULLIF(avg_current_gmv_usd, 0) - 1 AS shopify_shop_gmv_current_cohort_avg_percent,
+        shopify_shop_gmv_initial_total_usd / NULLIF(avg_initial_gmv_usd, 0) - 1 AS shopify_shop_gmv_initial_cohort_avg_percent,
         CASE
             WHEN shopify_shop_gmv_current_total_usd < 100 THEN 100
             WHEN shopify_shop_gmv_current_total_usd < 1000 THEN 1000
