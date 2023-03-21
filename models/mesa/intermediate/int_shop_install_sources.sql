@@ -14,7 +14,7 @@ install_page_sessions AS (
         session_id,
         tstamp
     FROM {{ ref('segment_web_page_views__sessionized') }}
-    WHERE page_url_path ILIKE '/apps/mesa/install%'
+    WHERE page_url_path ILIKE '%/apps/mesa/install%'
 
 ),
 
@@ -42,6 +42,8 @@ formatted_install_pageviews AS (
         referrer AS acquisition_referrer,
         referrer_host,
         CASE
+            WHEN utm_source IS NOT NULL AND utm_source != ''
+                THEN utm_source
             WHEN referrer ILIKE '%apps.shopify.com%'
                 THEN 'Shopify App Store'
             ELSE COALESCE(referrer_source, utm_source)
