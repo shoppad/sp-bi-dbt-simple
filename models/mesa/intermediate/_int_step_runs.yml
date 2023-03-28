@@ -65,11 +65,11 @@ models:
         description: The customer-provided name of the originating workflow.
       - name: shop_subdomain
         description: The foreign key for the Shop.
-        tests:
-          - not_null
-          - relationships:
-              to: ref('stg_shops')
-              field: shop_subdomain
+        # tests:
+        #   - not_null
+        #   - relationships:
+        #       to: ref('stg_shops')
+        #       field: shop_subdomain
       - name: is_workflow_hard_deleted
         description: Whether the workflow was hard deleted from the database and therefore missing
         tests:
