@@ -52,7 +52,8 @@ formatted_install_pageviews AS (
     FROM install_page_sessions
     LEFT JOIN segment_web_sessions USING (session_id)
     LEFT JOIN shops USING (shop_subdomain)
-    WHERE acquisition_source IS NOT NULL
+    WHERE
+        acquisition_source IS NOT NULL
         AND tstamp_pt <= first_installed_at_pt + INTERVAL '60seconds'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY tstamp_pt ASC) = 1
 ),
