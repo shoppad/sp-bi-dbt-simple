@@ -29,7 +29,7 @@ plan_dates AS (
 shop_dates AS (
     SELECT
         shop_subdomain,
-        first_installed_at_pt::DATE AS first_dt,
+        first_installed_at_pt AS first_dt,
         CASE
             WHEN uninstalled_at_pt IS NULL OR status = 'active'
                 THEN {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}
@@ -80,9 +80,9 @@ final AS (
         shop_subdomain,
         combined_dates.first_dt::DATE AS first_dt,
         LEAST(
-                COALESCE(combined_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE),
-                COALESCE(shop_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE)
-            ) AS last_dt,
+            COALESCE(combined_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE),
+            COALESCE(shop_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE)
+        ) AS last_dt,
         {{ datediff('first_dt', 'COALESCE(last_dt, ' ~ pacific_timestamp('CURRENT_TIMESTAMP()') ~ ')::DATE', 'day') }} + 1 AS lifespan_length
     FROM combined_dates
     LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.

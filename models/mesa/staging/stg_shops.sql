@@ -1,9 +1,11 @@
 WITH
 raw_shops AS (
-    SELECT * EXCLUDE (uuid),
+    SELECT
+        * EXCLUDE (uuid),
         uuid AS shop_subdomain
     FROM {{ source('mongo_sync', 'shops') }}
-    WHERE NOT(__hevo__marked_deleted)
+    WHERE
+        NOT __hevo__marked_deleted
         AND shopify:plan_name NOT IN ('staff', 'staff_business', 'shopify_alumni')
 
 ),
@@ -11,7 +13,8 @@ raw_shops AS (
 trimmed_shops AS (
     {% set exclude = ['_id', '_created_at', 'timestamp', 'method'] + var('etl_fields') -%}
 
-    SELECT * EXCLUDE ({{ exclude | join(', ') }}),
+    SELECT
+        * EXCLUDE ({{ exclude | join(', ') }}),
         _created_at AS created_at
     FROM raw_shops
 ),
@@ -35,6 +38,8 @@ custom_apps AS (
 install_dates AS (
     SELECT
         shop_subdomain,
+        MIN(COALESCE(created_at, first_dt)) AS first_installed_at_utc,
+        MAX(COALESCE(created_at, first_dt)) AS latest_installed_at_utc,
         {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }} AS first_installed_at_pt,
         {{ pacific_timestamp('MAX(COALESCE(created_at, first_dt))') }} AS latest_installed_at_pt,
         DATE_TRUNC('week', first_installed_at_pt)::DATE AS cohort_week,
@@ -46,21 +51,27 @@ install_dates AS (
 
 uninstall_data_points AS (
     SELECT
-        id AS shop_subdomain,
-        apps_mesa_uninstalledat AS uninstalled_at_pt -- NOTE: This timestamp is already in PST
-    FROM {{ source('php_segment', 'users') }}
-
-    UNION ALL
-    SELECT
         shop_subdomain,
-        {{ pacific_timestamp('uninstalled_at_pt') }} AS uninstalled_at_pt
-    FROM {{ ref('stg_mesa_uninstalls') }}
+        IFF(shops.status = 'active', NULL, uninstalled_at_pt) AS uninstalled_at_pt
+    FROM shops
+    LEFT JOIN (
+        SELECT
+            id AS shop_subdomain,
+            apps_mesa_uninstalledat AS uninstalled_at_pt -- NOTE: This timestamp is already in PST
+        FROM {{ source('php_segment', 'users') }}
 
-    UNION ALL
-    SELECT
-        shop_subdomain,
-        last_dt AS uninstalled_at_pt
-    FROM custom_apps
+        UNION ALL
+        SELECT
+            shop_subdomain,
+           uninstalled_at_pt -- NOTE: This timestamp is already in PST
+        FROM {{ ref('stg_mesa_uninstalls') }}
+
+        UNION ALL
+        SELECT
+            shop_subdomain,
+            last_dt AS uninstalled_at_pt
+        FROM custom_apps
+    ) USING (shop_subdomain)
 ),
 
 uninstall_dates AS (

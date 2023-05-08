@@ -2,10 +2,12 @@ version: 2
 models:
   - name: int_shop_lifespans
     tests:
-      # - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
-      #     column_A: last_dt
-      #     column_B: first_dt
-      #     or_equal: true
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: last_dt
+          column_B: first_dt
+          or_equal: true
+          config:
+                where: first_dt > '2022-01-01'
     columns:
       - name: shop_subdomain
         tests:
