@@ -10,7 +10,7 @@ cohorts_m AS (
     SELECT
         first_month,
         month AS active_month,
-        datediff(month, first_month, month) AS months_since_first,
+        datediff(MONTH, first_month, month) AS months_since_first,
         count(DISTINCT shop_subdomain) AS shops,
         sum(inc_amount) AS inc_amt
     FROM {{ ref('int_shop_months') }}
@@ -35,11 +35,11 @@ cohorts_cumulative_m AS (
         c1.active_month,
         c1.months_since_first,
         c1.shops,
-        cs.shops as cohort_num_users,
-        1.0 * c1.shops / cs.shops as retained_pctg,
+        cs.shops AS cohort_num_users,
+        1.0 * c1.shops / cs.shops AS retained_pctg,
         c1.inc_amt,
-        sum(c2.inc_amt) as cum_amt,
-        1.0 * sum(c2.inc_amt) / cs.shops as cum_amt_per_user
+        SUM(c2.inc_amt) AS cum_amt,
+        1.0 * SUM(c2.inc_amt) / cs.shops AS cum_amt_per_user
     FROM
         cohorts_m AS c1,
         cohorts_m AS c2,
