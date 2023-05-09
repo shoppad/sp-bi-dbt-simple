@@ -255,6 +255,18 @@ plan_upgrade_counts AS (
     GROUP BY 1
 ),
 
+shopify_plan_counts AS (
+    SELECT
+        cohort_month
+        {% for plan in ['basic', 'professional', 'shopify_plus', 'unlimited', 'trial' ] %}
+        , COUNT_IF(shopify_plan_name = '{{ plan }}') AS shopify_{{ plan }}_plan_count,
+        shopify_{{ plan }}_plan_count / COUNT(*) AS shopify_{{ plan }}_plan_pct
+        {% endfor %}
+    FROM shops
+    GROUP BY 1
+),
+
+
 final AS (
 
     SELECT
@@ -267,6 +279,7 @@ final AS (
     LEFT JOIN workflows_created_time_buckets USING (cohort_month)
     LEFT JOIN workflows_enabled_time_buckets USING (cohort_month)
     LEFT JOIN plan_upgrade_counts USING (cohort_month)
+    LEFT JOIN shopify_plan_counts USING (cohort_month)
 )
 
 SELECT *
