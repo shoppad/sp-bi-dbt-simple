@@ -153,4 +153,5 @@ final AS (
 )
 
 SELECT * FROM final
+WHERE cohort_week <= date_trunc('week', CURRENT_DATE())
 ORDER BY cohort_week DESC
