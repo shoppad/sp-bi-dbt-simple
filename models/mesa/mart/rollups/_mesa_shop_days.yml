@@ -96,3 +96,11 @@ models:
         description: The total revenue from this shop in the last 30 days as of this day.
         tests:
           - not_null
+      - name: workflows_wizard_complete_count
+        description: The number of times the template wizard was completed on this day.
+      - name: workflows_created_count
+        description: The number of workflows created on this day.
+      - name: workflows_wizard_started_count
+        description: The number of times the template wizard was started on this day.
+      - name: workflows_wizard_incomplete_count
+        description: The number of times the template wizard was started but not completed on this day.
