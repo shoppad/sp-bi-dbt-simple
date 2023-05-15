@@ -1,8 +1,7 @@
 WITH
-shop_trial_end_dates AS (
+shops AS (
     SELECT
         shop_subdomain,
-        trial_end_dt AS dt,
         is_custom_app
     FROM {{ ref('stg_shops') }}
 ),
@@ -18,7 +17,7 @@ shop_lifespans AS (
 ),
 
 calendar_dates AS (
-    SELECT date_day as dt
+    SELECT date_day AS dt
     FROM {{ ref('calendar_dates') }}
 ),
 
@@ -26,18 +25,17 @@ shop_calendar AS (
     SELECT
         shop_subdomain,
         dt,
-        CASE
-            WHEN (NOT(is_custom_app) AND shop_trial_end_dates.dt IS NOT NULL AND dt < shop_trial_end_dates.dt)
-                THEN 0
-            ELSE COALESCE(daily_plan_revenue, 0)
-        END AS daily_plan_revenue,
+        COALESCE(daily_plan_revenue, 0) AS daily_plan_revenue,
         mesa_plan,
-        shopify_plan
+        mesa_plan_identifier,
+        COALESCE(shopify_plan, 'unavailable') AS shopify_plan,
+        is_in_trial,
+        is_shopify_zombie_plan
     FROM shop_lifespans
     INNER JOIN calendar_dates
         ON dt BETWEEN first_dt AND last_dt
     LEFT JOIN shop_plan_days USING (shop_subdomain, dt)
-    LEFT JOIN shop_trial_end_dates USING (shop_subdomain)
+    LEFT JOIN shops USING (shop_subdomain)
 )
 
 SELECT *

@@ -1,13 +1,13 @@
 version: 2
 models:
-  - name: stg_legacy_DAUs
+  - name: stg_legacy_daus
     description: Raw import of the legacy DAU tables (pre-Mesalytics)
     columns:
       - name: shop_subdomain
-        description: The shop subdomain
+        description: The foreign key for the Shop.
         tests:
           - not_null
       - name: dt
-        description: The date
+        description: The calendar date of the shop day.
         tests:
           - not_null

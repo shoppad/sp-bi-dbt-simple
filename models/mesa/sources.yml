@@ -102,7 +102,7 @@ sources:
       - name: shop_infos
         identifier: m3_shoppad_domains
         freshness: null
-      - name: legacy_DAUs
+      - name: legacy_daus
         identifier: sp_mesa_dau
         freshness: null
 

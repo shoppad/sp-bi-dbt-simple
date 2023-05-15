@@ -1,11 +1,11 @@
 {% set source_table = ref('stg_shops') %}
 WITH
 decorated_shops AS (
-{% set columns_to_skip = ['scopes', 'billing', 'status', 'entitlements', 'timestamp', 'shopify', 'usage', 'config', 'themes', 'webhooks', 'messages', 'analytics', 'schema', 'handle', 'method', 'account', 'wizard', 'mongoid', 'authtoken', 'metabase'] %}
+    {% set columns_to_skip = ['scopes', 'billing', 'status', 'entitlements', 'timestamp', 'shopify', 'usage', 'config', 'themes', 'webhooks', 'messages', 'analytics', 'schema', 'handle', 'method', 'account', 'wizard', 'mongoid', 'authtoken', 'metabase'] %}
     SELECT
         {{ groomed_column_list(source_table, except=columns_to_skip)  | join(",\n       ") }},
-        shopify:plan_name::string AS shopify_plan_name,
-        shopify:currency::string AS currency,
+        shopify:plan_name::STRING AS shopify_plan_name,
+        shopify:currency::STRING AS currency,
         {{ pacific_timestamp('cast(shopify:created_at AS TIMESTAMP_LTZ)') }} AS shopify_shop_created_at_pt,
         shopify:country::STRING AS shopify_shop_country,
         status AS install_status,
@@ -13,7 +13,8 @@ decorated_shops AS (
         analytics:initial:orders_gmv AS shopify_shop_gmv_initial_total,
         analytics:orders:count::NUMERIC AS shopify_shop_orders_current_count,
         analytics:orders:gmv AS shopify_shop_gmv_current_total,
-        wizard:builder:step = 'complete' AS is_builder_wizard_completed,
+        analytics:initial:shopify_plan_name::STRING AS initial_shopify_plan_name,
+        COALESCE(wizard:builder:step = 'complete', FALSE) AS is_builder_wizard_completed,
         {{ datediff('shopify_shop_created_at_pt', 'first_installed_at_pt', 'day') }} AS age_of_store_at_install_in_days,
         {{ datediff('shopify_shop_created_at_pt', 'first_installed_at_pt', 'week') }} AS age_of_store_at_install_in_weeks,
         CASE
@@ -26,7 +27,7 @@ decorated_shops AS (
             WHEN age_of_store_at_install_in_days <= 547 THEN '7-First 18 Months (After First Year)'
             WHEN age_of_store_at_install_in_days <= 730 THEN '8-First 2 Years (After 18 Months)'
             ELSE '9-2nd Year+'
-            END AS age_of_store_at_install_bucket
+        END AS age_of_store_at_install_bucket
     FROM {{ source_table }}
 ),
 
@@ -43,19 +44,14 @@ activation_dates AS (
 launch_session_dates AS (
     SELECT
         shop_subdomain,
-        meta_attribs.value:value::DATE AS launch_session_date
+        IFF(
+            meta_attribs.value:name = 'launchsessiondate',
+            meta_attribs.value:value::DATE,
+            NULL
+        ) AS launch_session_date,
+        NOT launch_session_date IS NULL AS has_had_launch_session
     FROM {{ ref('stg_shops') }},
         LATERAL FLATTEN(input => meta) AS meta_attribs
-    WHERE meta_attribs.value:name = 'launchsessiondate'
-),
-
-boolean_launch_sessions AS (
-  SELECT
-        shop_subdomain,
-        meta_attribs.value:value = 'enabled' AS has_had_launch_session
-    FROM {{ ref('stg_shops') }},
-        LATERAL FLATTEN(input => meta) AS meta_attribs
-    WHERE meta_attribs.value:name = 'hadlaunchsession'
 ),
 
 conversion_rates AS (
@@ -73,7 +69,6 @@ final AS (
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
-    LEFT JOIN boolean_launch_sessions USING (shop_subdomain)
     LEFT JOIN conversion_rates USING (currency)
 )
 

@@ -41,6 +41,7 @@ install_dates AS (
         MIN(COALESCE(created_at, first_dt)) AS first_installed_at_utc,
         MAX(COALESCE(created_at, first_dt)) AS latest_installed_at_utc,
         {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }} AS first_installed_at_pt,
+        {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }}::DATE AS first_installed_on_pt,
         {{ pacific_timestamp('MAX(COALESCE(created_at, first_dt))') }} AS latest_installed_at_pt,
         DATE_TRUNC('week', first_installed_at_pt)::DATE AS cohort_week,
         DATE_TRUNC('month', first_installed_at_pt)::DATE AS cohort_month
@@ -63,7 +64,7 @@ uninstall_data_points AS (
         UNION ALL
         SELECT
             shop_subdomain,
-           uninstalled_at_pt -- NOTE: This timestamp is already in PST
+            uninstalled_at_pt -- NOTE: This timestamp is already in PST
         FROM {{ ref('stg_mesa_uninstalls') }}
 
         UNION ALL
@@ -93,7 +94,8 @@ shop_metas AS (
 shops AS (
     SELECT * EXCLUDE ("META")
     FROM trimmed_shops
-    WHERE NOT(shop_subdomain IN (SELECT * FROM staff_subdomains))
+    WHERE
+        NOT shop_subdomain IN (SELECT * FROM staff_subdomains)
         AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
 ),
@@ -101,7 +103,7 @@ shops AS (
 plan_upgrade_dates AS (
     SELECT
         shop_subdomain,
-        MIN(timestamp)::DATE as plan_upgrade_date
+        MIN(timestamp)::DATE AS plan_upgrade_date
     FROM {{ ref('stg_mesa_flow_events') }}
     WHERE event_id IN ('plan_upgrade', 'plan_select')
     GROUP BY 1
