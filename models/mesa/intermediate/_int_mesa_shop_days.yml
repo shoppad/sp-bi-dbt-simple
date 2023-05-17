@@ -45,11 +45,11 @@ models:
       - name: workflow_runs_rolling_thirty_day_count
         tests:
           - not_null
-        description: The number of successful workflow run attempts initiated in the last 30 days as of this day.
+        description: The number of successful workflow run attempts initiated in the last 30 days.
       - name: workflow_runs_rolling_year_count
         tests:
           - not_null
-        description: The number of successful workflow run attempts initiated in the last year as of this day.
+        description: The number of successful workflow run attempts initiated in the last 365 days.
       - name: is_active
         tests:
           - not_null

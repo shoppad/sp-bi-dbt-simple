@@ -51,8 +51,7 @@ successful_workflow_run_counts AS (
         COALESCE(COUNT(DISTINCT workflow_id), 0) AS unique_workflows_successfully_run_count
     FROM shops
     LEFT JOIN {{ ref('workflow_runs') }}
-        ON
-            shops.shop_subdomain = workflow_runs.shop_subdomain
+        ON shops.shop_subdomain = workflow_runs.shop_subdomain
             AND workflow_runs.run_status = 'success'
     GROUP BY 1
 ),
@@ -115,6 +114,12 @@ max_funnel_steps AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY step_order DESC) = 1
 ),
 
+last_thirty_day_revenues AS (
+    SELECT *
+    FROM {{ ref('mesa_shop_days') }}
+    WHERE dt >= {{ pacific_timestamp('CURRENT_DATE()') }}::date - INTERVAL '31 days' -- 30 days + 1 day since current day isn't recorded.
+),
+
 total_ltv_revenue AS (
     SELECT
         shop_subdomain,
@@ -130,7 +135,8 @@ shop_infos AS (
 ),
 
 cohort_average_current_shop_gmv AS (
-    SELECT AVG(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
+    SELECT
+        AVG(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
     FROM {{ ref('int_shops') }}
 ),
 
@@ -149,7 +155,7 @@ final AS (
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
 
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
-        COALESCE(has_had_launch_session, NOT launch_session_date IS NULL) AS has_had_launch_session,
+        IFNULL(has_had_launch_session, NOT(launch_session_date IS NULL)) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
         shopify_shop_gmv_current_total_usd / NULLIF(avg_current_gmv_usd, 0) - 1 AS shopify_shop_gmv_current_cohort_avg_percent,
         shopify_shop_gmv_initial_total_usd / NULLIF(avg_initial_gmv_usd, 0) - 1 AS shopify_shop_gmv_initial_cohort_avg_percent,
@@ -174,15 +180,15 @@ final AS (
             WHEN shopify_shop_gmv_current_total_usd < 1000000000 THEN 1000000000
         END AS shopify_shop_gmv_current_total_tier,
 
-        'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/'
-        || shop_subdomain
-        || '/mesa' AS backdoor_url,
-        'https://insights.hotjar.com/sites/1547357/'
-        || 'workspaces/1288874/playbacks/list?'
-        || 'filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,'
-        || '%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22'
-        || shop_subdomain
-        || '%22%7D%7D%5D%7D' AS hotjar_url,
+        'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' ||
+            shop_subdomain ||
+            '/mesa' AS backdoor_url,
+        'https://insights.hotjar.com/sites/1547357/' ||
+            'workspaces/1288874/playbacks/list?' ||
+            'filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,' ||
+            '%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22' ||
+            shop_subdomain ||
+            '%22%7D%7D%5D%7D' AS hotjar_url,
         CASE
             WHEN store_leads_estimated_monthly_sales < 1000 THEN 'A-Under $1,000'
             WHEN store_leads_estimated_monthly_sales < 5000 THEN 'B-$1,000-$5,000'
@@ -195,7 +201,7 @@ final AS (
             WHEN store_leads_estimated_monthly_sales < 1000000 THEN 'I-$500,000-$1,000,000'
             WHEN store_leads_estimated_monthly_sales < 2500000 THEN 'J-$1,000,000-$2,500,000'
             ELSE 'K-$2,500,000+'
-        END AS store_leads_estimated_monthly_sales_bucket
+            END AS store_leads_estimated_monthly_sales_bucket
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

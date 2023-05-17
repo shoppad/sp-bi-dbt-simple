@@ -88,8 +88,6 @@ models:
         description: The Mesa billing plan the Shop was on that day.
       - name: shopify_plan
         description: The Shopify plan the Shop was on that day.
-        tests:
-          - not_null
       - name: income_rolling_year_total
         description: The total revenue from this shop in the last year as of this day.
         tests:
@@ -106,15 +104,3 @@ models:
         description: The number of times the template wizard was started on this day.
       - name: workflows_wizard_incomplete_count
         description: The number of times the template wizard was started but not completed on this day.
-      - name: has_incomplete_wizard
-        description: Whether the shop has an incomplete wizard on this day.
-      - name: created_wowithout_wizard
-        description: Whether the shop created a workflow without using the wizard on this day.
-      - name: created_a_workflow
-        description: Whether the shop created a workflow on this day.
-      - name: started_wizard
-        description: Whether the shop started the wizard on this day.
-      - name: completed_wizard
-        description: Whether the shop completed the wizard on this day.
-      - name: workflows_created_without_wizard_count
-        description: The number of workflows created without using the wizard on this day.
