@@ -50,6 +50,24 @@ install_dates AS (
     GROUP BY 1
 ),
 
+
+shop_metas AS (
+    SELECT
+        shop_subdomain,
+        ARRAY_UNION_AGG(meta) AS aggregated_meta
+    FROM trimmed_shops
+    GROUP BY 1
+),
+
+shops AS (
+    SELECT * EXCLUDE ("META")
+    FROM trimmed_shops
+    WHERE
+        NOT shop_subdomain IN (SELECT * FROM staff_subdomains)
+        AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
+),
+
 uninstall_data_points AS (
     SELECT
         shop_subdomain,
@@ -81,23 +99,6 @@ uninstall_dates AS (
         MAX(uninstalled_at_pt) AS uninstalled_at_pt
     FROM uninstall_data_points
     GROUP BY 1
-),
-
-shop_metas AS (
-    SELECT
-        shop_subdomain,
-        ARRAY_UNION_AGG(meta) AS aggregated_meta
-    FROM trimmed_shops
-    GROUP BY 1
-),
-
-shops AS (
-    SELECT * EXCLUDE ("META")
-    FROM trimmed_shops
-    WHERE
-        NOT shop_subdomain IN (SELECT * FROM staff_subdomains)
-        AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
 ),
 
 plan_upgrade_dates AS (
