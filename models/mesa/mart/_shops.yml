@@ -354,7 +354,7 @@ models:
       - name: store_leads_monthly_app_spend
         description:
           The estimated amount the Shop spends on Shopify apps (pulled in from
-          Store Leads).
+          Store Leads).†≤
         meta:
           metabase.semantic_type: type/Currency
           metabase.display_name: Monthly App Spend (Store Leads)
@@ -402,3 +402,13 @@ models:
         description: The timestamp of the Shop's latest install in UTC.
       - name: first_installed_at_utc
         description: The timestamp of the Shop's first install in UTC.
+      - name: is_mql
+        description: Whether the Shop is an MQL.
+        meta:
+          metabase.display_name: Is MQL?
+      - name: initial_shopify_plan_name
+        description: The name of the Shop's initial Shopify plan.
+      - name: first_installed_on_pt
+        description: The date of the Shop's first install.
+        meta:
+          metabase.display_name: First Installed On (PT)

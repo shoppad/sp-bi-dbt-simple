@@ -147,7 +147,7 @@ final AS (
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
         NOT(activation_date_pt IS NULL) AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
-
+        shopify_shop_orders_initial_count >= 50 AND shopify_shop_created_at_pt <= CURRENT_DATE - INTERVAL '2 years' AS is_mql,
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
         COALESCE(has_had_launch_session, NOT launch_session_date IS NULL) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
