@@ -139,6 +139,24 @@ plan_upgrade_counts AS (
     GROUP BY 1
 ),
 
+mql_counts AS (
+    SELECT
+        cohort_week,
+        COUNT_IF(is_mql) AS mql_count
+    FROM shops
+    GROUP BY 1
+),
+
+non_mesa_installs AS (
+    SELECT
+        date_trunc('week', first_installed_at) AS cohort_week,
+        COUNT(*) AS non_mesa_shop_count,
+        COUNT_IF(is_mql) AS non_mesa_mql_count
+    FROM {{ ref('stg_shop_infos') }}
+    LEFT OUTER JOIN shops USING (shop_subdomain)
+    GROUP BY 1
+),
+
 shopify_plan_counts AS (
     SELECT
         cohort_week
@@ -157,12 +175,22 @@ final AS (
         total_ltv_revenue / NULLIF(cohort_size, 0) AS lifetime_value_installed,
         total_ltv_revenue / NULLIF(has_a_workflow_count, 0) AS lifetime_value_has_a_workflow,
         total_ltv_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
-        total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated
+        total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated,
+        AVG(cohort_size) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_new_customer_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_new_customer_count, 0) AS one_week_growth_rate,
+        AVG(mql_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_mql_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_mql_count, 0) AS one_week_mql_growth_rate,
+        SUM(non_mesa_shop_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_non_mesa_customer_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_customer_count, 0) AS one_week_normalization_rate,
+        SUM(non_mesa_mql_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_non_mesa_mql_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_mql_count, 0) AS one_week_mql_normalization_rate
     FROM workflow_setup_counts
     LEFT JOIN workflows_created_time_buckets USING (cohort_week)
     LEFT JOIN workflows_enabled_time_buckets USING (cohort_week)
     LEFT JOIN shopify_plan_counts USING (cohort_week)
     LEFT JOIN plan_upgrade_counts USING (cohort_week)
+    LEFT JOIN mql_counts USING (cohort_week)
+    LEFT JOIN non_mesa_installs USING (cohort_week)
 )
 
 SELECT * FROM final

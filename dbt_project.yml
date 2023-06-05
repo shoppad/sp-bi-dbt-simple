@@ -44,7 +44,6 @@ vars:
       event_text,
       sent_at,
       received_at,
-      handle,
       original_timestamp,
     ]
   segment:
@@ -78,6 +77,11 @@ models:
 
     generic:
       +schema: support
+      staging:
+        stg_shop_infos:
+          # +materialized: incremental
+          # +on_schema_change: "sync_all_columns"
+          # +unique_key: shop_subdomain
     mesa:
       mart:
         step_runs:

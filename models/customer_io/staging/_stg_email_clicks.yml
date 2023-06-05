@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_email_clicks
+    description: "Email clicks from Customer.io"
+    tags: ["staging", "customer_io"]
+    columns:
+        - name: delivery_id
+          description: "Unique ID for the email delivery"
+          tests:
+            - not_null
+        - name: shop_subdomain
+          description: "Shopify subdomain"
+          tests:
+            - not_null

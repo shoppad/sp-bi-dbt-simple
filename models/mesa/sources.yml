@@ -760,3 +760,15 @@ sources:
         identifier: shopify_planchange
       - name: app_uninstalls
         identifier: shoppad_uninstall
+
+  - name: customer_io
+    description: tables synced from customer.io
+    database: mongo
+    schema: customer_io
+    loader: hevo
+    loaded_at_field: received_at
+    tables:
+      - name: email_opens
+        identifier: email_opened
+      - name: email_clicks
+        identifier: email_link_clicked

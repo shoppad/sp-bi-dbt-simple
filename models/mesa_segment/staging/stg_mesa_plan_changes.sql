@@ -8,7 +8,7 @@ WITH raw_mesa_plan_changes AS (
         END, 0) AS price,
         {{ pacific_timestamp('timestamp') }} AS changed_at_pt,
         DATE_TRUNC('day', changed_at_pt)::DATE AS changed_on_pt,
-        * EXCLUDE (user_id, id, price, timestamp, {{ var('ugly_segment_fields') | join(', ') }})
+        * EXCLUDE (user_id, id, price, handle, timestamp, {{ var('ugly_segment_fields') | join(', ') }})
     FROM {{ source('php_segment', 'mesa_plan_changes') }}
     WHERE handle = 'mesa'
 ),

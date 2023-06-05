@@ -1,7 +1,7 @@
 WITH
 raw_shopify_plan_changes AS (
     SELECT
-        * EXCLUDE (id, user_id, timestamp, {{ var('ugly_segment_fields') | join(', ') }}),
+        * EXCLUDE (id, user_id, timestamp, handle, {{ var('ugly_segment_fields') | join(', ') }}),
         id AS shopify_plan_change_id,
         user_id AS shop_subdomain,
         {{ pacific_timestamp('timestamp') }} AS changed_at_pt,

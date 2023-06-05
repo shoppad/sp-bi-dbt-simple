@@ -126,7 +126,7 @@ total_ltv_revenue AS (
 
 shop_infos AS (
     SELECT *
-    FROM {{ ref('stg_shop_infos') }}
+    FROM {{ ref('int_shop_infos') }}
 ),
 
 cohort_average_current_shop_gmv AS (
@@ -142,12 +142,47 @@ cohort_average_initial_shop_gmv AS (
     GROUP BY 1
 ),
 
+email_open_details AS (
+    SELECT
+        shop_subdomain,
+        MIN(opened_at_pt) AS first_email_open_at_pt,
+        MAX(opened_at_pt) AS last_email_open_at_pt,
+        COALESCE(COUNT(DISTINCT email_id), 0) AS email_opens_count,
+        email_opens_count > 0 AS has_opened_email
+    FROM shops
+    LEFT JOIN {{ ref('stg_email_opens') }} USING (shop_subdomain)
+    GROUP BY 1
+),
+
+email_click_details AS (
+    SELECT
+        shop_subdomain,
+        MIN(clicked_at_pt) AS first_email_clicked_at_pt,
+        MAX(clicked_at_pt) AS last_email_clicked_at_pt,
+        COALESCE(COUNT(DISTINCT email_id), 0) AS email_click_count,
+        email_click_count > 0 AS has_clicked_email
+    FROM shops
+    LEFT JOIN {{ ref('stg_email_clicks') }} USING (shop_subdomain)
+    GROUP BY 1
+),
+
+email_conversion_details AS (
+    SELECT
+        shop_subdomain,
+        MIN(converted_at_pt) AS first_email_converted_at_pt,
+        MAX(converted_at_pt) AS last_email_converted_at_pt,
+        COALESCE(COUNT(DISTINCT email_id), 0) AS email_conversion_count,
+        email_conversion_count > 0 AS has_converted_via_email
+    FROM shops
+    LEFT JOIN {{ ref('stg_email_conversions') }} USING (shop_subdomain)
+    GROUP BY 1
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
         NOT(activation_date_pt IS NULL) AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
-        shopify_shop_orders_initial_count >= 50 AND shopify_shop_created_at_pt <= CURRENT_DATE - INTERVAL '2 years' AS is_mql,
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
         COALESCE(has_had_launch_session, NOT launch_session_date IS NULL) AS has_had_launch_session,
         {{ dbt.datediff('launch_session_date', 'activation_date_pt', 'days') }} AS days_from_launch_session_to_activation,
@@ -211,6 +246,9 @@ final AS (
     LEFT JOIN shop_infos USING (shop_subdomain)
     LEFT JOIN cohort_average_current_shop_gmv
     LEFT JOIN cohort_average_initial_shop_gmv USING (cohort_month)
+    LEFT JOIN email_open_details USING (shop_subdomain)
+    LEFT JOIN email_click_details USING (shop_subdomain)
+    LEFT JOIN email_conversion_details USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

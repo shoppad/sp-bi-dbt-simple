@@ -1,3 +1,11 @@
 version: 2
 models:
   - name: stg_shop_infos
+    columns:
+      - name: shop_subdomain
+        type: string
+        length: 255
+        primary: true
+        tests:
+          - not_null
+          - unique
