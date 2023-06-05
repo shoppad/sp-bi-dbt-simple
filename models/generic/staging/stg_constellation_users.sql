@@ -12,6 +12,7 @@ WITH constellation_users AS (
 
     FROM {{ source('php_segment', 'users') }}
     WHERE shop_subdomain NOT IN (SELECT * FROM {{ ref('staff_subdomains') }})
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY createdat DESC) = 1
 )
 
 SELECT *
