@@ -140,6 +140,10 @@ models:
       intermediate:
         +schema: support
 
+    customer_io:
+      staging:
+        +schema: support
+
 tests:
   shoppad:
     mesa:
