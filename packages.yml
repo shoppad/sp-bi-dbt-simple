@@ -8,10 +8,10 @@ packages:
   - package: dbt-labs/metrics
     version: [">=1.5.0", "<1.6.0"]
   - package: dbt-labs/dbt_utils
-    version: 1.0.0
+    version: 1.1.1
   #- git: "https://github.com/JonCrawford/dbt_segment"
   #  warn-unpinned: false
-  - package: dbt-labs/segment
-    version: 0.9.0
+  - package: Fleetio/dbt_segment
+    version: 0.1.1
   - package: dbt-labs/codegen
     version: 0.9.0

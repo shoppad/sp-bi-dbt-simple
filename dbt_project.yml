@@ -46,8 +46,9 @@ vars:
       received_at,
       original_timestamp,
     ]
-  segment:
-    segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
+
+  segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
+  segment_sessionization_trailing_window: 3
 
 seeds:
   +schema: seed_data
