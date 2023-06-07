@@ -149,20 +149,21 @@ mql_counts AS (
 
 non_mesa_installs AS (
     SELECT
-        date_trunc('week', first_installed_at) AS cohort_week,
+        date_trunc('week', updated_at) AS cohort_week,
         COUNT(*) AS non_mesa_shop_count,
         COUNT_IF(is_mql) AS non_mesa_mql_count
-    FROM {{ ref('stg_shop_infos') }}
+    FROM {{ ref('int_shop_infos') }}
     LEFT OUTER JOIN shops USING (shop_subdomain)
+    WHERE shop_subdomain NOT IN (SELECT * FROM {{ ref('staff_subdomains') }})
     GROUP BY 1
 ),
 
 shopify_plan_counts AS (
     SELECT
         cohort_week
-        {% for plan in ['basic', 'professional', 'shopify_plus', 'unlimited', 'trial' ] %}
-        , COUNT_IF(shopify_plan_name = '{{ plan }}') AS shopify_{{ plan }}_plan_count,
-        shopify_{{ plan }}_plan_count / COUNT(*) AS shopify_{{ plan }}_plan_pct
+        {% for plan in ['basic', 'professional', 'shopify_plus', 'unlimited', 'trial' ] %},
+            COUNT_IF(shopify_plan_name = '{{ plan }}') AS shopify_{{ plan }}_plan_count,
+            shopify_{{ plan }}_plan_count / COUNT(*) AS shopify_{{ plan }}_plan_pct
         {% endfor %}
     FROM shops
     GROUP BY 1
@@ -176,14 +177,24 @@ final AS (
         total_ltv_revenue / NULLIF(has_a_workflow_count, 0) AS lifetime_value_has_a_workflow,
         total_ltv_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
         total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated,
-        AVG(cohort_size) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_new_customer_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_new_customer_count, 0) AS one_week_growth_rate,
-        AVG(mql_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_mql_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_mql_count, 0) AS one_week_mql_growth_rate,
-        SUM(non_mesa_shop_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_non_mesa_customer_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_customer_count, 0) AS one_week_normalization_rate,
-        SUM(non_mesa_mql_count) OVER( ORDER BY cohort_week ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS prior_one_week_non_mesa_mql_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_mql_count, 0) AS one_week_mql_normalization_rate
+
+        {# Rest of Constellation Growth #}
+        LAG(non_mesa_shop_count) OVER (ORDER BY cohort_week) AS prior_one_week_non_mesa_customer_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_customer_count, 0) -1 AS one_week_non_mesa_growth_rate,
+
+        {# Rest of Constellation MQL Growth #}
+        LAG(non_mesa_mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_non_mesa_mql_count,
+        1.0 * non_mesa_mql_count / NULLIF(prior_one_week_non_mesa_mql_count, 0) - 1 AS one_week_non_mesa_mql_growth_rate,
+
+        {# MESA Install Growth #}
+        LAG(cohort_size) OVER (ORDER BY cohort_week) AS prior_one_week_new_customer_count,
+        1.0 * cohort_size / NULLIF(prior_one_week_new_customer_count, 0) - 1 AS one_week_mesa_growth_rate,
+        1.0 * prior_one_week_non_mesa_customer_count / (1 + NULLIF(one_week_non_mesa_growth_rate, 0)) AS one_week_normalized_customer_count,
+
+        {# MESA MQL Growth #}
+        LAG(mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_mql_count,
+        1.0 * mql_count / NULLIF(prior_one_week_mql_count, 0) - 1 AS one_week_mql_growth_rate,
+        1.0 * mql_count / NULLIF(1 + one_week_non_mesa_mql_growth_rate, 0) AS one_week_normalized_mql_count
     FROM workflow_setup_counts
     LEFT JOIN workflows_created_time_buckets USING (cohort_week)
     LEFT JOIN workflows_enabled_time_buckets USING (cohort_week)
@@ -193,6 +204,11 @@ final AS (
     LEFT JOIN non_mesa_installs USING (cohort_week)
 )
 
-SELECT * FROM final
-WHERE cohort_week <= date_trunc('week', CURRENT_DATE())
+SELECT
+    *,
+    LAG(one_week_normalized_mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_normalized_mql_count,
+    1.0 * mql_count / NULLIF(prior_one_week_normalized_mql_count, 0) - 1 AS normalized_growth_rate,
+    1.0 * one_week_normalized_mql_count / NULLIF(prior_one_week_normalized_mql_count, 0) - 1 AS double_normalized_growth_rate
+FROM final
+WHERE cohort_week < date_trunc('week', CURRENT_DATE())
 ORDER BY cohort_week DESC

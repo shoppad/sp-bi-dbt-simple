@@ -1,7 +1,8 @@
 WITH constellation_users AS (
     SELECT
-        uuid AS shop_subdomain,
-        createdat AS first_installed_at,
+        COALESCE(uuid, id) AS shop_subdomain,
+        createdat AS first_in_constellation_at_utc,
+        COALESCE(updatedat, createdat, uuid_ts) AS updated_at,
         analytics_gmv,
         analytics_orders,
         shopify_createdat,
@@ -11,7 +12,6 @@ WITH constellation_users AS (
         analytics_orders >= 50 AND shopify_createdat <= CURRENT_DATE - INTERVAL '2 years' AS is_mql
 
     FROM {{ source('php_segment', 'users') }}
-    WHERE shop_subdomain NOT IN (SELECT * FROM {{ ref('staff_subdomains') }})
     QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY createdat DESC) = 1
 )
 

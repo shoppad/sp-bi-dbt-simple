@@ -1,8 +1,7 @@
 WITH
 raw_shops AS (
     SELECT
-        * EXCLUDE (uuid),
-        uuid AS shop_subdomain
+        * RENAME uuid AS shop_subdomain
     FROM {{ source('mongo_sync', 'shops') }}
     WHERE
         NOT __hevo__marked_deleted

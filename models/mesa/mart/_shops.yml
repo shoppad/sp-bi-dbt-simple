@@ -412,3 +412,29 @@ models:
         description: The date of the Shop's first install.
         meta:
           metabase.display_name: First Installed On (PT)
+      - name: last_email_open_at_pt
+        description: The timestamp of the Shop's last email open
+      - name: email_opens_count
+        description: The number of email opens for the Shop.
+      - name: has_opened_email
+        description: Whether the Shop has opened an email.
+      - name: first_email_open_at_pt
+        description: The timestamp of the Shop's first email open.
+      - name: first_email_clicked_at_pt
+        description: The timestamp of the Shop's first email click.
+      - name: first_email_converted_at_pt
+        description: The timestamp of the Shop's first email conversion.
+      - name: has_converted_via_email
+        description: Whether the Shop has converted via email.
+      - name: last_email_clicked_at_pt
+        description: The timestamp of the Shop's last email click.
+      - name: email_click_count
+        description: The number of email clicks for the Shop.
+      - name: email_conversion_count
+        description: The number of email conversions for the Shop.
+      - name: has_clicked_email
+        description: Whether the Shop has clicked an email.
+      - name: last_email_converted_at_pt
+        description: The timestamp of the Shop's last email conversion.
+      - name: first_in_constellation_at_utc
+        description: The timestamp of the Shop's first install in the constellation.

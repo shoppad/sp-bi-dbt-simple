@@ -126,6 +126,15 @@ total_ltv_revenue AS (
 
 shop_infos AS (
     SELECT *
+        EXCLUDE (
+            updated_at,
+            shopify_createdat,
+            analytics_gmv,
+            shopify_plandisplayname,
+            shopify_inactiveat,
+            analytics_orders,
+            shopify_planname
+        )
     FROM {{ ref('int_shop_infos') }}
 ),
 

@@ -373,3 +373,56 @@ models:
         description:
           The percentage of users who first installed in the given week and
           have enabled a workflow within the first six months.
+      - name: non_mesa_shop_count
+        description: The number of new installed Shops but are not in the Mesa
+          segment.
+      - name: shopify_shopify_plus_plan_count
+        description: The number of users who have a Shopify Plus plan.
+      - name: non_mesa_mql_count
+        description: The number of MQLs who are not in the Mesa segment.
+      - name: shopify_trial_plan_count
+        description: The number of users who have a trial plan.
+      - name: shopify_trial_plan_pct
+        description: The percentage of users who have a trial plan.
+      - name: shopify_professional_plan_pct
+        description: The percentage of users who have a Professional plan.
+      - name: shopify_professional_plan_count
+        description: The number of users who have a Professional plan.
+      - name: shopify_basic_plan_pct
+        description: The percentage of users who have a Basic plan.
+      - name: shopify_basic_plan_count
+        description: The number of Mesa users who have a Basic plan.
+      - name: one_week_non_mesa_mql_growth_rate
+        description: The percentage of non-MESA MQL shops in the constellation for the given week compared to the week prior.
+      - name: prior_one_week_non_mesa_customer_count
+        description: The number of non-MESA new customer app installs in the prior week.
+      - name: shopify_unlimited_plan_pct
+        description: The percentage of users who have an Unlimited plan.
+      - name: one_week_mesa_growth_rate
+        description: The percentage of new customer MESA installs for the given week compared to the week prior.
+      - name: one_week_mql_growth_rate
+        description: The percentage of new customer MQL MESA installs for the given week compared to the week prior.
+      - name: shopify_unlimited_plan_count
+        description: The number of users who have an Unlimited plan
+      - name: prior_one_week_mql_count
+        description: The number of MQLs in the prior week.
+      - name: prior_one_week_non_mesa_mql_count
+        description: The number of non-MESA MQL shops in the constellation in the prior week.
+      - name: shopify_shopify_plus_plan_pct
+        description: The percentage of users who have a Shopify Plus plan.
+      - name: mql_count
+        description: The number of MQLs that installed MESA in the given week.
+      - name: one_week_non_mesa_growth_rate
+        description: The percentage of non-MESA new customer app installs for the given week compared to the week prior.
+      - name: prior_one_week_new_customer_count
+        description: The number of new customer MESA app installs in the prior week.
+      - name: one_week_normalized_customer_count
+        description: The number of new customer MESA installs for the given week normalized by the number of growth rate of the constellation.
+      - name: normalized_growth_rate
+        description: The grwoth rate of MESA normalized by the growth rate of the constellation.
+      - name: double_normalized_growth_rate
+        description: The MESA normalized insall count multipled by the normalized growth rate of the constellation.
+      - name: prior_one_week_normalized_mql_count
+        description: The number of MQLs in the prior week normalized by the number of growth rate of the constellation.
+      - name: one_week_normalized_mql_count
+        description: The number of MQLs in the given week normalized by the number of growth rate of the constellation.
