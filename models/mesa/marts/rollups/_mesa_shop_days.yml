@@ -118,3 +118,9 @@ models:
         description: Whether the shop completed the wizard on this day.
       - name: workflows_created_without_wizard_count
         description: The number of workflows created without using the wizard on this day.
+      - name: is_in_trial
+        description: Whether the shop is in a trial on this day.
+      - name: is_shopify_zombie_plan
+        description: Whether the shop is on a zombie plan on this day.
+      - name: mesa_plan_identifier
+        description: The Mesa plan identifier for the shop on this day.

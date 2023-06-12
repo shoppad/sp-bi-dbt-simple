@@ -438,3 +438,15 @@ models:
         description: The timestamp of the Shop's last email conversion.
       - name: first_in_constellation_at_utc
         description: The timestamp of the Shop's first install in the constellation.
+      - name: first_in_constellation_on_pt
+        description: The date of the Shop's first install in the constellation apart from MESA.
+        meta:
+          metabase.display_name: First In Constellation On (PT)
+      - name: first_in_constellation_at_pt
+        description: The timestamp of the Shop's first install in the constellation apart from MESA.
+        meta:
+          metabase.display_name: First In Constellation At (PT)
+      - name: constellation_cohort_week
+        description: The week of the Shop's first install in the constellation apart from MESA.
+        meta:
+          metabase.display_name: Constellation Cohort Week

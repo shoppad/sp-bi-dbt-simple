@@ -373,3 +373,23 @@ models:
         description:
           The percentage of users who first installed in the given month and
           have enabled a workflow within the first six months.
+      - name: shopify_unlimited_plan_count
+        description: The number of users who have a Shopify Unlimited plan.
+      - name: shopify_basic_plan_count
+        description: The number of users who have a Shopify Basic plan.
+      - name: shopify_trial_plan_count
+        description: The number of users who have a Shopify Trial plan.
+      - name: shopify_unlimited_plan_pct
+        description: The percentage of users who have a Shopify Unlimited plan.
+      - name: shopify_professional_plan_pct
+        description: The percentage of users who have a Shopify Professional plan.
+      - name: shopify_shopify_plus_plan_pct
+        description: The percentage of users who have a Shopify Plus plan.
+      - name: shopify_professional_plan_count
+        description: The number of users who have a Shopify Professional plan.
+      - name: shopify_trial_plan_pct
+        description: The percentage of users who have a Shopify Trial plan.
+      - name: shopify_basic_plan_pct
+        description: The percentage of users who have a Shopify Basic plan.
+      - name: shopify_shopify_plus_plan_count
+        description: The number of users who have a Shopify Plus plan.

@@ -4,52 +4,52 @@ models:
   - name: monthly_cohort_performance
     description: "This table breaks paying shops into cohorts based on when they starrted to pay and into monthly revenue performance"
     tests:
-        - dbt_expectations.expect_compound_columns_to_be_unique:
-            column_list:
-                - first_month
-                - active_month
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list:
+            - first_month
+            - active_month
     columns:
       - name: first_month
         description: "The first month the Shop paid us."
         tests:
-            - not_null
+          - not_null
 
       - name: active_month
         description: "The month of the performance."
         tests:
-            - not_null
+          - not_null
 
       - name: months_since_first
         description: "The number of the period after the first paying month."
         tests:
-            - not_null
+          - not_null
 
       - name: shops
         description: "The count of Shops that paid this month."
         tests:
-            - not_null
+          - not_null
 
       - name: cohort_num_users
         description: "The total count of the cohort's Shops at the beginning"
         tests:
-            - not_null
+          - not_null
 
       - name: retained_pctg
         description: "The percent of Shops that paid this month compared to the total cohort."
         tests:
-            - not_null
+          - not_null
 
       - name: inc_amt
         description: "The revenue of this cohort in this month."
         tests:
-            - not_null
+          - not_null
 
       - name: cum_amt
         description: "The sum total of all cohort revenue up through this period."
         tests:
-            - not_null
+          - not_null
 
       - name: cum_amt_per_user
         description: "The average revenue per Shop in this cohort up to this period."
         tests:
-            - not_null
+          - not_null

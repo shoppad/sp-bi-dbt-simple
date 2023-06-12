@@ -2,6 +2,9 @@ WITH constellation_users AS (
     SELECT
         COALESCE(uuid, id) AS shop_subdomain,
         createdat AS first_in_constellation_at_utc,
+        {{ pacific_timestamp('first_in_constellation_at_utc') }} AS first_in_constellation_at_pt,
+        first_in_constellation_at_pt::DATE AS first_in_constellation_on_pt,
+        date_trunc('week', first_in_constellation_on_pt) AS constellation_cohort_week,
         COALESCE(updatedat, createdat, uuid_ts) AS updated_at,
         analytics_gmv,
         analytics_orders,

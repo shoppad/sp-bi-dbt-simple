@@ -133,3 +133,5 @@ models:
         description: Whether the workflow has been deleted by the Shop.
         tests:
           - not_null
+      - name: setup
+        description: The stage of a template-wizard workflow setup process.

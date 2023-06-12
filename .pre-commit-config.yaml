@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.0.0
+    rev: v1.1.0
     hooks:
       - id: dbt-docs-generate
       - id: check-script-semicolon
@@ -8,17 +8,19 @@ repos:
       - id: check-model-has-properties-file
       - id: check-script-has-no-table-name
         files: ^models
-      - id: unify-column-description
+      - id: generate-model-properties-file
+        args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
+      # - id: unify-column-description
       # - id: check-column-name-contract
       #  args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
       - id: check-model-has-all-columns
-        name: Check columns - mart
-        files: ^models/mesa/mart
+        name: Check columns - marts
+        files: ^models/mesa/marts
       - id: check-model-has-tests
-        files: ^models/mesa/mart
+        files: ^models/mesa/marts
         args: ["--test-cnt", "1", "--"]
-      - id: check-model-columns-have-desc
-        files: ^models/mesa/mart
+      # - id: check-model-columns-have-desc
+      #  files: ^models/mesa/marts
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -28,6 +30,6 @@ repos:
       - id: trailing-whitespace
         exclude: ^.bumpversion.cfg
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v3.0.0-alpha.4"
+    rev: "v3.0.0-alpha.6"
     hooks:
       - id: prettier

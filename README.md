@@ -153,7 +153,7 @@ The application's models are structured into 3 types & folders.
 
 - staging: The initial import of raw source data with filtering and slight formatting.
 - intermdiate: intermediary formatting and supporting models that are not business user-facing.
-- mart: The finalized production-ready business insight models.
+- marts: The finalized production-ready business insight models.
 
 ## Oddities & Gotchas
 

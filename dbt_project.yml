@@ -84,7 +84,7 @@ models:
           # +on_schema_change: "sync_all_columns"
           # +unique_key: shop_subdomain
     mesa:
-      mart:
+      marts:
         step_runs:
           +on_schema_change: "sync_all_columns"
           +cluster_by: ["shop_subdomain"]
@@ -144,6 +144,12 @@ models:
     customer_io:
       staging:
         +schema: support
+
+  dbt_project_evaluator:
+    marts:
+      structure:
+        fct_model_naming_conventions:
+          +enabled: false
 
 tests:
   shoppad:

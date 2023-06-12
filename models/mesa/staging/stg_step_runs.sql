@@ -24,6 +24,7 @@ decorated_step_runs AS (
         'request',
         'uuid',
         'priority',
+        "__HEVO__SOURCE_MODIFIED_AT",
     ] %}
     SELECT
         _id AS step_run_id,

@@ -147,15 +147,43 @@ mql_counts AS (
     GROUP BY 1
 ),
 
-non_mesa_installs AS (
+weekly_constellation_installs AS (
     SELECT
-        date_trunc('week', updated_at) AS cohort_week,
-        COUNT(*) AS non_mesa_shop_count,
-        COUNT_IF(is_mql) AS non_mesa_mql_count
-    FROM {{ ref('int_shop_infos') }}
+        constellation_cohort_week,
+        COUNT(stg_constellation_users.*) AS constellation_cohort_size,
+        COUNT_IF(stg_constellation_users.is_mql) AS constellation_mql_count
+    FROM {{ ref('stg_constellation_users') }}
     LEFT OUTER JOIN shops USING (shop_subdomain)
     WHERE shop_subdomain NOT IN (SELECT * FROM {{ ref('staff_subdomains') }})
     GROUP BY 1
+),
+
+constellation_comparison_groups AS (
+    SELECT
+        constellation_cohort_week AS cohort_week,
+        AVG(constellation_cohort_size)
+            OVER (ORDER BY constellation_cohort_week ROWS BETWEEN 3 PRECEDING AND CURRENT ROW)
+            AS avg_constellation_cohort_size,
+        AVG(constellation_mql_count)
+            OVER (ORDER BY constellation_cohort_week ROWS BETWEEN 3 PRECEDING AND CURRENT ROW)
+            AS avg_constellation_mql_count,
+        avg_constellation_mql_count / avg_constellation_cohort_size
+            AS avg_constellation_mql_pct
+    FROM weekly_constellation_installs
+),
+
+decorated_constellation_comparison_groups AS (
+    SELECT
+        *,
+        LAG(avg_constellation_cohort_size)
+            OVER (ORDER BY cohort_week) AS last_period_avg_constellation_cohort_size,
+        LAG(avg_constellation_mql_count)
+            OVER (ORDER BY cohort_week) AS last_period_avg_constellation_mql_count,
+        avg_constellation_cohort_size / last_period_avg_constellation_cohort_size - 1
+            AS avg_constellation_cohort_size_growth,
+        avg_constellation_mql_count / last_period_avg_constellation_mql_count - 1
+            AS avg_constellation_mql_count_growth
+    FROM constellation_comparison_groups
 ),
 
 shopify_plan_counts AS (
@@ -178,37 +206,31 @@ final AS (
         total_ltv_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
         total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated,
 
-        {# Rest of Constellation Growth #}
-        LAG(non_mesa_shop_count) OVER (ORDER BY cohort_week) AS prior_one_week_non_mesa_customer_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_non_mesa_customer_count, 0) -1 AS one_week_non_mesa_growth_rate,
-
-        {# Rest of Constellation MQL Growth #}
-        LAG(non_mesa_mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_non_mesa_mql_count,
-        1.0 * non_mesa_mql_count / NULLIF(prior_one_week_non_mesa_mql_count, 0) - 1 AS one_week_non_mesa_mql_growth_rate,
 
         {# MESA Install Growth #}
         LAG(cohort_size) OVER (ORDER BY cohort_week) AS prior_one_week_new_customer_count,
-        1.0 * cohort_size / NULLIF(prior_one_week_new_customer_count, 0) - 1 AS one_week_mesa_growth_rate,
-        1.0 * prior_one_week_non_mesa_customer_count / (1 + NULLIF(one_week_non_mesa_growth_rate, 0)) AS one_week_normalized_customer_count,
+        cohort_size / NULLIF(prior_one_week_new_customer_count, 0) - 1 AS mesa_growth_rate,
+        cohort_size * NULLIF(1 - avg_constellation_cohort_size_growth, 0) AS normalized_customer_count,
+        mesa_growth_rate * NULLIF(1 - avg_constellation_cohort_size_growth, 0) AS normalized_customer_growth,
 
         {# MESA MQL Growth #}
         LAG(mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_mql_count,
-        1.0 * mql_count / NULLIF(prior_one_week_mql_count, 0) - 1 AS one_week_mql_growth_rate,
-        1.0 * mql_count / NULLIF(1 + one_week_non_mesa_mql_growth_rate, 0) AS one_week_normalized_mql_count
+        mql_count / NULLIF(prior_one_week_mql_count, 0) - 1 AS mql_growth_rate,
+        mql_count * NULLIF(1 - avg_constellation_mql_count_growth, 0) AS normalized_mql_count,
+        mql_growth_rate * NULLIF(1 - avg_constellation_mql_count_growth, 0) AS normalized_mql_growth
+
+        {# MESA MQL Growth #}
     FROM workflow_setup_counts
     LEFT JOIN workflows_created_time_buckets USING (cohort_week)
     LEFT JOIN workflows_enabled_time_buckets USING (cohort_week)
     LEFT JOIN shopify_plan_counts USING (cohort_week)
     LEFT JOIN plan_upgrade_counts USING (cohort_week)
     LEFT JOIN mql_counts USING (cohort_week)
-    LEFT JOIN non_mesa_installs USING (cohort_week)
+    LEFT JOIN decorated_constellation_comparison_groups USING (cohort_week)
 )
 
 SELECT
-    *,
-    LAG(one_week_normalized_mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_normalized_mql_count,
-    1.0 * mql_count / NULLIF(prior_one_week_normalized_mql_count, 0) - 1 AS normalized_growth_rate,
-    1.0 * one_week_normalized_mql_count / NULLIF(prior_one_week_normalized_mql_count, 0) - 1 AS double_normalized_growth_rate
+    *
 FROM final
 WHERE cohort_week < date_trunc('week', CURRENT_DATE())
 ORDER BY cohort_week DESC

@@ -18,6 +18,7 @@ WITH flattened_table AS (
 
     FROM {{ source_table }}
     WHERE uuid IS NOT NULL
+        AND DATA != '[]'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
 ),
 
