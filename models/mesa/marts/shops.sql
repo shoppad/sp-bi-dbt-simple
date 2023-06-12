@@ -154,10 +154,21 @@ cohort_average_initial_shop_gmv AS (
 email_open_details AS (
     SELECT
         shop_subdomain,
-        MIN(opened_at_pt) AS first_email_open_at_pt,
-        MAX(opened_at_pt) AS last_email_open_at_pt,
-        COALESCE(COUNT(DISTINCT email_id), 0) AS email_opens_count,
-        email_opens_count > 0 AS has_opened_email
+        MIN(CASE WHEN email_type = 'broadcast' THEN opened_at_pt ELSE NULL END) AS first_broadcast_email_open_at_pt,
+        MAX(CASE WHEN email_type = 'broadcast' THEN opened_at_pt ELSE NULL END) AS last_broadcast_email_open_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'broadcast' THEN email_id ELSE NULL END),
+            0
+            ) AS broadcast_email_opens_count,
+        broadcast_email_opens_count > 0 AS has_opened_broadcast_email,
+
+        MIN(CASE WHEN email_type = 'journey' THEN opened_at_pt ELSE NULL END) AS first_journey_email_open_at_pt,
+        MAX(CASE WHEN email_type = 'journey' THEN opened_at_pt ELSE NULL END) AS last_journey_email_open_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'journey' THEN email_id ELSE NULL END),
+            0
+            ) AS journey_email_opens_count,
+        journey_email_opens_count > 0 AS has_opened_journey_email
     FROM shops
     LEFT JOIN {{ ref('stg_email_opens') }} USING (shop_subdomain)
     GROUP BY 1
@@ -166,10 +177,21 @@ email_open_details AS (
 email_click_details AS (
     SELECT
         shop_subdomain,
-        MIN(clicked_at_pt) AS first_email_clicked_at_pt,
-        MAX(clicked_at_pt) AS last_email_clicked_at_pt,
-        COALESCE(COUNT(DISTINCT email_id), 0) AS email_click_count,
-        email_click_count > 0 AS has_clicked_email
+        MIN(CASE WHEN email_type = 'broadcast' THEN clicked_at_pt ELSE NULL END) AS first_broadcast_email_clicked_at_pt,
+        MAX(CASE WHEN email_type = 'broadcast' THEN clicked_at_pt ELSE NULL END) AS last_broadcast_email_clicked_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'broadcast' THEN email_id ELSE NULL END),
+            0
+            ) AS broadcast_email_click_count,
+        broadcast_email_click_count > 0 AS has_clicked_broadcast_email,
+
+        MIN(CASE WHEN email_type = 'journey' THEN clicked_at_pt ELSE NULL END) AS first_journey_email_clicked_at_pt,
+        MAX(CASE WHEN email_type = 'journey' THEN clicked_at_pt ELSE NULL END) AS last_journey_email_clicked_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'journey' THEN email_id ELSE NULL END),
+            0
+            ) AS journey_email_click_count,
+        journey_email_click_count > 0 AS has_clicked_journey_email
     FROM shops
     LEFT JOIN {{ ref('stg_email_clicks') }} USING (shop_subdomain)
     GROUP BY 1
@@ -178,10 +200,21 @@ email_click_details AS (
 email_conversion_details AS (
     SELECT
         shop_subdomain,
-        MIN(converted_at_pt) AS first_email_converted_at_pt,
-        MAX(converted_at_pt) AS last_email_converted_at_pt,
-        COALESCE(COUNT(DISTINCT email_id), 0) AS email_conversion_count,
-        email_conversion_count > 0 AS has_converted_via_email
+        MIN(CASE WHEN email_type = 'broadcast' THEN converted_at_pt ELSE NULL END) AS first_broadcast_email_converted_at_pt,
+        MAX(CASE WHEN email_type = 'broadcast' THEN converted_at_pt ELSE NULL END) AS last_broadcast_email_converted_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'broadcast' THEN email_id ELSE NULL END),
+            0
+            ) AS broadcast_email_conversion_count,
+        broadcast_email_conversion_count > 0 AS has_converted_via_broadcast_email,
+
+        MIN(CASE WHEN email_type = 'journey' THEN converted_at_pt ELSE NULL END) AS first_journey_email_converted_at_pt,
+        MAX(CASE WHEN email_type = 'journey' THEN converted_at_pt ELSE NULL END) AS last_journey_email_converted_at_pt,
+        COALESCE(
+            COUNT(DISTINCT CASE WHEN email_type = 'journey' THEN email_id ELSE NULL END),
+            0
+            ) AS journey_email_conversion_count,
+        journey_email_conversion_count > 0 AS has_converted_via_journey_email
     FROM shops
     LEFT JOIN {{ ref('stg_email_conversions') }} USING (shop_subdomain)
     GROUP BY 1

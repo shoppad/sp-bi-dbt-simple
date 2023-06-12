@@ -764,11 +764,13 @@ sources:
   - name: customer_io
     description: tables synced from customer.io
     database: mongo
-    schema: customer_io
+    schema: public
     loader: hevo
-    loaded_at_field: received_at
+    loaded_at_field: __HEVO__LOADED_AT
     tables:
       - name: email_opens
-        identifier: email_opened
+        identifier: CUSTOMER_IO_EMAIL_OPENED
       - name: email_clicks
-        identifier: email_link_clicked
+        identifier: CUSTOMER_IO_EMAIL_LINK_CLICKED
+      - name: email_conversions
+        identifier: CUSTOMER_IO_EMAIL_CONVERTED

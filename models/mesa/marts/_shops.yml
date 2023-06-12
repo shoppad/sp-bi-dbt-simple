@@ -412,30 +412,28 @@ models:
         description: The date of the Shop's first install.
         meta:
           metabase.display_name: First Installed On (PT)
-      - name: last_email_open_at_pt
-        description: The timestamp of the Shop's last email open
-      - name: email_opens_count
-        description: The number of email opens for the Shop.
-      - name: has_opened_email
-        description: Whether the Shop has opened an email.
-      - name: first_email_open_at_pt
+      - name: last_broadcast_email_open_at_pt
+        description: The timestamp of the Shop's last broadcast email open
+      - name: broadcast_email_opens_count
+        description: The number of broadcast email opens for the Shop.
+      - name: has_opened_broadcast_email
+        description: Whether the Shop has opened a Broadcast email.
+      - name: first_broadcast_email_open_at_pt
         description: The timestamp of the Shop's first email open.
-      - name: first_email_clicked_at_pt
-        description: The timestamp of the Shop's first email click.
-      - name: first_email_converted_at_pt
-        description: The timestamp of the Shop's first email conversion.
-      - name: has_converted_via_email
-        description: Whether the Shop has converted via email.
-      - name: last_email_clicked_at_pt
-        description: The timestamp of the Shop's last email click.
-      - name: email_click_count
-        description: The number of email clicks for the Shop.
-      - name: email_conversion_count
+      - name: first_broadcast_email_clicked_at_pt
+        description: The timestamp of the Shop's first broadcast email click.
+      - name: first_broadcast_email_converted_at_pt
+        description: The timestamp of the Shop's first broadcast email conversion.
+      - name: last_broadcast_email_clicked_at_pt
+        description: The timestamp of the Shop's last broadcast email click.
+      - name: broadcast_email_click_count
+        description: The number of Broadcast email clicks for the Shop.
+      - name: broadcast_email_conversion_count
         description: The number of email conversions for the Shop.
-      - name: has_clicked_email
-        description: Whether the Shop has clicked an email.
-      - name: last_email_converted_at_pt
-        description: The timestamp of the Shop's last email conversion.
+      - name: has_clicked_broadcast_email
+        description: Whether the Shop has clicked a broadcast email.
+      - name: last_broadcast_email_converted_at_pt
+        description: The timestamp of the Shop's last broadcast email conversion.
       - name: first_in_constellation_at_utc
         description: The timestamp of the Shop's first install in the constellation.
       - name: first_in_constellation_on_pt
@@ -450,3 +448,29 @@ models:
         description: The week of the Shop's first install in the constellation apart from MESA.
         meta:
           metabase.display_name: Constellation Cohort Week
+      - name: last_journey_email_converted_at_pt
+        description: The timestamp of the Shop's last journey email conversion.
+      - name: has_converted_via_broadcast_email
+        description: Whether the Shop has converted via broadcast email.
+      - name: journey_email_opens_count
+        description: The number of journey email opens for the Shop.
+      - name: first_journey_email_converted_at_pt
+        description: The timestamp of the Shop's first journey email conversion.
+      - name: has_converted_via_journey_email
+        description: Whether the Shop has converted via journey email.
+      - name: journey_email_conversion_count
+        description: The number of journey email conversions for the Shop.
+      - name: last_journey_email_clicked_at_pt
+        description: The timestamp of the Shop's last journey email click.
+      - name: last_journey_email_open_at_pt
+        description: The timestamp of the Shop's last journey email open.
+      - name: first_journey_email_clicked_at_pt
+        description: The timestamp of the Shop's first journey email click.
+      - name: journey_email_click_count
+        description: The number of journey email clicks for the Shop.
+      - name: has_clicked_journey_email
+        description: Whether the Shop has clicked a journey email.
+      - name: first_journey_email_open_at_pt
+        description: The timestamp of the Shop's first journey email open.
+      - name: has_opened_journey_email
+        description: Whether the Shop has opened a journey email.
