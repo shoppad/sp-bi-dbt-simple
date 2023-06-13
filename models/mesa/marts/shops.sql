@@ -272,7 +272,8 @@ final AS (
             WHEN store_leads_estimated_monthly_sales < 1000000 THEN 'I-$500,000-$1,000,000'
             WHEN store_leads_estimated_monthly_sales < 2500000 THEN 'J-$1,000,000-$2,500,000'
             ELSE 'K-$2,500,000+'
-        END AS store_leads_estimated_monthly_sales_bucket
+        END AS store_leads_estimated_monthly_sales_bucket,
+        trial_ends_pt >= CURRENT_DATE AS is_in_trial
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
