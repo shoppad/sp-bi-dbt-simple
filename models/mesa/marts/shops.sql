@@ -273,7 +273,8 @@ final AS (
             WHEN store_leads_estimated_monthly_sales < 2500000 THEN 'J-$1,000,000-$2,500,000'
             ELSE 'K-$2,500,000+'
         END AS store_leads_estimated_monthly_sales_bucket,
-        trial_ends_pt >= CURRENT_DATE AS is_in_trial
+        COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
+        NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

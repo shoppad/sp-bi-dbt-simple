@@ -167,7 +167,7 @@ models:
           year as of this day.
       - name: uninstalled_at_pt
         description: The timestamp of the latest uninstallation of the app.
-      - name: plan_upgrade_date
+      - name: first_plan_upgrade_date
         description: The date of the first plan upgrade action.
       - name: acquisition_campaign
         description: The campaign that the shop was acquired through.
@@ -474,3 +474,35 @@ models:
         description: The timestamp of the Shop's first journey email open.
       - name: has_opened_journey_email
         description: Whether the Shop has opened a journey email.
+      - name: is_in_trial
+        description: Whether the Shop is in a trial.
+        meta:
+          metabase.display_name: Is In Trial?
+        tests:
+          - not_null
+      - name: ever_upgraded_to_paid_plan
+        description: Whether the Shop has ever upgraded to a paid plan.
+        meta:
+          metabase.display_name: Ever Upgraded to Paid Plan?
+        tests:
+          - not_null
+      - name: first_plan_identifier
+        description: The identifier of the Shop's first plan.
+      - name: days_until_first_plan_upgrade
+        description: The number of days until the Shop's first plan upgrade.
+        meta:
+          metabase.display_name: Days Until First Plan Upgrade
+      - name: last_plan_upgrade_date
+        description: The date of the Shop's last plan upgrade.
+        meta:
+          metabase.display_name: Last Plan Upgrade Date
+      - name: last_plan_identifier
+        description: The identifier of the Shop's latest MESA plan.
+        meta:
+          metabase.display_name: Latest Plan Identifier
+      - name: is_currently_paying
+        description: Whether the Shop is currently paying for a plan.
+        meta:
+          metabase.display_name: Is Currently Paying?
+        tests:
+          - not_null

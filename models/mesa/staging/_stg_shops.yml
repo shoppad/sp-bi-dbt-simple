@@ -52,7 +52,7 @@ models:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
         description: The minutes between initial install and the latest uninstall.
-      - name: plan_upgrade_date
+      - name: first_plan_upgrade_date
         description: The date of the first plan upgrade action.
       - name: cohort_week
         description: The week of the Shop's first app installation.

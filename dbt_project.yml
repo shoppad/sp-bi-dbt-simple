@@ -145,16 +145,10 @@ models:
       staging:
         +schema: support
 
-  dbt_project_evaluator:
-    marts:
-      structure:
-        fct_model_naming_conventions:
-          +enabled: false
-
 tests:
   shoppad:
     mesa:
       staging:
-        enabled: false #"{{ target.name not in ['prod', 'default'] }}"
+        enabled: true #"{{ target.name not in ['prod', 'default'] }}"
       intermediate:
         enabled: true #"{{ target.name not in ['prod', 'default'] }}"
