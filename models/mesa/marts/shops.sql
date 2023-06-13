@@ -274,7 +274,7 @@ final AS (
             ELSE 'K-$2,500,000+'
         END AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
-        NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying
+        NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

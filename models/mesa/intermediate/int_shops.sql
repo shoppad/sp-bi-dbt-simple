@@ -27,7 +27,8 @@ decorated_shops AS (
             WHEN age_of_store_at_install_in_days <= 547 THEN '7-First 18 Months (After First Year)'
             WHEN age_of_store_at_install_in_days <= 730 THEN '8-First 2 Years (After 18 Months)'
             ELSE '9-2nd Year+'
-        END AS age_of_store_at_install_bucket
+        END AS age_of_store_at_install_bucket,
+        COALESCE(shopify_plan_name IN ({{ "'" ~ var('zombie_store_shopify_plans') | join("', '")  ~ "'" }}), FALSE) AS is_zombie_shopify_plan
     FROM {{ source_table }}
 ),
 
@@ -65,7 +66,8 @@ final AS (
     SELECT
         * EXCLUDE (shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd),
         shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
-        shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd
+        shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
+        COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)

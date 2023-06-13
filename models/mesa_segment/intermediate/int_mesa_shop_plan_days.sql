@@ -47,14 +47,13 @@ mesa_plan_calendar_dates AS (
         ON calendar_dates.dt BETWEEN mesa_plan_changes.dt AND COALESCE(next_plan_changes.dt - INTERVAL '1day', CURRENT_DATE)
 ),
 
-{% set zombie_store_shopify_plans = ['frozen', 'fraudulent', 'paused', 'dormant', 'cancelled'] %}
 shopify_plan_changes AS (
     SELECT
         shop_subdomain,
         changed_on_pt AS dt,
         plan AS shopify_plan,
         oldplan AS old_shopify_plan,
-        COALESCE(plan IN ({{ "'" ~ zombie_store_shopify_plans | join("', '")  ~ "'" }}), FALSE) AS is_zombie,
+        COALESCE(plan IN ({{ "'" ~ var('zombie_store_shopify_plans') | join("', '")  ~ "'" }}), FALSE) AS is_zombie,
         ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY changed_at_pt ASC) AS change_order
     FROM {{ ref('stg_shopify_plan_changes') }}
 ),

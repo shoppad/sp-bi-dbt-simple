@@ -46,6 +46,7 @@ vars:
       received_at,
       original_timestamp,
     ]
+  zombie_store_shopify_plans: [frozen, fraudulent, paused, dormant, cancelled]
 
   segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
   segment_sessionization_trailing_window: 3
