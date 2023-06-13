@@ -103,7 +103,10 @@ uninstall_dates AS (
 plan_upgrade_dates AS (
     SELECT
         shop_subdomain,
-        MIN(timestamp)::DATE AS plan_upgrade_date
+        MIN(timestamp)::DATE AS first_plan_upgrade_date,
+        MAX(timestamp)::DATE AS last_plan_upgrade_date,
+        MIN_BY(properties_key, timestamp) AS first_plan_identifier,
+        MAX_BY(properties_key, timestamp) AS last_plan_identifier
     FROM {{ ref('stg_mesa_flow_events') }}
     WHERE event_id IN ('plan_upgrade', 'plan_select')
     GROUP BY 1
@@ -117,6 +120,7 @@ final AS (
         COALESCE(shops.shopify, custom_apps.shopify) AS shopify,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall,
+        first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade,
         COALESCE(is_custom_app, FALSE) AS is_custom_app
     FROM shops
     FULL OUTER JOIN custom_apps USING (shop_subdomain)
