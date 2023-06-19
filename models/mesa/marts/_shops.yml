@@ -528,3 +528,15 @@ models:
         description:
           The number of successful workflow run attempts initiated in the last
           30 days as of this day.
+      - name: input_step_rolling_thirty_day_count
+        description: The total number of Workflow Steps started in the last 30 days as of Yesterday.
+        tests:
+          - not_null
+      - name: output_step_rolling_thirty_day_count
+        description: The total number of "input" (Trigge) Workflow Steps completed in the last 30 days as of Yesterday.
+        tests:
+          - not_null
+      - name: total_workflow_steps_rolling_thirty_day_count
+        description: The total number of Workflow Steps completed in the last 30 days as of Yesterday.
+        tests:
+          - not_null

@@ -89,7 +89,10 @@ current_rolling_counts AS (
         COALESCE(workflow_run_attempt_rolling_year_count, 0) AS workflow_run_attempt_rolling_year_count,
         COALESCE(workflow_run_success_rolling_year_count, 0) AS workflow_run_success_rolling_year_count,
         COALESCE(income_rolling_thirty_day_total, 0) AS income_rolling_thirty_day_total,
-        COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total
+        COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total,
+        COALESCE(total_workflow_steps_rolling_thirty_day_count, 0) AS total_workflow_steps_rolling_thirty_day_count,
+        COALESCE(input_step_rolling_thirty_day_count, 0) AS input_step_rolling_thirty_day_count,
+        COALESCE(output_step_rolling_thirty_day_count, 0) AS output_step_rolling_thirty_day_count
     FROM shops
     LEFT JOIN yesterdays USING (shop_subdomain)
 ),

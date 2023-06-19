@@ -47,8 +47,8 @@ daily_workflow_run_counts AS (
 ),
 
 daily_step_counts AS (
-  SELECT *
-  FROM {{ ref('int_successful_step_run_day_counts') }}
+    SELECT *
+    FROM {{ ref('int_successful_step_run_day_counts') }}
 ),
 
 thirty_day_workflow_counts AS (
