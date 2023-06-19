@@ -79,7 +79,8 @@ thirty_day_workflow_counts AS (
     SELECT
         shop_subdomain,
         dt,
-        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_runs_rolling_thirty_day_count
+        COALESCE(SUM(workflow_runs_attempted_count), 0) AS workflow_run_attempt_rolling_thirty_day_count,
+        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_run_success_rolling_thirty_day_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
@@ -90,7 +91,8 @@ year_workflow_counts AS (
     SELECT
         shop_subdomain,
         dt,
-        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_runs_rolling_year_count
+        SUM(COALESCE(workflow_runs_attempted_count, 0)) AS workflow_run_attempt_rolling_year_count,
+        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_run_success_rolling_year_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(YEAR, -1, shop_calendar.dt) AND shop_calendar.dt
@@ -124,7 +126,7 @@ final AS (
         *,
         {{- dbt_utils.generate_surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
         daily_plan_revenue + daily_usage_revenue AS inc_amount,
-        (workflow_runs_rolling_year_count >= 10) AND (inc_amount > 0 OR workflow_runs_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }}) AS is_active
+        (workflow_run_success_rolling_year_count >= 10) AND (inc_amount > 0 OR workflow_run_success_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }}) AS is_active
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
     LEFT JOIN daily_charges USING (shop_subdomain, dt)

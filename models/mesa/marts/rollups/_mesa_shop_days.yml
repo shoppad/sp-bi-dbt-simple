@@ -49,11 +49,11 @@ models:
         description: Whether the shop is considered active on this day.
         tests:
           - not_null
-      - name: workflow_runs_rolling_thirty_day_count
+      - name: workflow_run_success_rolling_thirty_day_count
         description: The number of successful workflow run attempts initiated in the last 30 days as of this day.
         tests:
           - not_null
-      - name: workflow_runs_rolling_year_count
+      - name: workflow_run_success_rolling_year_count
         description: The number of successful workflow run attempts initiated in the last year as of this day.
         tests:
           - not_null
@@ -120,7 +120,19 @@ models:
         description: The number of workflows created without using the wizard on this day.
       - name: is_in_trial
         description: Whether the shop is in a trial on this day.
+        tests:
+          - not_null
       - name: is_shopify_zombie_plan
         description: Whether the shop is on a zombie plan on this day.
+        tests:
+          - not_null
       - name: mesa_plan_identifier
         description: The Mesa plan identifier for the shop on this day.
+      - name: workflow_run_attempt_rolling_thirty_day_count
+        description: The number of workflow run attempts initiated in the last 30 days as of this day.
+        tests:
+          - not_null
+      - name: workflow_run_attempt_rolling_year_count
+        description: The number of workflow run attempts initiated in the last year as of this day.
+        tests:
+          - not_null

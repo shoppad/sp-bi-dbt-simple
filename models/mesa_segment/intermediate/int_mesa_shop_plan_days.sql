@@ -127,7 +127,7 @@ final AS (
     SELECT
         dt,
         shop_subdomain,
-        (trial_end_dt IS NOT NULL AND dt <= trial_end_dt) AS is_in_trial,
+        COALESCE(trial_end_dt IS NOT NULL AND dt <= trial_end_dt, FALSE) AS is_in_trial,
         COALESCE(
             IFF(
                 is_zombie OR is_in_trial,

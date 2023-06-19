@@ -29,8 +29,8 @@ shop_calendar AS (
         mesa_plan,
         mesa_plan_identifier,
         COALESCE(shopify_plan, 'unavailable') AS shopify_plan,
-        is_in_trial,
-        is_shopify_zombie_plan
+        COALESCE(is_in_trial, FALSE) AS is_in_trial,
+        COALESCE(is_shopify_zombie_plan, FALSE) AS is_shopify_zombie_plan
     FROM shop_lifespans
     INNER JOIN calendar_dates
         ON dt BETWEEN first_dt AND last_dt

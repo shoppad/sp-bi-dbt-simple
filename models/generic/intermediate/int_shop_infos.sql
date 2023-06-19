@@ -17,5 +17,6 @@ final AS (
     FROM staged_shop_infos
     FULL OUTER JOIN staged_constellation_users USING (shop_subdomain)
 )
+
 SELECT *
 FROM final

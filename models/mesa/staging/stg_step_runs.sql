@@ -48,9 +48,9 @@ decorated_step_runs AS (
     FROM
         {{ source('mongo_sync', 'tasks') }}
     WHERE
-        NOT(__hevo__marked_deleted)
+        NOT (__hevo__marked_deleted)
         AND status NOT IN ('ready', 'skip', 'skip-ignore', 'skip-retry')
-        AND NOT(metadata:parents[0].trigger_key ILIKE '%delay%' OR metadata:parents[0].trigger_key ILIKE '%-vo%')
+        AND COALESCE(NOT (metadata:parents[0].trigger_key ILIKE '%delay%' OR metadata:parents[0].trigger_key ILIKE '%-vo%'), TRUE)
 
     {% if is_incremental() %}
     -- this filter will only be applied on an incremental run

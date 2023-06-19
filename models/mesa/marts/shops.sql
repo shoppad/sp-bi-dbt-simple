@@ -84,8 +84,10 @@ yesterdays AS (
 current_rolling_counts AS (
     SELECT
         shop_subdomain,
-        COALESCE(workflow_runs_rolling_thirty_day_count, 0) AS workflow_runs_rolling_thirty_day_count,
-        COALESCE(workflow_runs_rolling_year_count, 0) AS workflow_runs_rolling_year_count,
+        COALESCE(workflow_run_attempt_rolling_thirty_day_count, 0) AS workflow_run_attempt_rolling_thirty_day_count,
+        COALESCE(workflow_run_success_rolling_thirty_day_count, 0) AS workflow_run_success_rolling_thirty_day_count,
+        COALESCE(workflow_run_attempt_rolling_year_count, 0) AS workflow_run_attempt_rolling_year_count,
+        COALESCE(workflow_run_success_rolling_year_count, 0) AS workflow_run_success_rolling_year_count,
         COALESCE(income_rolling_thirty_day_total, 0) AS income_rolling_thirty_day_total,
         COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total
     FROM shops
@@ -125,7 +127,8 @@ total_ltv_revenue AS (
 ),
 
 shop_infos AS (
-    SELECT *
+    SELECT
+        *
         EXCLUDE (
             updated_at,
             shopify_createdat,
@@ -148,6 +151,18 @@ cohort_average_initial_shop_gmv AS (
         cohort_month,
         AVG(shopify_shop_gmv_initial_total_usd) AS avg_initial_gmv_usd
     FROM {{ ref('int_shops') }}
+    GROUP BY 1
+),
+
+usage_revenue AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(AVG(daily_usage_revenue), 0) AS average_daily_usage_revenue
+    FROM shops
+    LEFT JOIN {{ ref('mesa_shop_days') }} USING (shop_subdomain)
+    WHERE
+        dt >= CURRENT_DATE - INTERVAL '30 day'
+        AND inc_amount > 0
     GROUP BY 1
 ),
 
@@ -293,6 +308,7 @@ final AS (
     LEFT JOIN email_open_details USING (shop_subdomain)
     LEFT JOIN email_click_details USING (shop_subdomain)
     LEFT JOIN email_conversion_details USING (shop_subdomain)
+    LEFT JOIN usage_revenue USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

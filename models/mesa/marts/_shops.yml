@@ -150,7 +150,7 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.7
-      - name: workflow_runs_rolling_thirty_day_count
+      - name: workflow_run_success_rolling_thirty_day_count
         description:
           The number of successful workflow run attempts initiated in the last
           30 days as of this day.
@@ -161,7 +161,7 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.02
-      - name: workflow_runs_rolling_year_count
+      - name: workflow_run_success_rolling_year_count
         description:
           The number of successful workflow run attempts initiated in the last
           year as of this day.
@@ -518,3 +518,13 @@ models:
           metabase.display_name: Is Zombie Shopify Plan?
         tests:
           - not_null
+      - name: workflow_run_attempt_rolling_year_count
+        description:
+          The number of successful workflow run attempts initiated in the last
+          year as of this day.
+      - name: average_daily_usage_revenue
+        description: The average daily usage revenue for the Shop (calculated by the average of the last 30 billable days).
+      - name: workflow_run_attempt_rolling_thirty_day_count
+        description:
+          The number of successful workflow run attempts initiated in the last
+          30 days as of this day.
