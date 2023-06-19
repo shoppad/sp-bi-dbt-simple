@@ -1,8 +1,7 @@
 WITH
 raw_email_clicks AS (
     SELECT
-        *
-            EXCLUDE (
+        * EXCLUDE (
                 __hevo_id,
                 __hevo__ingested_at,
                 __hevo__loaded_at

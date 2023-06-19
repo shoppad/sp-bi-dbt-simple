@@ -9,18 +9,19 @@ repos:
       - id: check-script-has-no-table-name
         files: ^models
       - id: generate-model-properties-file
-        args: ["--properties-file", "/models/{schema}/{name}.yml", "--"]
-      # - id: unify-column-description
-      # - id: check-column-name-contract
-      #  args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
+        args: ["--properties-file", "./models/mesa/{name}.yml", "--"]
+
+      - id: unify-column-description
+      - id: check-column-name-contract
+        args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
       - id: check-model-has-all-columns
         name: Check columns - marts
         files: ^models/mesa/marts
       - id: check-model-has-tests
         files: ^models/mesa/marts
         args: ["--test-cnt", "1", "--"]
-      # - id: check-model-columns-have-desc
-      #  files: ^models/mesa/marts
+      - id: check-model-columns-have-desc
+        files: ^models/mesa/marts
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0

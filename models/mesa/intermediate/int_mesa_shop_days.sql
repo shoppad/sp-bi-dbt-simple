@@ -46,6 +46,48 @@ daily_workflow_run_counts AS (
         2
 ),
 
+daily_step_counts AS (
+  SELECT *
+  FROM {{ ref('int_successful_step_run_day_counts') }}
+),
+
+thirty_day_workflow_counts AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        COALESCE(SUM(workflow_runs_attempted_count), 0) AS workflow_run_attempt_rolling_thirty_day_count,
+        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_run_success_rolling_thirty_day_count
+    FROM shop_calendar
+    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
+    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
+    GROUP BY 1, 2
+),
+
+thirty_day_step_counts AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        COALESCE(SUM(total_workflow_steps_count), 0) AS total_workflow_steps_rolling_thirty_day_count,
+        COALESCE(SUM(input_step_count), 0) AS input_step_rolling_thirty_day_count,
+        COALESCE(SUM(output_step_count), 0) AS output_step_rolling_thirty_day_count
+    FROM shop_calendar
+    LEFT JOIN daily_step_counts USING (shop_subdomain)
+    WHERE daily_step_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
+    GROUP BY 1, 2
+),
+
+year_workflow_counts AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        SUM(COALESCE(workflow_runs_attempted_count, 0)) AS workflow_run_attempt_rolling_year_count,
+        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_run_success_rolling_year_count
+    FROM shop_calendar
+    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
+    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(YEAR, -1, shop_calendar.dt) AND shop_calendar.dt
+    GROUP BY 1, 2
+),
+
 charges AS (
     SELECT
         shop_subdomain,
@@ -72,30 +114,6 @@ daily_charges AS (
     FROM shop_calendar
     LEFT JOIN charges USING (dt, shop_subdomain)
     LEFT JOIN legacy_daus USING (dt, shop_subdomain)
-    GROUP BY 1, 2
-),
-
-thirty_day_workflow_counts AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        COALESCE(SUM(workflow_runs_attempted_count), 0) AS workflow_run_attempt_rolling_thirty_day_count,
-        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_run_success_rolling_thirty_day_count
-    FROM shop_calendar
-    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
-    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
-    GROUP BY 1, 2
-),
-
-year_workflow_counts AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        SUM(COALESCE(workflow_runs_attempted_count, 0)) AS workflow_run_attempt_rolling_year_count,
-        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_run_success_rolling_year_count
-    FROM shop_calendar
-    LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
-    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(YEAR, -1, shop_calendar.dt) AND shop_calendar.dt
     GROUP BY 1, 2
 ),
 
@@ -135,6 +153,8 @@ final AS (
     LEFT JOIN shop_cohort_dates USING (shop_subdomain)
     LEFT JOIN thirty_day_revenue_totals USING (shop_subdomain, dt)
     LEFT JOIN year_revenue_totals USING (shop_subdomain, dt)
+    LEFT JOIN daily_step_counts USING (shop_subdomain, dt)
+    LEFT JOIN thirty_day_step_counts USING (shop_subdomain, dt)
 )
 
 SELECT * FROM final

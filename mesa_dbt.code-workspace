@@ -845,7 +845,8 @@
     },
     "cSpell.ignoreWords": [
       "cachable"
-    ]
+    ],
+    "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true
   },
   "extensions": {
       "recommendations": [
