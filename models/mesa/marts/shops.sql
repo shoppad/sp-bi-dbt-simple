@@ -157,10 +157,12 @@ cohort_average_initial_shop_gmv AS (
     GROUP BY 1
 ),
 
-usage_revenue AS (
+thirty_day_revenue AS (
     SELECT
         shop_subdomain,
-        COALESCE(AVG(daily_usage_revenue), 0) AS average_daily_usage_revenue
+        COALESCE(AVG(daily_usage_revenue), 0) AS average_daily_usage_revenue,
+        COALESCE(AVG(inc_amount), 0) AS average_daily_revenue,
+        COALESCE(SUM(inc_amount), 0) AS total_thirty_day_revenue
     FROM shops
     LEFT JOIN {{ ref('mesa_shop_days') }} USING (shop_subdomain)
     WHERE
@@ -311,7 +313,7 @@ final AS (
     LEFT JOIN email_open_details USING (shop_subdomain)
     LEFT JOIN email_click_details USING (shop_subdomain)
     LEFT JOIN email_conversion_details USING (shop_subdomain)
-    LEFT JOIN usage_revenue USING (shop_subdomain)
+    LEFT JOIN thirty_day_revenue USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
