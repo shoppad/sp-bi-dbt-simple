@@ -12,7 +12,10 @@ workflows AS (
 SELECT
     _id AS workflow_step_id,
     shop_subdomain,
+    {{ pacific_timestamp('_created_at') }} AS created_at_pt,
     "TYPE" AS integration_app,
+    workflow_steps.key AS step_key,
+    trigger_name AS step_name,
     automation AS workflow_id,
     trigger_type AS step_type,
     weight AS step_weight,

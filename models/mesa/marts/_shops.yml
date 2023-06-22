@@ -540,3 +540,21 @@ models:
         description: The total number of Workflow Steps completed in the last 30 days as of Yesterday.
         tests:
           - not_null
+      - name: first_workflow_trigger_step_key
+        description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: total_thirty_day_revenue
+        description: The total revenue for the Shop in the last 30 days as of Yesterday.
+        tests:
+          - not_null
+      - name: first_workflow_trigger_app
+        description: The app of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_last_step_key
+        description: The key of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_last_step_app
+        description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_last_step_name
+        description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: average_daily_revenue
+        description: The average daily revenue for the Shop (calculated by the average of the last 30 billable days).
+      - name: first_workflow_trigger_step_name
+        description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.

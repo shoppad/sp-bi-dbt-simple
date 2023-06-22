@@ -240,6 +240,11 @@ email_conversion_details AS (
     GROUP BY 1
 ),
 
+first_workflow_keys AS (
+    SELECT *
+    FROM {{ ref('int_first_workflow_keys') }}
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
@@ -314,6 +319,7 @@ final AS (
     LEFT JOIN email_click_details USING (shop_subdomain)
     LEFT JOIN email_conversion_details USING (shop_subdomain)
     LEFT JOIN thirty_day_revenue USING (shop_subdomain)
+    LEFT JOIN first_workflow_keys USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

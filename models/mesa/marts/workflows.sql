@@ -9,7 +9,7 @@ workflow_steps AS (
 
     SELECT *
     FROM {{ ref('stg_workflow_steps') }}
-    WHERE NOT(is_deleted)
+    WHERE NOT is_deleted
 
 ),
 
@@ -108,7 +108,6 @@ workflow_enables AS (
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
     GROUP BY 1
-
 ),
 
 final AS (
@@ -120,7 +119,6 @@ final AS (
     LEFT JOIN workflow_saves USING (workflow_id)
     LEFT JOIN workflow_counts USING (workflow_id)
     LEFT JOIN workflow_enables USING (workflow_id)
-
 )
 
 SELECT * FROM final

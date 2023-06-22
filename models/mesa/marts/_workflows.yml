@@ -8,10 +8,12 @@ models:
         Some records are for Deleted Workflows, so be sure to filter on is_deleted.
     columns:
       - name: workflow_id
+        description: The unique identifier for the workflow.
         tests:
           - unique
           - not_null
       - name: shop_subdomain
+        description: The foreign key for the Shop.
         tests:
           - not_null
           - relationships:
