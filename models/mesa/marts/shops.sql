@@ -157,6 +157,14 @@ cohort_average_initial_shop_gmv AS (
     GROUP BY 1
 ),
 
+last_thirty_days AS (
+    SELECT *
+    FROM {{ ref('mesa_shop_days') }}
+    WHERE
+        dt >= CURRENT_DATE - INTERVAL '30 day'
+        AND inc_amount > 0
+),
+
 thirty_day_revenue AS (
     SELECT
         shop_subdomain,
@@ -164,10 +172,7 @@ thirty_day_revenue AS (
         COALESCE(AVG(inc_amount), 0) AS average_daily_revenue,
         COALESCE(SUM(inc_amount), 0) AS total_thirty_day_revenue
     FROM shops
-    LEFT JOIN {{ ref('mesa_shop_days') }} USING (shop_subdomain)
-    WHERE
-        dt >= CURRENT_DATE - INTERVAL '30 day'
-        AND inc_amount > 0
+    LEFT JOIN last_thirty_days USING (shop_subdomain)
     GROUP BY 1
 ),
 
