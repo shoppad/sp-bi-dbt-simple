@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: int_first_workflow_keys
+    columns:
+      - name: shop_subdomain
+      - name: first_workflow_trigger_app
+      - name: first_workflow_trigger_step_key
+      - name: first_workflow_trigger_step_name
+      - name: first_workflow_last_step_app
+      - name: first_workflow_last_step_key
+      - name: first_workflow_last_step_name
