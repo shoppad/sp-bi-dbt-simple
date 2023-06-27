@@ -32,18 +32,65 @@ workflow_counts AS (
         ) AS first_successful_run_at_pt,
         COUNT(
             DISTINCT IFF(workflow_runs.is_billable, workflow_runs.workflow_run_id, NULL)
-        ) AS run_attempt_count,
+        ) AS trigger_count,
+
         COUNT(
             DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.is_successful), workflow_runs.workflow_run_id, NULL)
             {# ?: is is_successful appropriate here? Do failed filter runs result in something besides success? #}
         ) AS run_success_count,
-        run_success_count / NULLIF(run_attempt_count, 0) AS run_success_percent
+        1.0 * run_success_count / NULLIF(trigger_count, 0) AS run_success_percent,
+
+        COUNT(
+            DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.did_move_data), workflow_runs.workflow_run_id, NULL)
+        ) AS run_did_move_data_count,
+        1.0 * run_did_move_data_count / NULLIF(trigger_count, 0) AS run_moved_data_percent,
+
+        COUNT(
+            DISTINCT IFF((workflow_runs.is_billable AND workflow_runs.was_filter_stopped), workflow_runs.workflow_run_id, NULL)
+        ) AS run_was_filter_stopped_count,
+        1.0 * run_was_filter_stopped_count / NULLIF(trigger_count, 0) AS run_was_filter_stopped_percent
     FROM workflows
     LEFT JOIN workflow_steps USING (workflow_id)
     LEFT JOIN workflow_runs USING (workflow_id)
     GROUP BY
         1
 ),
+
+thirty_day_workflow_runs AS (
+    SELECT *
+    FROM {{ ref('int_workflow_runs') }}
+    WHERE workflow_run_at_pt >= CURRENT_DATE - INTERVAL '30 days'
+),
+
+thirty_day_workflow_counts AS (
+    SELECT
+        workflow_id,
+        COUNT(DISTINCT workflow_steps.*) AS thirty_day_step_count,
+        COUNT(
+            DISTINCT IFF(thirty_day_workflow_runs.is_billable, thirty_day_workflow_runs.workflow_run_id, NULL)
+        ) AS thirty_day_trigger_count,
+        COUNT(
+            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.is_successful), thirty_day_workflow_runs.workflow_run_id, NULL)
+            {# ?: is is_successful appropriate here? Do failed filter runs result in something besides success? #}
+        ) AS thirty_day_run_success_count,
+        thirty_day_run_success_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_success_percent,
+
+        COUNT(
+            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.did_move_data), thirty_day_workflow_runs.workflow_run_id, NULL)
+        ) AS thirty_day_run_did_move_data_count,
+        1.0 * thirty_day_run_did_move_data_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_moved_data_percent,
+
+        COUNT(
+            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.was_filter_stopped), thirty_day_workflow_runs.workflow_run_id, NULL)
+        ) AS thirty_day_run_was_filter_stopped_count,
+        1.0 * thirty_day_run_was_filter_stopped_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_was_filter_stopped_percent
+    FROM workflows
+    LEFT JOIN workflow_steps USING (workflow_id)
+    LEFT JOIN thirty_day_workflow_runs USING (workflow_id)
+    GROUP BY
+        1
+),
+
 
 test_runs AS (
 
@@ -119,6 +166,7 @@ final AS (
     LEFT JOIN workflow_saves USING (workflow_id)
     LEFT JOIN workflow_counts USING (workflow_id)
     LEFT JOIN workflow_enables USING (workflow_id)
+    LEFT JOIN thirty_day_workflow_counts USING (workflow_id)
 )
 
 SELECT * FROM final

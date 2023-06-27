@@ -23,7 +23,8 @@ first_workflow_first_steps AS (
         step_key AS source_step_key,
         step_name AS source_step_name,
         workflow_step_id AS source_step_id,
-        title AS first_workflow_title
+        is_deleted AS first_workflow_title,
+        IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title
     FROM workflows
     LEFT JOIN workflow_steps USING (workflow_id)
         WHERE step_type = 'input'

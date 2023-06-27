@@ -57,7 +57,7 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
-      - name: run_attempt_count
+      - name: trigger_count
         description: The number of times the workflow has been run.
         tests:
           - not_null
@@ -137,3 +137,27 @@ models:
           - not_null
       - name: setup
         description: The stage of a template-wizard workflow setup process.
+      - name: thirty_day_run_was_filter_stopped_percent
+        description: The percent of workflow run attempts that were stopped by a filter in the last 30 days.
+      - name: thirty_day_run_was_filter_stopped_count
+        description: The number of times the workflow was stopped by a filter in the last 30 days.
+      - name: thirty_day_run_success_percent
+        description: The percent of workflow run attempts that successfully ran in the last 30 days.
+      - name: run_did_move_data_count
+        description: The number of workflow runs that successfully moved data.
+      - name: run_moved_data_percent
+        description: The percent of workflow runs that successfully moved data.
+      - name: thirty_day_run_moved_data_percent
+        description: The percent of workflow runs that successfully moved data in the last 30 days.
+      - name: thirty_day_trigger_count
+        description: The number of times the workflow has started to run in the last 30 days.
+      - name: thirty_day_step_count
+        description: The total number of steps that have been executed for this Workflow in the last 30 days.
+      - name: run_was_filter_stopped_count
+        description: The number of times the workflow was stopped by a filter.
+      - name: thirty_day_run_success_count
+        description: The number of times the workflow has been run successfully in the last 30 days.
+      - name: thirty_day_run_did_move_data_count
+        description: The number of workflow runs that successfully moved data in the last 30 days.
+      - name: run_was_filter_stopped_percent
+        description: The percent of workflow run attempts that were stopped by a filter.

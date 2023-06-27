@@ -24,7 +24,9 @@ first_step_runs AS (
         metadata:automation:automation_name::STRING AS workflow_name,
         metadata:trigger:trigger_name::STRING AS source_app,
         metadata:trigger:trigger_key::STRING AS integration_key,
-        COALESCE(metadata:child_fails, 0) AS child_failure_count,
+        metadata:child_fails::NUMERIC AS child_failure_count,
+        metadata:child_stops::NUMERIC AS child_stop_count,
+        metadata:child_completes::NUMERIC AS child_complete_count,
         updated_at,
         metadata:is_test AS is_test_run
     FROM {{ source('mongo_sync', 'tasks') }}
