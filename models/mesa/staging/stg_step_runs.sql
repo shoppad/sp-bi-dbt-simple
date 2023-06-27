@@ -36,6 +36,7 @@ decorated_step_runs AS (
         metadata:trigger:_id::VARCHAR AS workflow_step_id,
         _created_at AS step_run_at_utc,
         {{ pacific_timestamp("_created_at") }} AS step_run_at_pt,
+        DATE_TRUNC('day', step_run_at_utc)::DATE AS step_run_on_utc,
         DATE_TRUNC('day', step_run_at_pt)::DATE AS step_run_on_pt,
         metadata:trigger:trigger_type::STRING AS step_type,
         metadata:trigger:trigger_name::STRING AS integration_name,

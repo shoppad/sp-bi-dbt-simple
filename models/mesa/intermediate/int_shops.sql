@@ -65,8 +65,8 @@ conversion_rates AS (
 final AS (
     SELECT
         * EXCLUDE (shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd),
-        shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
-        shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
+        1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
+        1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
         COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)

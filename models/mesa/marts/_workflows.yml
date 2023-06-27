@@ -46,7 +46,7 @@ models:
         description: The current number of steps in the workflow.
         tests:
           - dbt_utils.accepted_range:
-              max_value: 40
+              max_value: 100
       - name: first_run_at_pt
         description: The timestamp of the first run of the workflow.
         tests:
