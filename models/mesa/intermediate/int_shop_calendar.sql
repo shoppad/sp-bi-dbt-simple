@@ -19,6 +19,7 @@ shop_lifespans AS (
 calendar_dates AS (
     SELECT date_day AS dt
     FROM {{ ref('calendar_dates') }}
+    WHERE dt <= {{ pacific_timestamp('CURRENT_TIMESTAMP') }}::DATE - INTERVAL '1 DAY'
 ),
 
 shop_calendar AS (
