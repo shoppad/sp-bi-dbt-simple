@@ -26,7 +26,8 @@ workflow_counts AS (
         shop_subdomain,
         COUNT(DISTINCT workflows.workflow_id) AS workflows_current_count,
         COUNT_IF(workflows.is_enabled) AS workflows_enabled_current_count,
-        COUNT(DISTINCT workflows.template_name) AS templates_installed_count
+        COUNT(DISTINCT workflows.template_name) AS templates_installed_count,
+        COUNT_IF(workflows.has_pro_app) > 0 AS is_using_pro_apps
     FROM shops
     LEFT JOIN workflows USING (shop_subdomain)
     GROUP BY
@@ -250,6 +251,14 @@ first_workflow_keys AS (
     FROM {{ ref('int_first_workflow_keys') }}
 ),
 
+max_workflow_steps AS (
+    SELECT
+        shop_subdomain,
+        MAX(step_count) AS max_workflow_steps
+    FROM {{ ref('workflows') }}
+    GROUP BY 1
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
@@ -325,6 +334,7 @@ final AS (
     LEFT JOIN email_conversion_details USING (shop_subdomain)
     LEFT JOIN thirty_day_revenue USING (shop_subdomain)
     LEFT JOIN first_workflow_keys USING (shop_subdomain)
+    LEFT JOIN max_workflow_steps USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

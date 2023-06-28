@@ -3,6 +3,7 @@ WITH shops AS (
     FROM {{ ref('stg_shops') }}
 )
 
-SELECT *
+SELECT
+    *
 FROM {{ ref('stg_workflow_steps') }}
 INNER JOIN shops USING (shop_subdomain)

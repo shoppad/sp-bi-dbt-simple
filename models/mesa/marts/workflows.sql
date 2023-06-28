@@ -23,6 +23,7 @@ workflow_runs AS (
 workflow_counts AS (
     SELECT
         workflow_id,
+        COUNT_IF(workflow_steps.is_pro_app) > 0 AS has_pro_app,
         COUNT(DISTINCT workflow_steps.*) AS step_count,
         MIN(
             IFF(workflow_runs.is_billable, workflow_runs.workflow_run_at_pt, NULL)
