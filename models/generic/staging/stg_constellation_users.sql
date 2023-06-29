@@ -15,7 +15,7 @@ WITH constellation_users AS (
         analytics_orders >= 50 AND shopify_createdat <= CURRENT_DATE - INTERVAL '2 years' AS is_mql
 
     FROM {{ source('php_segment', 'users') }}
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY createdat DESC) = 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY COALESCE(uuid, id) ORDER BY createdat DESC) = 1
 )
 
 SELECT *

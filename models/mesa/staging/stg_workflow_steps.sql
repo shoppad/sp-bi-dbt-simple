@@ -9,7 +9,7 @@ workflows AS (
     FROM {{ ref('stg_workflows') }}
 )
 
-{% set pro_apps = ['sms', 'email', 'custom', 'segment', 'hubspot', 'salesforce', 'twilio', 'odoo'] %}
+{% set pro_apps = ['sms', 'email', 'custom', 'segment', 'hubspot', 'salesforce', 'twilio', 'odoo', 'recharge', 'recharge_legacy', 'api', 'webhook', 'json_webhook'] %}
 
 SELECT
     _id AS workflow_step_id,
