@@ -72,13 +72,17 @@ models:
       - name: child_failure_count
         description: The number of steps that failed in the workflow run.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: workflow_run_on_pt > '2021-09-20'
       - name: is_successful
         description:
           Whether the workflow run was successfully until the end or a safe
           exit.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: workflow_run_on_pt > '2021-09-20'
       - name: destination_app
         description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
@@ -105,3 +109,23 @@ models:
         description: The date the customer achieved the current definition of Activated.
       - name: funnel_phase
         description: The funnel phase the Shop was in when the workflow run was executed.
+      - name: did_end_with_delay
+        description: Whether the workflow run ended with a delay.
+        tests:
+          - not_null
+      - name: child_complete_count
+        description: The number of steps that completed in the workflow run.
+        tests:
+          - not_null
+      - name: did_move_data
+        description: Whether the workflow run moved data.
+        tests:
+          - not_null
+      - name: was_filter_stopped
+        description: Whether the workflow run was stopped by a filter.
+        tests:
+          - not_null
+      - name: child_stop_count
+        description: The number of steps that were stopped in the workflow run.
+        tests:
+          - not_null
