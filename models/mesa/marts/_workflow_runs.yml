@@ -116,16 +116,27 @@ models:
       - name: child_complete_count
         description: The number of steps that completed in the workflow run.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: WORKFLOW_RUN_AT_UTC > '2022-12-06'
       - name: did_move_data
         description: Whether the workflow run moved data.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: workflow_run_at_utc > '2022-12-06'
+
       - name: was_filter_stopped
         description: Whether the workflow run was stopped by a filter.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: workflow_run_at_utc > '2022-12-06'
       - name: child_stop_count
         description: The number of steps that were stopped in the workflow run.
         tests:
-          - not_null
+          - not_null:
+              config:
+                where: WORKFLOW_RUN_AT_UTC > '2022-12-06'
+      - name: is_time_travel
+        description: Indicates whether the workflow run was a part of Time Travel execution.

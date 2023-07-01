@@ -29,7 +29,7 @@ final AS (
         child_failure_count = 0 and run_status = 'success' AS is_successful,
         destination_app ILIKE '%delay%' AS did_end_with_delay,
         child_complete_count > 0 AND NOT did_end_with_delay AS did_move_data,
-        child_complete_count = 0 AND child_stop_count > 0 AS was_filter_stopped
+        COALESCE(child_complete_count = 0 AND child_stop_count > 0, FALSE) AS was_filter_stopped
     FROM workflow_runs
     LEFT JOIN action_run_stats USING (workflow_run_id)
 )
