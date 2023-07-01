@@ -161,3 +161,5 @@ models:
         description: The number of workflow runs that successfully moved data in the last 30 days.
       - name: run_was_filter_stopped_percent
         description: The percent of workflow run attempts that were stopped by a filter.
+      - name: has_pro_app
+        description: Is the Shop using any of the Pro apps in a workflow?

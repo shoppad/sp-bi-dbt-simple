@@ -28,7 +28,8 @@ first_step_runs AS (
         metadata:child_stops::NUMERIC AS child_stop_count,
         metadata:child_completes::NUMERIC AS child_complete_count,
         updated_at,
-        metadata:is_test AS is_test_run
+        metadata:is_test AS is_test_run,
+        metadata:backfill_id IS NOT NULL AS is_time_travel
     FROM {{ source('mongo_sync', 'tasks') }}
     WHERE
         NOT(__hevo__marked_deleted)

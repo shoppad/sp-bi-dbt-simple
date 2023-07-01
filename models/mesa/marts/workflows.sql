@@ -17,6 +17,7 @@ workflow_runs AS (
 
     SELECT *
     FROM {{ ref('int_workflow_runs') }}
+    WHERE NOT is_time_travel
 
 ),
 
