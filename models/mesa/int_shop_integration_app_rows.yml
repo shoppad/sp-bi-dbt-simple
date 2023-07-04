@@ -1,0 +1,12 @@
+version: 2
+models:
+  - name: int_shop_integration_app_rows
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: integration_app
+      - name: workflow_count
+      - name: is_multi_workflow
+      - name: workflow_step_count
+      - name: is_multi_workflow_step
+      - name: is_pro_app

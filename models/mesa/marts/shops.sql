@@ -34,6 +34,16 @@ workflow_counts AS (
         1
 ),
 
+int_shop_integration_app_rows AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(COUNT(DISTINCT integration_app), 0) AS integration_apps_enabled_count,
+        COALESCE(COUNT_IF(is_pro_app), 0) AS pro_apps_enabled_count
+    FROM shops
+    LEFT JOIN {{ ref('int_shop_integration_app_rows') }} USING (shop_subdomain)
+    GROUP BY 1
+),
+
 
 workflow_run_counts AS (
     SELECT
@@ -254,8 +264,9 @@ first_workflow_keys AS (
 max_workflow_steps AS (
     SELECT
         shop_subdomain,
-        MAX(step_count) AS max_workflow_steps
-    FROM {{ ref('workflows') }}
+        COALESCE(MAX(step_count), 0) AS max_workflow_steps
+    FROM shops
+    LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
     GROUP BY 1
 ),
 
@@ -335,6 +346,7 @@ final AS (
     LEFT JOIN thirty_day_revenue USING (shop_subdomain)
     LEFT JOIN first_workflow_keys USING (shop_subdomain)
     LEFT JOIN max_workflow_steps USING (shop_subdomain)
+    LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

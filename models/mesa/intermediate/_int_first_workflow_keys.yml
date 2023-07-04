@@ -3,9 +3,28 @@ models:
   - name: int_first_workflow_keys
     columns:
       - name: shop_subdomain
+        description: The foreign key for the Shop.
       - name: first_workflow_trigger_app
-      - name: first_workflow_trigger_step_key
-      - name: first_workflow_trigger_step_name
-      - name: first_workflow_last_step_app
-      - name: first_workflow_last_step_key
-      - name: first_workflow_last_step_name
+        description:
+          The app of the first step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
+      - name: first_workflow_trigger_key
+        description:
+          The key of the first step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
+      - name: first_workflow_trigger_name
+        description:
+          The name of the first step in the Shop's first workflow. Gives a
+          clue to their MESA use case.
+      - name: first_workflow_destination_app
+        description:
+          The app of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
+      - name: first_workflow_destination_key
+        description:
+          The key of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
+      - name: first_workflow_destination_name
+        description:
+          The name of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.

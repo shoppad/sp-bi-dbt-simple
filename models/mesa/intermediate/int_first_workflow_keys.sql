@@ -19,10 +19,10 @@ first_workflow_first_steps AS (
     SELECT
         shop_subdomain,
         workflow_id AS first_workflow_id,
-        integration_app AS source_step_app,
-        step_key AS source_step_key,
-        step_name AS source_step_name,
-        workflow_step_id AS source_step_id,
+        integration_app AS first_workflow_trigger_app,
+        step_key AS first_workflow_trigger_key,
+        step_name AS first_workflow_trigger_name,
+        workflow_step_id AS first_workflow_trigger_step_id,
         is_deleted AS first_workflow_title,
         IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title
     FROM workflows
@@ -36,14 +36,14 @@ first_workflow_last_steps AS (
 
     SELECT
         workflow_id AS first_workflow_id,
-        integration_app AS destination_step_app,
-        step_key AS destination_step_key,
-        step_name AS destination_step_name
+        integration_app AS first_workflow_destination_app,
+        step_key AS first_workflow_destination_key,
+        step_name AS first_workflow_destination_name
     FROM workflow_steps
     WHERE
         step_type = 'output'
         AND workflow_step_id NOT IN (
-            SELECT source_step_id
+            SELECT first_workflow_trigger_step_id
             FROM first_workflow_first_steps
         )
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY position_in_workflow DESC) = 1
@@ -53,10 +53,10 @@ first_workflow_last_steps AS (
 final AS (
 
     SELECT
-        * EXCLUDE (first_workflow_id, source_step_id),
-        source_step_app || ' - ' || destination_step_app AS source_destination_app_pair,
-        source_step_key || ' - ' || destination_step_key AS source_destination_key_pair,
-        source_step_name || ' - ' || destination_step_name AS source_destination_name_pair
+        * EXCLUDE (first_workflow_id, first_workflow_trigger_step_id),
+        first_workflow_trigger_app || ' - ' || first_workflow_destination_app AS trigger_destination_app_pair,
+        first_workflow_trigger_key || ' - ' || first_workflow_destination_key AS trigger_destination_key_pair,
+        first_workflow_trigger_name || ' - ' || first_workflow_destination_name AS trigger_destination_name_pair
 
     FROM first_workflow_first_steps
     LEFT JOIN first_workflow_last_steps USING (first_workflow_id)

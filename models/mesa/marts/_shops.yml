@@ -540,7 +540,7 @@ models:
         description: The total number of Workflow Steps completed in the last 30 days as of Yesterday.
         tests:
           - not_null
-      - name: first_workflow_trigger_step_key
+      - name: first_workflow_trigger_key
         description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: total_thirty_day_revenue
         description: The total revenue for the Shop in the last 30 days as of Yesterday.
@@ -548,13 +548,49 @@ models:
           - not_null
       - name: first_workflow_trigger_app
         description: The app of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: first_workflow_last_step_key
+      - name: first_workflow_destination_key
         description: The key of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: first_workflow_last_step_app
+      - name: first_workflow_destination_app
         description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: first_workflow_last_step_name
+      - name: first_workflow_destination_name
         description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: average_daily_revenue
         description: The average daily revenue for the Shop (calculated by the average of the last 30 billable days).
-      - name: first_workflow_trigger_step_name
+      - name: first_workflow_trigger_name
         description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: integration_apps_enabled_count
+        description: The number of unique integration apps enabled for the Shop.
+        tests:
+          - not_null
+      - name: pro_apps_enabled_count
+        description: The number of unique pro apps enabled in workflows for the Shop.
+        tests:
+          - not_null
+      - name: first_workflow_sort_title
+        description: The sort title of the first workflow in the Shop. (Cleaned title or marked as DELETED.)
+      - name: trigger_destination_app_pair
+        description: The app pair of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: trigger_destination_key_pair
+        description: The key pair of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_destination_name
+        description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_destination_key
+        description: The key of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_trigger_name
+        description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: max_workflow_steps
+        description: The maximum number of steps in any workflow for the Shop.
+        tests:
+          - not_null
+      - name: first_workflow_title
+        description: The title of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: is_using_pro_apps
+        description: Whether the Shop is using any pro apps.
+        tests:
+          - not_null
+      - name: first_workflow_trigger_key
+        description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_destination_app
+        description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: trigger_destination_name_pair
+        description: The name pair of the Shop's first workflow. Gives a clue to their MESA use case.

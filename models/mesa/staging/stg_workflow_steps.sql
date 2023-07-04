@@ -9,8 +9,6 @@ workflows AS (
     FROM {{ ref('stg_workflows') }}
 )
 
-{% set pro_apps = ['sms', 'email', 'custom', 'segment', 'hubspot', 'salesforce', 'twilio', 'odoo', 'recharge', 'recharge_legacy', 'api', 'webhook', 'json_webhook'] %}
-
 SELECT
     _id AS workflow_step_id,
     shop_subdomain,
@@ -23,7 +21,7 @@ SELECT
     trigger_type AS step_type,
     weight AS step_weight,
     ROW_NUMBER() OVER (PARTITION BY workflow_id, step_type ORDER BY weight) as position_in_workflow,
-    integration_app IN ('{{ pro_apps | join("', '") }}') AS is_pro_app
+    integration_app IN ('{{ var("pro_apps") | join("', '") }}') AS is_pro_app
 
 FROM workflow_steps
 LEFT JOIN workflows ON workflow_steps.automation = workflows.workflow_id

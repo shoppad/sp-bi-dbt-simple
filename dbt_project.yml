@@ -25,6 +25,20 @@ clean-targets: # directories to be removed by `dbt clean`
 
 vars:
   "dbt_date:time_zone": "America/Los_Angeles"
+  pro_apps:
+    - sms
+    - email
+    - custom
+    - segment
+    - hubspot
+    - salesforce
+    - twilio
+    - odoo
+    - recharge
+    - recharge_legacy
+    - api
+    - webhook
+    - json_webhook
   etl_fields:
     [
       "__HEVO__DATABASE_NAME",
