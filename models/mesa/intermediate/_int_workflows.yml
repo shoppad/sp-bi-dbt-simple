@@ -1,0 +1,19 @@
+version: 2
+models:
+  - name: int_workflows
+    columns:
+      - name: workflow_id
+      - name: created_at_pt
+      - name: shop_subdomain
+      - name: title
+      - name: is_premium
+      - name: description
+      - name: key
+      - name: tags
+      - name: is_enabled
+      - name: is_deleted
+      - name: template_name
+      - name: updated_at_pt
+      - name: setup
+      - name: app_chain
+      - name: step_chain
