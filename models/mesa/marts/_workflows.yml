@@ -163,3 +163,7 @@ models:
         description: The percent of workflow run attempts that were stopped by a filter.
       - name: has_pro_app
         description: Is the Shop using any of the Pro apps in a workflow?
+      - name: app_chain
+        description: The ordered list of apps in the workflow.
+      - name: step_chain
+        description: The ordered list of steps in the workflow.

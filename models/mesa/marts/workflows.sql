@@ -1,7 +1,7 @@
 WITH workflows AS (
 
     SELECT *
-    FROM {{ ref('stg_workflows') }}
+    FROM {{ ref('int_workflows') }}
 
 ),
 
@@ -25,7 +25,7 @@ workflow_counts AS (
     SELECT
         workflow_id,
         COUNT_IF(workflow_steps.is_pro_app) > 0 AS has_pro_app,
-        COUNT(DISTINCT workflow_steps.*) AS step_count,
+        COUNT(DISTINCT workflow_steps.workflow_step_id) AS step_count,
         MIN(
             IFF(workflow_runs.is_billable, workflow_runs.workflow_run_at_pt, NULL)
         ) AS first_run_at_pt,
@@ -67,7 +67,7 @@ thirty_day_workflow_runs AS (
 thirty_day_workflow_counts AS (
     SELECT
         workflow_id,
-        COUNT(DISTINCT workflow_steps.*) AS thirty_day_step_count,
+        COUNT(DISTINCT workflow_steps.workflow_step_id) AS thirty_day_step_count,
         COUNT(
             DISTINCT IFF(thirty_day_workflow_runs.is_billable, thirty_day_workflow_runs.workflow_run_id, NULL)
         ) AS thirty_day_trigger_count,
@@ -140,7 +140,7 @@ workflow_saves AS (
         COALESCE(
             COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND properties_workflow_id = workflow_id),
             0)
-        AS save_count,
+            AS save_count,
         save_count > 0 AS has_edited_or_saved_workflow
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
@@ -160,7 +160,6 @@ workflow_enables AS (
 ),
 
 final AS (
-
     SELECT *
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)

@@ -39,6 +39,9 @@ vars:
     - api
     - webhook
     - json_webhook
+    - quickbooks
+    - gorgias
+
   etl_fields:
     [
       "__HEVO__DATABASE_NAME",

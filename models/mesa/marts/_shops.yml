@@ -594,3 +594,7 @@ models:
         description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: trigger_destination_name_pair
         description: The name pair of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_app_chain
+        description: The app chain of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_step_chain
+        description: The step chain of the Shop's first workflow. Gives a clue to their MESA use case.

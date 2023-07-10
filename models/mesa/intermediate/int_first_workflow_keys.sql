@@ -1,10 +1,9 @@
 WITH workflows AS (
 
     SELECT *
-    FROM {{ ref('stg_workflows') }}
+    FROM {{ ref('int_workflows') }}
 
 ),
-
 
 workflow_steps AS (
 
@@ -24,7 +23,9 @@ first_workflow_first_steps AS (
         step_name AS first_workflow_trigger_name,
         workflow_step_id AS first_workflow_trigger_step_id,
         is_deleted AS first_workflow_title,
-        IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title
+        IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title,
+        app_chain AS first_workflow_app_chain,
+        step_chain AS first_workflow_step_chain
     FROM workflows
     LEFT JOIN workflow_steps USING (workflow_id)
         WHERE step_type = 'input'
