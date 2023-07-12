@@ -6,6 +6,10 @@ models:
           min_value: 1
           config:
             where: shop_subdomain = 'dev-emson' AND daily_plan_revenue > 0
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list:
+            - dt
+            - shop_subdomain
     columns:
       - name: shop_subdomain
         tests:

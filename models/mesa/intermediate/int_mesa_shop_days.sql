@@ -110,7 +110,7 @@ daily_charges AS (
         shop_subdomain,
         dt,
         COALESCE(SUM(charges.billed_count), 0) AS billed_count,
-        COALESCE(SUM(COALESCE(charges.billed_amount, legacy_daus.daily_usage_revenue)), 0) AS daily_usage_revenue
+        COALESCE(SUM(IFF(is_in_trial, 0, COALESCE(charges.billed_amount, legacy_daus.daily_usage_revenue))), 0) AS daily_usage_revenue
     FROM shop_calendar
     LEFT JOIN charges USING (dt, shop_subdomain)
     LEFT JOIN legacy_daus USING (dt, shop_subdomain)
@@ -143,7 +143,7 @@ final AS (
     SELECT
         *,
         {{- dbt_utils.generate_surrogate_key(['shop_subdomain','dt'] ) }} AS mesa_shop_days_id,
-        daily_plan_revenue + daily_usage_revenue AS inc_amount,
+        IFF(is_in_trial, 0, daily_plan_revenue + daily_usage_revenue) AS inc_amount,
         (workflow_run_success_rolling_year_count >= 10) AND (inc_amount > 0 OR workflow_run_success_rolling_thirty_day_count >= {{ var('activation_workflow_run_count') }}) AS is_active
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain, dt)
@@ -157,4 +157,6 @@ final AS (
     LEFT JOIN thirty_day_step_counts USING (shop_subdomain, dt)
 )
 
-SELECT * FROM final
+SELECT *
+FROM final
+ORDER BY shop_subdomain, dt

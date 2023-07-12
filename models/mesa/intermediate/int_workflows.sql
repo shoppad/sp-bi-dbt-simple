@@ -25,7 +25,7 @@ app_chains AS (
     SELECT
         workflow_id,
         LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS app_chain,
-        LISTAGG(CONCAT(integration_app, ' →  ' , step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
+        LISTAGG(CONCAT(integration_app, ' → ' , step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
     FROM workflow_steps
     GROUP BY 1
 

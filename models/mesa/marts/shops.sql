@@ -270,6 +270,22 @@ max_workflow_steps AS (
     GROUP BY 1
 ),
 
+plan_change_chains AS (
+    SELECT
+        shop_subdomain,
+        COUNT(DISTINCT plan) AS plan_change_count,
+        LISTAGG(
+            CONCAT(
+                IFF(previous_price IS NULL OR previous_price <= price, '↑:', '↓:'),
+                planid,
+                ':$',
+                price
+            ),
+        ' • ') WITHIN GROUP (ORDER BY changed_at_pt ASC) AS plan_change_chain
+    FROM {{ ref('stg_mesa_plan_changes') }}
+    GROUP BY 1
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
@@ -324,7 +340,8 @@ final AS (
             ELSE 'K-$2,500,000+'
         END AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
-        NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying
+        NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
+        plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
@@ -347,7 +364,9 @@ final AS (
     LEFT JOIN first_workflow_keys USING (shop_subdomain)
     LEFT JOIN max_workflow_steps USING (shop_subdomain)
     LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
+    LEFT JOIN plan_change_chains USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
-SELECT * FROM final
+SELECT *
+FROM final

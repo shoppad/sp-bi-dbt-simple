@@ -2,7 +2,7 @@ WITH raw_mesa_plan_changes AS (
     SELECT
         COALESCE(CASE
             WHEN price NOT IN ('hybrid', 'usage')
-                THEN REPLACE(price, ',', '')::NUMERIC
+                THEN REPLACE(price, ',', '')::FLOAT
         END, 0) AS price,
         {{ pacific_timestamp('timestamp') }} AS changed_at_pt,
         DATE_TRUNC('day', changed_at_pt)::DATE AS changed_on_pt,
@@ -18,7 +18,9 @@ shops AS (
 ),
 
 final AS (
-    SELECT *
+    SELECT
+        *,
+        LAG(price, 1) OVER (PARTITION BY shop_subdomain ORDER BY changed_at_pt) AS previous_price
     FROM shops
     INNER JOIN raw_mesa_plan_changes USING (shop_subdomain)
 

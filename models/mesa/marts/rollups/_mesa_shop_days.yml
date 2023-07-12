@@ -108,7 +108,7 @@ models:
         description: The number of times the template wizard was started but not completed on this day.
       - name: has_incomplete_wizard
         description: Whether the shop has an incomplete wizard on this day.
-      - name: created_wowithout_wizard
+      - name: created_workflow_without_wizard
         description: Whether the shop created a workflow without using the wizard on this day.
       - name: created_a_workflow
         description: Whether the shop created a workflow on this day.
@@ -136,3 +136,15 @@ models:
         description: The number of workflow run attempts initiated in the last year as of this day.
         tests:
           - not_null
+      - name: input_step_count
+        description: The number of trigger steps executed on this day.
+      - name: input_step_rolling_thirty_day_count
+        description: The number of trigger steps executed in the last 30 days as of this day.
+      - name: output_step_count
+        description: The number of action steps executed on this day.
+      - name: output_step_rolling_thirty_day_count
+        description: The number of action steps executed in the last 30 days as of this day.
+      - name: total_workflow_steps_count
+        description: The number of workflow steps executed on this day.
+      - name: total_workflow_steps_rolling_thirty_day_count
+        description: The number of workflow steps executed in the last 30 days as of this day.

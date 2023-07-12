@@ -5,13 +5,6 @@ calendar_dates AS (
     FROM {{ ref('calendar_dates') }}
 ),
 
-shop_trial_end_dts AS (
-    SELECT
-        shop_subdomain,
-        trial_end_dt
-    FROM {{ ref('stg_shops') }}
-),
-
 mesa_plan_changes AS (
     SELECT
         shop_subdomain,
@@ -127,12 +120,9 @@ final AS (
     SELECT
         dt,
         shop_subdomain,
-        COALESCE(trial_end_dt IS NOT NULL AND dt <= trial_end_dt, FALSE) AS is_in_trial,
         COALESCE(
             IFF(
-                is_zombie OR is_in_trial,
-                0,
-                daily_plan_revenue
+                is_zombie, 0, daily_plan_revenue
             ), 0
         )
         + COALESCE(custom_daily_plan_revenue, 0) AS daily_plan_revenue,
@@ -143,9 +133,9 @@ final AS (
         COALESCE(is_zombie, FALSE) AS is_shopify_zombie_plan
     FROM mesa_plan_calendar_dates
     FULL OUTER JOIN custom_app_daily_revenue_dates USING (shop_subdomain, dt)
-    LEFT JOIN shop_trial_end_dts USING (shop_subdomain)
     LEFT JOIN shopify_plan_calendar_dates USING (shop_subdomain, dt)
 )
 
 SELECT *
 FROM final
+ORDER BY shop_subdomain, dt

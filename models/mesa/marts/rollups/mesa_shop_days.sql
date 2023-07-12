@@ -28,7 +28,7 @@ workflow_counts AS (
         workflows_wizard_started_count > 0 AS started_wizard,
         workflows_wizard_complete_count > 0 AS completed_wizard,
         workflows_wizard_incomplete_count > 0 AS has_incomplete_wizard,
-        workflows_created_without_wizard_count > 0 AS created_wowithout_wizard
+        workflows_created_without_wizard_count > 0 AS created_workflow_without_wizard
     FROM shop_days
     LEFT JOIN workflows USING (shop_subdomain, dt)
     GROUP BY 1, 2
