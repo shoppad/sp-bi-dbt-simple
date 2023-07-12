@@ -598,3 +598,5 @@ models:
         description: The app chain of the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_step_chain
         description: The step chain of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: first_workflow_id
+        description: The ID of the Shop's first workflow. Gives a clue to their MESA use case.

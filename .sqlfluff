@@ -33,6 +33,6 @@ apply_dbt_builtins = true
 [sqlfluff:templater:jinja:macros]
 
 # Specific Rule rules
-[sqlfluff:rules:L066]
+[sqlfluff:rules:aliasing.length]
 min_alias_length = 4
 max_alias_length = None

@@ -13,6 +13,13 @@ workflow_steps AS (
 
 ),
 
+first_workflows AS (
+    SELECT *
+    FROM workflows
+    WHERE step_count > 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at_pt ASC) = 1
+),
+
 first_workflow_first_steps AS (
 
     SELECT
@@ -22,15 +29,14 @@ first_workflow_first_steps AS (
         step_key AS first_workflow_trigger_key,
         step_name AS first_workflow_trigger_name,
         workflow_step_id AS first_workflow_trigger_step_id,
-        is_deleted AS first_workflow_title,
+        title AS first_workflow_title,
         IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title,
         app_chain AS first_workflow_app_chain,
         step_chain AS first_workflow_step_chain
-    FROM workflows
+    FROM first_workflows
     LEFT JOIN workflow_steps USING (workflow_id)
-        WHERE step_type = 'input'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY workflow_steps.created_at_pt ASC) = 1
-
+    WHERE workflow_steps.step_type = 'input'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY position_in_workflow DESC) = 1
 ),
 
 first_workflow_last_steps AS (
@@ -48,13 +54,12 @@ first_workflow_last_steps AS (
             FROM first_workflow_first_steps
         )
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY position_in_workflow DESC) = 1
-
 ),
 
 final AS (
 
     SELECT
-        * EXCLUDE (first_workflow_id, first_workflow_trigger_step_id),
+        * EXCLUDE first_workflow_trigger_step_id,
         first_workflow_trigger_app || ' - ' || first_workflow_destination_app AS trigger_destination_app_pair,
         first_workflow_trigger_key || ' - ' || first_workflow_destination_key AS trigger_destination_key_pair,
         first_workflow_trigger_name || ' - ' || first_workflow_destination_name AS trigger_destination_name_pair

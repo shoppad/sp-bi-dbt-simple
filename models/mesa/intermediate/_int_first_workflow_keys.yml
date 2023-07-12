@@ -4,6 +4,9 @@ models:
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.
+        tests:
+          - unique
+          - not_null
       - name: first_workflow_trigger_app
         description:
           The app of the first step in the Shop's first workflow. Gives a clue
@@ -28,3 +31,7 @@ models:
         description:
           The name of the last step in the Shop's first workflow. Gives a clue
           to their MESA use case.
+      - name: first_workflow_id
+        description:
+          The ID of the Shop's first workflow. Gives a clue to their MESA use
+          case.

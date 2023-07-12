@@ -24,8 +24,8 @@ workflows AS (
 workflow_counts AS (
     SELECT
         shop_subdomain,
-        COUNT(DISTINCT workflows.workflow_id) AS workflows_current_count,
-        COUNT_IF(workflows.is_enabled) AS workflows_enabled_current_count,
+        COUNT_IF(workflows.step_count > 1) AS workflows_current_count,
+        COUNT_IF(workflows.step_count > 1 AND workflows.is_enabled) AS workflows_enabled_current_count,
         COUNT(DISTINCT workflows.template_name) AS templates_installed_count,
         COUNT_IF(workflows.has_pro_app AND workflows.is_enabled) > 0 AS is_using_pro_apps
     FROM shops

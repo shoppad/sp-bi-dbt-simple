@@ -23,7 +23,7 @@
       "*.yml": "jinja-yaml"
     },
     "sqlfluff.format.enabled": true,
-    "sqlfluff.suppressNotifications": true,
+    "sqlfluff.suppressNotifications": false,
     "dbt.queryLimit": 500,
     "dbt.queryPreview.queryLimit": 250,
     "sqlfluff.osmosis.enabled": false,
@@ -846,7 +846,8 @@
     "cSpell.ignoreWords": [
       "cachable"
     ],
-    "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true
+    "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true,
+    "sqlfluff.env.useDotEnvFile": true
   },
   "extensions": {
       "recommendations": [
