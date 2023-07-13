@@ -1,11 +1,11 @@
 with plan_events AS (
     SELECT
-        shop_subdomain,
+        uuid AS shop_subdomain,
         usg.value:plan_type::VARCHAR AS plan_type,
         usg.value:label::VARCHAR AS label,
         {{ pacific_timestamp('TO_TIMESTAMP(usg.value:start::VARCHAR)') }}::DATE AS started_on
 
-    FROM {{ ref('stg_shops') }}, table(flatten(usage)) usg
+    FROM {{ source('mongo_sync', 'shops') }}, table(flatten(usage)) usg
 ),
 
 shop_events_formatted AS (
