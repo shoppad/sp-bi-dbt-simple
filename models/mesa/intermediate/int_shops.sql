@@ -55,6 +55,16 @@ launch_session_dates AS (
         LATERAL FLATTEN(input => meta) AS meta_attribs
 ),
 
+plan_upgrade_dates AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS first_plan_upgrade_date,
+        MIN_BY(mesa_plan_identifier, dt) AS first_plan_identifier
+    FROM {{ ref('int_mesa_shop_days') }}
+    WHERE inc_amount > 0
+    GROUP BY 1
+),
+
 conversion_rates AS (
     SELECT
         currency,
@@ -67,11 +77,16 @@ final AS (
         * EXCLUDE (shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd),
         1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
         1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
-        COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported
+        COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported,
+        first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade,
+        COALESCE(first_plan_upgrade_date IS NOT NULL, FALSE) AS ever_upgraded_to_paid_plan
+
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
     LEFT JOIN conversion_rates USING (currency)
+    LEFT JOIN plan_upgrade_dates USING (shop_subdomain)
+
 )
 
 SELECT * FROM final
