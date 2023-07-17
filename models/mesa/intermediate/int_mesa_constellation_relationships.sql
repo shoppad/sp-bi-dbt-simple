@@ -10,9 +10,15 @@ WITH
 ),
 {% endfor %}
 
+
+
 final AS (
     SELECT
         shop_subdomain,
+        COALESCE({%- for app in constellation_apps -%}
+            has_{{ app }} {%- if not loop.last %} OR {% endif -%}
+        {% endfor %}, FALSE) AS has_shoppad_constellation_app,
+
         {%- for app in constellation_apps %}
 
         COALESCE(has_{{ app }}, FALSE) as has_{{ app }}

@@ -122,14 +122,36 @@ workflow_enables AS (
     GROUP BY 1
 ),
 
+workflow_triggers AS (
+    SELECT
+        workflow_id,
+        integration_app AS trigger_app
+    FROM workflow_steps
+    WHERE step_type = 'input'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id) = 1
+),
+
+workflow_destintaions AS (
+    SELECT
+        workflow_id,
+        integration_app AS destination_app
+    FROM workflow_steps
+    WHERE step_type = 'output'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id DESC) = 1
+),
+
 final AS (
-    SELECT *
+    SELECT
+        *,
+        trigger_app || ' - ' || destination_app AS source_destination_pair
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)
     LEFT JOIN test_counts USING (workflow_id)
     LEFT JOIN workflow_saves USING (workflow_id)
     LEFT JOIN workflow_enables USING (workflow_id)
     LEFT JOIN thirty_day_workflow_counts USING (workflow_id)
+    LEFT JOIN workflow_triggers USING (workflow_id)
+    LEFT JOIN workflow_destintaions USING (workflow_id)
 )
 
 SELECT * FROM final
