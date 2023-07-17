@@ -27,6 +27,7 @@ final AS (
     SELECT
         _id AS workflow_id,
         {{ pacific_timestamp('created_at') }} AS created_at_pt,
+        created_at_pt::DATE AS created_on_pt,
         shop_subdomain,
         name AS title,
         COALESCE(is_premium, FALSE) AS is_premium,
