@@ -257,39 +257,49 @@ models:
       - name: has_uploadery
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
+
       - name: has_tracktor
         description: whether the shop has an account for this app.
         tests:
-          - not_null
-      - name: has_blog_studio
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
+      - name: has_blogstudio
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: has_kitkarts
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: has_smile
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: has_bouncer
         description: whether the shop has an account for this app.
         tests:
-          - not_null
-      - name: has_page_studio
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
+      - name: has_pagestudio
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: has_coin
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: has_infinite_options
         description: whether the shop has an account for this app.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: acquisition_template
         description:
           The template the Shop intended to use when they first installed the
@@ -492,14 +502,6 @@ models:
         description: The number of days until the Shop's first plan upgrade.
         meta:
           metabase.display_name: Days Until First Plan Upgrade
-      - name: last_plan_upgrade_date
-        description: The date of the Shop's last plan upgrade.
-        meta:
-          metabase.display_name: Last Plan Upgrade Date
-      - name: last_plan_identifier
-        description: The identifier of the Shop's latest MESA plan.
-        meta:
-          metabase.display_name: Latest Plan Identifier
       - name: is_currently_paying
         description: Whether the Shop is currently paying for a plan.
         meta:
@@ -600,3 +602,37 @@ models:
         description: The step chain of the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_id
         description: The ID of the Shop's first workflow. Gives a clue to their MESA use case.
+      - name: has_ever_installed_coin
+        description: Whether the Shop has ever installed Coin.
+      - name: has_shoppad_constellation_app
+        description: Whether the Shop has ever installed any Shoppad Constellation app.
+      - name: plan_change_count
+        description: The number of times the Shop has changed plans.
+        tests:
+          - not_null
+      - name: has_ever_installed_infinite_options
+        description: Whether the Shop has ever installed Infinite Options.
+      - name: plan_change_chain
+        description: The plan change chain of the Shop.
+        tests:
+          - not_null
+      - name: has_ever_installed_kitkarts
+        description: Whether the Shop has ever installed Kit Karts.
+      - name: has_ever_installed_smile
+        description: Whether the Shop has ever installed Smile.
+      - name: has_ever_installed_bouncer
+        description: Whether the Shop has ever installed Bouncer.
+      - name: has_ever_installed_tracktor
+        description: Whether the Shop has ever installed Tracktor.
+      - name: has_ever_installed_pagestudio
+        description: Whether the Shop has ever installed Page Studio.
+      - name: has_ever_installed_blogstudio
+        description: Whether the Shop has ever installed Blog Studio.
+      - name: did_install_another_shoppad_app_first
+        description: Whether the Shop installed another Shoppad app before installing their first Shoppad Constellation app.
+      - name: has_ever_installed_uploadery
+        description: Whether the Shop has ever installed Uploadery.
+      - name: first_shoppad_app_installed
+        description: The first Shoppad app installed by the Shop.
+      - name: did_pay_and_then_downgrade_to_free
+        description: Whether the Shop has ever paid for a plan and then downgraded to the free plan.

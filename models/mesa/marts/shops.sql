@@ -68,12 +68,6 @@ successful_workflow_run_counts AS (
     GROUP BY 1
 ),
 
-
-constellation_app_presences AS (
-    SELECT *
-    FROM {{ ref('int_mesa_constellation_relationships') }}
-),
-
 app_pageview_bookend_times AS (
     SELECT
         user_id AS shop_subdomain,
@@ -353,7 +347,6 @@ final AS (
     LEFT JOIN install_sources USING (shop_subdomain)
     LEFT JOIN max_funnel_steps USING (shop_subdomain)
     LEFT JOIN total_ltv_revenue USING (shop_subdomain)
-    LEFT JOIN constellation_app_presences USING (shop_subdomain)
     LEFT JOIN shop_infos USING (shop_subdomain)
     LEFT JOIN cohort_average_current_shop_gmv
     LEFT JOIN cohort_average_initial_shop_gmv USING (cohort_month)
