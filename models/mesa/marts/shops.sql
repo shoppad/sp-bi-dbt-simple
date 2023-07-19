@@ -276,7 +276,8 @@ plan_change_chains AS (
                 price
             ),
         ' • ') WITHIN GROUP (ORDER BY changed_at_pt ASC) AS plan_change_chain
-    FROM {{ ref('stg_mesa_plan_changes') }}
+    FROM shops
+    LEFT JOIN {{ ref('stg_mesa_plan_changes') }} USING (shop_subdomain)
     GROUP BY 1
 ),
 
@@ -335,7 +336,20 @@ final AS (
         END AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
         NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
-        plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free
+        plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free,
+        CASE
+            WHEN max_workflow_steps <= 2 THEN 1
+            WHEN max_workflow_steps BETWEEN 3 AND 4 THEN 2
+            ELSE 3
+            END AS virtual_plan_step_qualifier,
+        IFF(is_using_pro_apps, 2, 1) AS virtual_plan_pro_app_qualifier,
+        CASE
+            WHEN workflow_run_attempt_rolling_thirty_day_count <= 500 THEN 1
+            WHEN workflow_run_attempt_rolling_thirty_day_count BETWEEN 501 AND 5000 THEN 2
+            WHEN workflow_run_attempt_rolling_thirty_day_count BETWEEN 5001 AND 10000 THEN 3
+            ELSE 4
+            END AS virtual_plan_workflow_run_attempt_qualifier,
+        GREATEST(virtual_plan_step_qualifier, virtual_plan_pro_app_qualifier, virtual_plan_workflow_run_attempt_qualifier) AS virtual_plan
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

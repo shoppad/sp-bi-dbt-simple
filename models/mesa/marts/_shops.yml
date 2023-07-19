@@ -614,8 +614,6 @@ models:
         description: Whether the Shop has ever installed Infinite Options.
       - name: plan_change_chain
         description: The plan change chain of the Shop.
-        tests:
-          - not_null
       - name: has_ever_installed_kitkarts
         description: Whether the Shop has ever installed Kit Karts.
       - name: has_ever_installed_smile
@@ -636,3 +634,13 @@ models:
         description: The first Shoppad app installed by the Shop.
       - name: did_pay_and_then_downgrade_to_free
         description: Whether the Shop has ever paid for a plan and then downgraded to the free plan.
+      - name: virtual_plan
+        description: The v10 plan the Shop's usage qualifies for.
+        tests:
+          - not_null
+      - name: virtual_plan_workflow_run_attempt_qualifier
+        description: The qualifier for the Shop's virtual plan based on their workflow run attempts/triggers.
+      - name: virtual_plan_pro_app_qualifier
+        description: The qualifier for the Shop's virtual plan based on their pro app usage.
+      - name: virtual_plan_step_qualifier
+        description: The qualifier for the Shop's virtual plan based on their workflow step usage.
