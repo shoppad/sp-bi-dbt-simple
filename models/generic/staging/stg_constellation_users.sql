@@ -16,7 +16,7 @@ WITH constellation_users AS (
         shopify_planname,
         analytics_orders >= 50 AND shopify_createdat <= (CURRENT_DATE - INTERVAL '2 years') AS is_mql,
         {%- for app in constellation_apps %}
-            COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_isactive, FALSE) AS has_{{ app }},
+            COALESCE(COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_isactive, apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL), FALSE) AS has_{{ app }},
             COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL, FALSE) AS has_ever_installed_{{ app }}{%- if not loop.last %}, {% endif -%}
         {%- endfor %},
         COALESCE({%- for app in constellation_apps -%}

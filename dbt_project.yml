@@ -41,6 +41,19 @@ vars:
     - json_webhook
     - quickbooks
     - gorgias
+    - ftp
+    - image
+    - openai
+    - chatgpt
+    - shipstation
+    - api
+    - airtable
+    - data
+    - dalle
+    - square
+    - klaviyo
+    - gorgias
+    - webrequest
 
   etl_fields:
     [
