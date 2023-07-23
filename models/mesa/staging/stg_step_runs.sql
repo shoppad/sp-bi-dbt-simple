@@ -46,7 +46,7 @@ decorated_step_runs AS (
         metadata:trigger:trigger_key::VARCHAR AS workflow_step_key,
         metadata:is_test AS is_test_run,
         {{ groomed_column_list(source('mongo_sync', 'tasks'), except=columns_to_skip)  | join(",\n      ") }},
-        metadata:backfill_id IS NOT NULL AS is_time_travel
+        COALESCE(NOT IS_NULL_VALUE(metadata:backfill_id), FALSE) AS is_time_travel
     FROM
         {{ source('mongo_sync', 'tasks') }}
     WHERE

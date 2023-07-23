@@ -335,7 +335,8 @@ final AS (
             ELSE 'K-$2,500,000+'
         END AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
-        NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
+        average_daily_revenue > 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
+        average_daily_revenue = 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
         plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free,
         CASE
             WHEN max_workflow_steps <= 2 THEN 1
