@@ -143,7 +143,8 @@ workflow_destintaions AS (
 final AS (
     SELECT
         *,
-        trigger_app || ' - ' || destination_app AS source_destination_pair
+        trigger_app || ' - ' || destination_app AS source_destination_pair,
+        COALESCE(template_name IS NOT NULL AND template_name != '', FALSE) AS is_from_template
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)
     LEFT JOIN test_counts USING (workflow_id)
@@ -154,4 +155,5 @@ final AS (
     LEFT JOIN workflow_destintaions USING (workflow_id)
 )
 
-SELECT * FROM final
+SELECT *
+FROM final

@@ -167,3 +167,13 @@ models:
         description: The ordered list of apps in the workflow.
       - name: step_chain
         description: The ordered list of steps in the workflow.
+      - name: trigger_app
+        description: The app that triggered the workflow.
+      - name: created_on_pt
+        description: The timestamp of the workflow's creation in PT.
+        tests:
+          - not_null
+      - name: source_destination_pair
+        description: The source and destination apps in the workflow.
+      - name: destination_app
+        description: The destination app in the workflow.
