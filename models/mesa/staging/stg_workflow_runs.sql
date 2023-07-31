@@ -17,7 +17,7 @@ first_step_runs AS (
         _created_at AS workflow_run_at_utc,
         {{ pacific_timestamp("_created_at") }} AS workflow_run_at_pt,
         DATE_TRUNC('day', workflow_run_at_pt)::DATE AS workflow_run_on_pt,
-        status AS run_status,
+        status AS run_status, {# TODO: Status "stop" is not put on the trigger. #}
         NULLIF(metadata:unbillable_reason::STRING, '') AS unbillable_reason,
         unbillable_reason IS NOT NULL AS is_free_workflow,
         unbillable_reason IS NULL AS is_billable,

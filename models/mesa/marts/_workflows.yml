@@ -177,3 +177,5 @@ models:
         description: The source and destination apps in the workflow.
       - name: destination_app
         description: The destination app in the workflow.
+      - name: is_from_template
+        description: Whether the workflow was created from a template.

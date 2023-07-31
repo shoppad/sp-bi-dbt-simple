@@ -49,7 +49,9 @@ workflow_run_counts AS (
     SELECT
         shop_subdomain,
         COALESCE(COUNT(DISTINCT workflow_id), 0) AS unique_workflows_attempted_count,
-        COALESCE(COUNT(workflow_runs.workflow_run_id), 0) AS workflow_runs_attempted_count
+        COALESCE(COUNT(workflow_runs.workflow_run_id), 0) AS workflow_runs_attempted_count,
+        COALESCE(COUNT_IF(workflow_runs.is_stop), 0) AS workflow_runs_stop_count,
+        COALESCE(COUNT_IF(workflow_runs.is_failure), 0) AS workflow_runs_fail_count
     FROM shops
     LEFT JOIN {{ ref('workflow_runs') }} USING (shop_subdomain)
     GROUP BY 1
@@ -91,8 +93,12 @@ current_rolling_counts AS (
         shop_subdomain,
         COALESCE(workflow_run_attempt_rolling_thirty_day_count, 0) AS workflow_run_attempt_rolling_thirty_day_count,
         COALESCE(workflow_run_success_rolling_thirty_day_count, 0) AS workflow_run_success_rolling_thirty_day_count,
+        COALESCE(workflow_run_failure_rolling_thirty_day_count, 0) AS workflow_run_failure_rolling_thirty_day_count,
+        COALESCE(workflow_run_stop_rolling_thirty_day_count, 0) AS workflow_run_stop_rolling_thirty_day_count,
         COALESCE(workflow_run_attempt_rolling_year_count, 0) AS workflow_run_attempt_rolling_year_count,
         COALESCE(workflow_run_success_rolling_year_count, 0) AS workflow_run_success_rolling_year_count,
+        COALESCE(workflow_run_failure_rolling_year_count, 0) AS workflow_run_failure_rolling_year_count,
+        COALESCE(workflow_run_stop_rolling_year_count, 0) AS workflow_run_stop_rolling_year_count,
         COALESCE(income_rolling_thirty_day_total, 0) AS income_rolling_thirty_day_total,
         COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total,
         COALESCE(total_workflow_steps_rolling_thirty_day_count, 0) AS total_workflow_steps_rolling_thirty_day_count,

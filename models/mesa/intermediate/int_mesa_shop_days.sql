@@ -28,7 +28,9 @@ workflow_runs AS (
         shop_subdomain,
         workflow_run_id,
         workflow_run_on_pt AS dt,
-        is_successful
+        is_successful,
+        is_failure,
+        is_stop
     FROM {{ ref('int_workflow_runs') }}
 ),
 
@@ -38,6 +40,8 @@ daily_workflow_run_counts AS (
         dt,
         COALESCE(COUNT(workflow_runs.workflow_run_id), 0) AS workflow_runs_attempted_count,
         COALESCE(COUNT_IF(workflow_runs.is_successful), 0) AS workflow_runs_success_count,
+        COALESCE(COUNT_IF(workflow_runs.is_failure), 0) AS workflow_runs_failure_count,
+        COALESCE(COUNT_IF(workflow_runs.is_stop), 0) AS workflow_runs_stop_count,
         COALESCE((workflow_runs_success_count / NULLIF(workflow_runs_attempted_count, 0)), 0) AS workflow_success_percent
     FROM shop_calendar
     LEFT JOIN workflow_runs USING (shop_subdomain, dt)
@@ -56,7 +60,9 @@ thirty_day_workflow_counts AS (
         shop_subdomain,
         dt,
         COALESCE(SUM(workflow_runs_attempted_count), 0) AS workflow_run_attempt_rolling_thirty_day_count,
-        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_run_success_rolling_thirty_day_count
+        COALESCE(SUM(workflow_runs_success_count), 0) AS workflow_run_success_rolling_thirty_day_count,
+        COALESCE(SUM(workflow_runs_failure_count), 0) AS workflow_run_failure_rolling_thirty_day_count,
+        COALESCE(SUM(workflow_runs_stop_count), 0) AS workflow_run_stop_rolling_thirty_day_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
