@@ -1,7 +1,7 @@
 dbt-core
 dbt-snowflake
 dbt-rpc
-sqlfluff==2.1.4
+sqlfluff
 dbt-metabase
 pre-commit
-sqlfluff-templater-dbt==2.1.4
+sqlfluff-templater-dbt
