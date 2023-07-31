@@ -87,7 +87,9 @@ year_workflow_counts AS (
         shop_subdomain,
         dt,
         SUM(COALESCE(workflow_runs_attempted_count, 0)) AS workflow_run_attempt_rolling_year_count,
-        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_run_success_rolling_year_count
+        SUM(COALESCE(workflow_runs_success_count, 0)) AS workflow_run_success_rolling_year_count,
+        SUM(COALESCE(workflow_runs_failure_count, 0)) AS workflow_run_failure_rolling_year_count,
+        SUM(COALESCE(workflow_runs_stop_count, 0)) AS workflow_run_stop_rolling_year_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
     WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(YEAR, -1, shop_calendar.dt) AND shop_calendar.dt
