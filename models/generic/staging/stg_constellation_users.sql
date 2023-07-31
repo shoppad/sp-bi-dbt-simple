@@ -14,7 +14,7 @@ WITH constellation_users AS (
         shopify_inactiveat,
         shopify_plandisplayname,
         shopify_planname,
-        analytics_gmv > 3000 OR shopify_planname IN ('professional', 'unlimited', 'shopify_plus') AS is_mql,
+        COALESCE(analytics_gmv > 3000, FALSE) OR shopify_planname IN ('professional', 'unlimited', 'shopify_plus') AS is_mql,
         {%- for app in constellation_apps %}
             COALESCE(COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_isactive, apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL), FALSE) AS has_{{ app }},
             COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL, FALSE) AS has_ever_installed_{{ app }}{%- if not loop.last %}, {% endif -%}
