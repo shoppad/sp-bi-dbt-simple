@@ -1,0 +1,17 @@
+version: 2
+models:
+  - name: stg_newsletters
+    columns:
+      - name: newsletter_id
+      - name: content_ids
+      - name: name
+      - name: sent_at
+      - name: created
+      - name: updated
+      - name: type
+      - name: tags
+      - name: recipient_segment_ids
+      - name: subscription_topic_id
+      - name: __hevo__ingested_at
+      - name: __hevo__loaded_at
+      - name: workspace

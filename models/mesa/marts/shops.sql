@@ -256,6 +256,17 @@ email_conversion_details AS (
     GROUP BY 1
 ),
 
+email_unsubscribe_details AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(email_unsubscribe_email_type IS NOT NULL, FALSE) AS has_unsubscribed_from_email,
+        email_unsubscribe_email_type,
+        email_unsubscribe_email_name
+    FROM shops
+    LEFT JOIN {{ ref('stg_email_unsubscribes') }} USING (shop_subdomain)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY __HEVO__INGESTED_AT DESC) = 1
+),
+
 first_workflow_keys AS (
     SELECT *
     FROM {{ ref('int_first_workflow_keys') }}
@@ -379,6 +390,7 @@ final AS (
     LEFT JOIN max_workflow_steps USING (shop_subdomain)
     LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
     LEFT JOIN plan_change_chains USING (shop_subdomain)
+    LEFT JOIN email_unsubscribe_details USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

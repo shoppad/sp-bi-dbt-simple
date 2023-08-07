@@ -1,4 +1,20 @@
 WITH
+campaigns AS (
+    SELECT
+        campaign_id,
+        name AS campaign_name,
+        type AS campaign_type
+    FROM {{ ref('stg_campaigns') }}
+),
+
+newsletters AS (
+    SELECT
+        newsletter_id,
+        name AS newsletter_name,
+        type AS newsletter_type
+    FROM {{ ref('stg_newsletters') }}
+),
+
 raw_email_opens AS (
     SELECT
         *
@@ -19,3 +35,7 @@ raw_email_opens AS (
 
 SELECT *
 FROM raw_email_opens
+LEFT JOIN campaigns USING (campaign_id)
+LEFT JOIN newsletters USING (newsletter_id)
+WHERE campaign_id IN (SELECT campaign_id FROM campaigns)
+    OR newsletter_id IN (SELECT newsletter_id FROM newsletters)

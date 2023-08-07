@@ -2,6 +2,7 @@ WITH
 shops AS (
     SELECT *
     FROM {{ ref('shops') }}
+    WHERE is_mql
 ),
 
 workflow_setup_counts AS (

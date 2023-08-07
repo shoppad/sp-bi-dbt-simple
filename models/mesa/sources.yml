@@ -774,3 +774,13 @@ sources:
         identifier: CUSTOMER_IO_EMAIL_LINK_CLICKED
       - name: email_conversions
         identifier: CUSTOMER_IO_EMAIL_CONVERTED
+      - name: newsletters_shoppad
+        identifier: CIO_NEWSLETTERS_SHOPPAD
+      - name: newsletters_marketing
+        identifier: CIO_NEWSLETTERS_MARKETING
+      - name: campaigns_shoppad
+        identifier: CIO_CAMPAIGNS_SHOPPAD
+      - name: campaigns_marketing
+        identifier: CIO_CAMPAIGNS_MARKETING
+      - name: email_unsubscribes_shoppad
+        identifier: CUSTOMER_IO_EMAIL_UNSUBSCRIBED

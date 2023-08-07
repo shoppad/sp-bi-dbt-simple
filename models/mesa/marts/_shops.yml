@@ -644,3 +644,19 @@ models:
         description: The qualifier for the Shop's virtual plan based on their pro app usage.
       - name: virtual_plan_step_qualifier
         description: The qualifier for the Shop's virtual plan based on their workflow step usage.
+      - name: workflow_runs_stop_count
+        description: The number of workflow runs that have resulted in Stop.
+        tests:
+          - not_null
+      - name: is_likely_shopify_plus_dev_store
+        description: Whether the Shop is likely a Shopify Plus dev store and therefore not valuable.
+      - name: workflow_run_failure_rolling_year_count
+        description: The number of workflow runs that have resulted in Failure in the last year.
+      - name: workflow_run_stop_rolling_year_count
+        description: The number of workflow runs that have resulted in Stop in the last year.
+      - name: workflow_run_stop_rolling_thirty_day_count
+        description: The number of workflow runs that have resulted in Stop in the last 30 days.
+      - name: workflow_runs_fail_count
+        description: The number of workflow runs that have resulted in Failure.
+      - name: workflow_run_failure_rolling_thirty_day_count
+        description: The number of workflow runs that have resulted in Failure in the last 30 days.
