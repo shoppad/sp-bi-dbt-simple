@@ -181,6 +181,7 @@ thirty_day_revenue AS (
         shop_subdomain,
         COALESCE(AVG(daily_usage_revenue), 0) AS average_daily_usage_revenue,
         COALESCE(AVG(inc_amount), 0) AS average_daily_revenue,
+        average_daily_revenue * 30 AS projected_mrr,
         COALESCE(SUM(inc_amount), 0) AS total_thirty_day_revenue
     FROM shops
     LEFT JOIN last_thirty_days USING (shop_subdomain)
