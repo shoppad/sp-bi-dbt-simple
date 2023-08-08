@@ -784,3 +784,19 @@ sources:
         identifier: CIO_CAMPAIGNS_MARKETING
       - name: email_unsubscribes_shoppad
         identifier: CUSTOMER_IO_EMAIL_UNSUBSCRIBED
+
+  - name: customer_io_deprecated
+    description: tables synced from customer.io prior to June 2023
+    database: mongo
+    schema: customer_io
+    loader: hevo
+    loaded_at_field: __HEVO__LOADED_AT
+    tables:
+      - name: email_opens_deprecated
+        identifier: EMAIL_OPENED
+      - name: email_clicks_deprecated
+        identifier: EMAIL_LINK_CLICKED
+      - name: email_conversions_deprecated
+        identifier: EMAIL_CONVERTED
+      - name: email_unsubscribes_deprecated
+        identifier: EMAIL_UNSUBSCRIBED
