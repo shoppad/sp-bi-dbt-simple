@@ -1,0 +1,5 @@
+version: 2
+models:
+  - name: metricflow_time_spine
+    columns:
+      - name: date_day

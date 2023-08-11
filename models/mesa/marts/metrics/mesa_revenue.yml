@@ -1,15 +1,23 @@
-version: 2
-metrics:
-  - name: total_mesa_revenue
-    label: Revenue from the mesa_charges table.
+semantic_models:
+  - name: revenue
+    description: Revenue from the mesa_charges table.
     model: ref('mesa_charges')
-    description: "The Mesa-attributed revenue."
 
-    calculation_method: sum
-    expression: billed_amount
+    defaults:
+      agg_time_dimension: metric_time
 
-    timestamp: charged_on_pt
-    time_grains: [day, week, month, all_time]
+    entities: #Entities. These usually correspond to keys in the table.table.
+      - name: shop
+        type: foreign
+        expr: shop_subdomain
 
-    dimensions:
-      - shop_subdomain
+    measures: #Measures. These are the aggregations on the columns in the table.
+      - name: billed_amount
+        agg: sum
+    dimensions: #Dimensions,either categorical or time. These add additional context to metrics. The typical querying pattern is Metric by Dimension.
+      - name: charge_date
+        expr: charged_on_pt
+        type: time
+        is_partition: True
+        type_params:
+          time_granularity: day
