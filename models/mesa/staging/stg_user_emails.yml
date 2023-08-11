@@ -1,0 +1,7 @@
+version: 2
+models:
+  - name: stg_user_emails
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: email

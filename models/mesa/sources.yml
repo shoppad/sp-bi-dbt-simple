@@ -776,6 +776,8 @@ sources:
         identifier: CUSTOMER_IO_EMAIL_CONVERTED
       - name: newsletters_shoppad
         identifier: CIO_NEWSLETTERS_SHOPPAD
+      - name: email_sends
+        identifier: CUSTOMER_IO_EMAIL_SENT
       - name: newsletters_marketing
         identifier: CIO_NEWSLETTERS_MARKETING
       - name: campaigns_shoppad
@@ -800,3 +802,5 @@ sources:
         identifier: EMAIL_CONVERTED
       - name: email_unsubscribes_deprecated
         identifier: EMAIL_UNSUBSCRIBED
+      - name: email_sends
+        identifier: EMAIL_sent

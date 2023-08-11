@@ -299,6 +299,11 @@ plan_change_chains AS (
     GROUP BY 1
 ),
 
+first_newsletter_deliveries AS (
+    SELECT *
+    FROM {{ ref('int_first_newsletter_deliveries') }}
+),
+
 final AS (
     SELECT
         * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
@@ -368,7 +373,8 @@ final AS (
             WHEN workflow_run_attempt_rolling_thirty_day_count BETWEEN 5001 AND 10000 THEN 3
             ELSE 4
             END AS virtual_plan_workflow_run_attempt_qualifier,
-        GREATEST(virtual_plan_step_qualifier, virtual_plan_pro_app_qualifier, virtual_plan_workflow_run_attempt_qualifier) AS virtual_plan
+        GREATEST(virtual_plan_step_qualifier, virtual_plan_pro_app_qualifier, virtual_plan_workflow_run_attempt_qualifier) AS virtual_plan,
+        COALESCE(first_newsletter_sent_at_pt < first_installed_at_pt - INTERVAL '24 hours', FALSE) AS is_email_acquisition
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
@@ -392,6 +398,7 @@ final AS (
     LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
     LEFT JOIN plan_change_chains USING (shop_subdomain)
     LEFT JOIN email_unsubscribe_details USING (shop_subdomain)
+    LEFT JOIN first_newsletter_deliveries USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 

@@ -660,3 +660,23 @@ models:
         description: The number of workflow runs that have resulted in Failure.
       - name: workflow_run_failure_rolling_thirty_day_count
         description: The number of workflow runs that have resulted in Failure in the last 30 days.
+      - name: email_unsubscribe_email_name
+        description: The name of the email the Shop unsubscribed from.
+      - name: first_shoppad_app_installed_at_pt
+        description: The date/time the Shop installed their first Shoppad app.
+      - name: is_email_acquisition
+        description: Whether the Shop was acquired via email/email played a role in their journey.
+      - name: has_unsubscribed_from_email
+        description: Whether the Shop has unsubscribed from email.
+      - name: first_shoppad_app_installed_at_utc
+        description: The date/time the Shop installed their first Shoppad app in UTC.
+      - name: projected_mrr
+        description: Their daily average MRR multiplied by 30.
+        tests:
+          - not_null
+      - name: first_newsletter_sent_on_pt
+        description: The date the Shop received their first newsletter.
+      - name: email_unsubscribe_email_type
+        description: The type of email the Shop unsubscribed from.
+      - name: first_newsletter_sent_at_pt
+        description: The date/time the Shop received their first newsletter.

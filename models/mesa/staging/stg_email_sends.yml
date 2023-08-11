@@ -1,28 +1,27 @@
 version: 2
 models:
-  - name: stg_email_unsubscribes
+  - name: stg_email_sends
     columns:
       - name: newsletter_id
       - name: campaign_id
-      - name: content_id
+      - name: action_id
       - name: shop_subdomain
         description: The foreign key for the Shop.
       - name: delivery_id
-      - name: recipient
-      - name: userid
-      - name: __hevo_id
-      - name: subject
-      - name: __hevo__ingested_at
-      - name: __hevo__loaded_at
-      - name: action_id
-      - name: failure_message
       - name: journey_id
-      - name: parent_action_id
+      - name: subject
+      - name: content_id
       - name: trigger_event_id
+      - name: parent_action_id
+      - name: sent_at_utc
+      - name: sent_at_pt
+      - name: email_type
+      - name: email_id
+      - name: recipient
       - name: campaign_name
       - name: campaign_type
+      - name: campaign_workspace
       - name: newsletter_name
       - name: newsletter_type
+      - name: newsletter_workspace
       - name: workspace
-      - name: email_unsubscribe_email_type
-      - name: email_unsubscribe_email_name
