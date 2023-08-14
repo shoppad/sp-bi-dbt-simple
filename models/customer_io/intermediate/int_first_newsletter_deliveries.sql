@@ -3,7 +3,9 @@ first_newsletter_sends AS (
     SELECT
         recipient AS email,
         MIN(sent_at_pt) AS first_newsletter_sent_at_pt,
-        first_newsletter_sent_at_pt::DATE AS first_newsletter_sent_on_pt
+        first_newsletter_sent_at_pt::DATE AS first_newsletter_sent_on_pt,
+        MIN_BY(newsletter_name, sent_at_pt) AS first_newsletter_sent_name,
+        MIN_BY(subject, sent_at_pt) AS first_newsletter_sent_subject
     FROM {{ ref('stg_email_sends') }}
     WHERE newsletter_id IS NOT NULL
     GROUP BY 1

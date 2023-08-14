@@ -381,12 +381,14 @@ final AS (
             END AS virtual_plan_workflow_run_attempt_qualifier,
         GREATEST(virtual_plan_step_qualifier, virtual_plan_pro_app_qualifier, virtual_plan_workflow_run_attempt_qualifier) AS virtual_plan,
         COALESCE(LEAST(
-            first_newsletter_sent_at_pt,
-            first_journey_sent_at_pt,
-            first_broadcast_email_clicked_at_pt,
-            first_journey_email_open_at_pt,
-            first_journey_email_converted_at_pt
-        ) < first_installed_at_pt - INTERVAL '24 hours', FALSE)
+            COALESCE(first_newsletter_sent_at_pt, current_timestamp()),
+            COALESCE(first_broadcast_email_clicked_at_pt, current_timestamp()),
+            COALESCE(first_broadcast_email_open_at_pt, current_timestamp()),
+            COALESCE(first_broadcast_email_converted_at_pt, current_timestamp()),
+            COALESCE(first_journey_sent_at_pt, current_timestamp()),
+            COALESCE(first_journey_email_open_at_pt, current_timestamp()),
+            COALESCE(first_journey_email_converted_at_pt, current_timestamp())
+        ) < first_installed_at_pt, FALSE)
             AS is_email_acquisition
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
@@ -415,14 +417,5 @@ final AS (
     LEFT JOIN first_journey_deliveries USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
-
-SELECT
-    first_newsletter_sent_at_pt,
-            first_journey_sent_at_pt,
-            first_broadcast_email_clicked_at_pt,
-            first_journey_email_open_at_pt,
-            first_journey_email_converted_at_pt,
-    is_email_acquisition,
-    first_installed_at_pt
+SELECT *
 FROM final
-WHERE shop_subdomain = 'cloud9gg'

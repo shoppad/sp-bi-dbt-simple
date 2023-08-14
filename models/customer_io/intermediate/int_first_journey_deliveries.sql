@@ -3,7 +3,9 @@ first_journey_sends AS (
     SELECT
         recipient AS email,
         MIN(sent_at_pt) AS first_journey_sent_at_pt,
-        first_journey_sent_at_pt::DATE AS first_journey_sent_on_pt
+        first_journey_sent_at_pt::DATE AS first_journey_sent_on_pt,
+        MIN_BY(campaign_name, sent_at_pt) AS first_journey_sent_name,
+        MIN_BY(subject, sent_at_pt) AS first_journey_sent_subject
     FROM {{ ref('stg_email_sends') }}
     WHERE campaign_id IS NOT NULL
     GROUP BY 1
