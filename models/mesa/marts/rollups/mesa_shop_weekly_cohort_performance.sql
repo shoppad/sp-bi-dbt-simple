@@ -168,7 +168,7 @@ constellation_comparison_groups AS (
         AVG(constellation_mql_count)
             OVER (ORDER BY constellation_cohort_week ROWS BETWEEN 3 PRECEDING AND CURRENT ROW)
             AS avg_constellation_mql_count,
-        avg_constellation_mql_count / avg_constellation_cohort_size
+        avg_constellation_mql_count / NULLIF(avg_constellation_cohort_size, 0)
             AS avg_constellation_mql_pct
     FROM weekly_constellation_installs
 ),
@@ -180,9 +180,9 @@ decorated_constellation_comparison_groups AS (
             OVER (ORDER BY cohort_week) AS last_period_avg_constellation_cohort_size,
         LAG(avg_constellation_mql_count)
             OVER (ORDER BY cohort_week) AS last_period_avg_constellation_mql_count,
-        avg_constellation_cohort_size / last_period_avg_constellation_cohort_size - 1
+        avg_constellation_cohort_size / NULLIF(last_period_avg_constellation_cohort_size - 1, 0)
             AS avg_constellation_cohort_size_growth,
-        avg_constellation_mql_count / last_period_avg_constellation_mql_count - 1
+        avg_constellation_mql_count / NULLIF(last_period_avg_constellation_mql_count - 1, 0)
             AS avg_constellation_mql_count_growth
     FROM constellation_comparison_groups
 ),
@@ -207,16 +207,15 @@ final AS (
         total_ltv_revenue / NULLIF(has_enabled_a_workflow_count, 0) AS lifetime_value_enabled_workflow,
         total_ltv_revenue / NULLIF(is_activated_count, 0) AS lifetime_value_activated,
 
-
         {# MESA Install Growth #}
         LAG(cohort_size) OVER (ORDER BY cohort_week) AS prior_one_week_new_customer_count,
-        cohort_size / NULLIF(prior_one_week_new_customer_count, 0) - 1 AS mesa_growth_rate,
+        cohort_size / NULLIF(prior_one_week_new_customer_count- 1, 0) AS mesa_growth_rate,
         cohort_size * NULLIF(1 - avg_constellation_cohort_size_growth, 0) AS normalized_customer_count,
         mesa_growth_rate * NULLIF(1 - avg_constellation_cohort_size_growth, 0) AS normalized_customer_growth,
 
         {# MESA MQL Growth #}
         LAG(mql_count) OVER (ORDER BY cohort_week) AS prior_one_week_mql_count,
-        mql_count / NULLIF(prior_one_week_mql_count, 0) - 1 AS mql_growth_rate,
+        mql_count / NULLIF(prior_one_week_mql_count- 1, 0)  AS mql_growth_rate,
         mql_count * NULLIF(1 - avg_constellation_mql_count_growth, 0) AS normalized_mql_count,
         mql_growth_rate * NULLIF(1 - avg_constellation_mql_count_growth, 0) AS normalized_mql_growth
 

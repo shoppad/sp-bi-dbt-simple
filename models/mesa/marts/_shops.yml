@@ -680,3 +680,7 @@ models:
         description: The type of email the Shop unsubscribed from.
       - name: first_newsletter_sent_at_pt
         description: The date/time the Shop received their first newsletter.
+      - name: first_journey_sent_on_pt
+        description: The date the Shop received their first journey email.
+      - name: first_journey_sent_at_pt
+        description: The date/time the Shop received their first journey email.

@@ -12,17 +12,19 @@ install_page_sessions AS (
 
     SELECT
         session_id,
-        tstamp
+        tstamp,
+        anonymous_id
     FROM {{ ref('segment_web_page_views__sessionized') }}
     WHERE page_url_path ILIKE '%/apps/mesa/install%'
 
 ),
 
-segment_web_sessions AS (
+first_segment_web_sessions AS (
     SELECT
         * EXCLUDE (blended_user_id),
         blended_user_id AS shop_subdomain
     FROM {{ ref('segment_web_sessions') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY blended_user_id ORDER BY session_start_tstamp ASC) = 1
 ),
 
 raw_install_events AS (
@@ -50,7 +52,7 @@ formatted_install_pageviews AS (
         END AS acquisition_source,
         COALESCE(referrer_medium, utm_medium) AS acquisition_medium
     FROM install_page_sessions
-    LEFT JOIN segment_web_sessions USING (session_id)
+    LEFT JOIN first_segment_web_sessions USING (anonymous_id)
     LEFT JOIN shops USING (shop_subdomain)
     WHERE
         acquisition_source IS NOT NULL
@@ -93,6 +95,7 @@ combined_install_sources AS (
         COALESCE(formatted_install_pageviews.acquisition_medium, formatted_install_events.acquisition_medium) AS acquisition_medium
     FROM formatted_install_pageviews
     FULL OUTER JOIN formatted_install_events USING (shop_subdomain)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY COALESCE(formatted_install_pageviews.tstamp_pt, formatted_install_events.tstamp_pt) ASC) = 1
 ),
 
 referrer_mapping as (

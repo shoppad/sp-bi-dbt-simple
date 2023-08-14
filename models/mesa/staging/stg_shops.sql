@@ -75,7 +75,7 @@ uninstall_data_points AS (
     LEFT JOIN (
         SELECT
             id AS shop_subdomain,
-            apps_mesa_uninstalledat AS uninstalled_at_pt -- NOTE: This timestamp is already in PST
+            apps_mesa_uninstalledat AS uninstalled_at_pt,-- NOTE: This timestamp is already in PST
         FROM {{ source('php_segment', 'users') }}
 
         UNION ALL

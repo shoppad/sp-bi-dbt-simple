@@ -847,7 +847,9 @@
       "cachable"
     ],
     "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true,
-    "sqlfluff.env.useDotEnvFile": true
+    "sqlfluff.env.useDotEnvFile": true,
+    "WizardForDbtCore(TM).trace.server": "messages",
+    "dbt.queryScale": 0.87
   },
   "extensions": {
       "recommendations": [
