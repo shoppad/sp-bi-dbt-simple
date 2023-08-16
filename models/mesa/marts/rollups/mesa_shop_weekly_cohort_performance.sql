@@ -114,8 +114,10 @@ workflows_enabled_time_buckets AS (
 plan_upgrade_counts AS (
     SELECT
         cohort_week,
-        COUNT_IF(ever_upgraded_to_paid_plan) AS ever_paid_plan_count,
-        ever_paid_plan_count / NULLIF(COUNT(*), 0) AS ever_paid_plan_pct,
+        COUNT_IF(has_done_a_trial) AS has_done_a_trial_count,
+        has_done_a_trial_count / COUNT(*) AS ever_did_trial_pct,
+        COUNT_IF(has_ever_upgraded_to_paid_plan) AS ever_paid_plan_count,
+        ever_paid_plan_count / COUNT(*) AS ever_paid_plan_pct,
         COUNT_IF(first_plan_upgrade_date < DATEADD('day', 1, first_installed_at_pt)) AS paid_plan_first_day_count,
         paid_plan_first_day_count / NULLIF(COUNT(*), 0) AS paid_plan_first_day_pct,
         COUNT_IF(first_plan_upgrade_date < DATEADD('day', 2, first_installed_at_pt)) AS paid_plan_first_two_days_count,

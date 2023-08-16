@@ -32,6 +32,7 @@ workflow_runs AS (
         is_failure,
         is_stop
     FROM {{ ref('int_workflow_runs') }}
+    WHERE workflow_name NOT ILIKE '%report card%'
 ),
 
 daily_workflow_run_counts AS (
@@ -65,7 +66,8 @@ thirty_day_workflow_counts AS (
         COALESCE(SUM(workflow_runs_stop_count), 0) AS workflow_run_stop_rolling_thirty_day_count
     FROM shop_calendar
     LEFT JOIN daily_workflow_run_counts USING (shop_subdomain)
-    WHERE daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
+    WHERE
+        daily_workflow_run_counts.dt BETWEEN DATEADD(DAY, -30, shop_calendar.dt) AND shop_calendar.dt
     GROUP BY 1, 2
 ),
 

@@ -367,6 +367,15 @@ final AS (
         average_daily_revenue > 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
         average_daily_revenue = 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
         plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free,
+        has_ever_upgraded_to_paid_plan AND NOT is_currently_paying AS has_churned,
+        CASE
+            WHEN NOT has_done_a_trial THEN '1-Has Not Done A Trial'
+            WHEN has_done_a_trial_but_not_upgraded_to_paid_plan THEN '2-Has Done A Trial But Not Upgraded To Paid Plan'
+            WHEN has_ever_upgraded_to_paid_plan AND NOT is_currently_paying THEN '3-Paid and Then Churned'
+            WHEN is_currently_paying THEN '4-Currently Paying'
+            ELSE '5-Not trial but a paid plan (should not happen)'
+        END AS plan_upgrade_funnel_status,
+
         CASE
             WHEN max_workflow_steps <= 2 THEN 1
             WHEN max_workflow_steps BETWEEN 3 AND 4 THEN 2
@@ -417,5 +426,6 @@ final AS (
     LEFT JOIN first_journey_deliveries USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
+
 SELECT *
 FROM final

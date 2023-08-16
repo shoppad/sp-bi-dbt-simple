@@ -59,9 +59,24 @@ plan_upgrade_dates AS (
     SELECT
         shop_subdomain,
         MIN(dt) AS first_plan_upgrade_date,
-        MIN_BY(mesa_plan_identifier, dt) AS first_plan_identifier
-    FROM {{ ref('int_mesa_shop_days') }}
-    WHERE inc_amount > 0
+        MIN_BY(mesa_plan_identifier, dt) AS first_plan_identifier,
+        COUNT_IF(inc_amount > 0) AS paid_days_completed,
+        paid_days_completed > 0 AS has_ever_upgraded_to_paid_plan
+    FROM decorated_shops
+    LEFT JOIN (SELECT * FROM {{ ref('int_mesa_shop_days') }} WHERE inc_amount > 0) USING (shop_subdomain)
+    GROUP BY 1
+),
+
+trial_dates AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS first_trial_start_date,
+        MIN_BY(mesa_plan_identifier, dt) AS first_trial_plan_identifier,
+        COUNT_IF(is_in_trial) AS trial_days_completed,
+        trial_days_completed > 0 AS has_done_a_trial
+    FROM decorated_shops
+    LEFT JOIN (SELECT * FROM {{ ref('int_mesa_shop_days') }} WHERE is_in_trial) USING (shop_subdomain)
+
     GROUP BY 1
 ),
 
@@ -78,14 +93,15 @@ final AS (
         1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
         1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
         COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported,
+        first_trial_start_date - first_installed_on_pt AS days_until_first_trial,
         first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade,
-        COALESCE(first_plan_upgrade_date IS NOT NULL, FALSE) AS ever_upgraded_to_paid_plan
-
+        has_done_a_trial AND NOT has_ever_upgraded_to_paid_plan AS has_done_a_trial_but_not_upgraded_to_paid_plan
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
     LEFT JOIN conversion_rates USING (currency)
     LEFT JOIN plan_upgrade_dates USING (shop_subdomain)
+    LEFT JOIN trial_dates USING (shop_subdomain)
 
 )
 

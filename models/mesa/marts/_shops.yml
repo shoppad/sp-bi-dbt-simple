@@ -490,7 +490,7 @@ models:
           metabase.display_name: Is In Trial?
         tests:
           - not_null
-      - name: ever_upgraded_to_paid_plan
+      - name: has_ever_upgraded_to_paid_plan
         description: Whether the Shop has ever upgraded to a paid plan.
         meta:
           metabase.display_name: Ever Upgraded to Paid Plan?
@@ -684,3 +684,33 @@ models:
         description: The date the Shop received their first journey email.
       - name: first_journey_sent_at_pt
         description: The date/time the Shop received their first journey email.
+      - name: has_churned
+        description: Whether the Shop has churned.
+      - name: first_trial_plan_identifier
+        description: The identifier of the Shop's first trial plan.
+      - name: plan_upgrade_funnel_status
+        description: The status of the Shop's plan upgrade funnel through trial, paying and churn.
+      - name: first_journey_sent_name
+        description: The name of the first journey email the Shop received.
+      - name: first_journey_sent_subject
+        description: The subject of the first journey email the Shop received.
+      - name: trial_days_completed
+        description: The number of days the Shop has been in trial.
+      - name: has_contacted_support
+        description: Whether the Shop has contacted support.
+      - name: first_newsletter_sent_subject
+        description: The subject of the first newsletter the Shop received.
+      - name: first_newsletter_sent_name
+        description: The name of the first newsletter the Shop received.
+      - name: has_done_a_trial
+        description: Whether the Shop has ever been in trial.
+      - name: has_done_a_trial_but_not_upgraded_to_paid_plan
+        description: Whether the Shop has ever been in trial but not upgraded to a paid plan.
+      - name: first_trial_start_date
+        description: The date the Shop started their first trial.
+      - name: paid_days_completed
+        description: The number of days the Shop has been on a paid plan.
+      - name: support_lastreplyat
+        description: The timestamp of the Shop's last support reply.
+      - name: days_until_first_trial
+        description: The number of days until the Shop's first trial.
