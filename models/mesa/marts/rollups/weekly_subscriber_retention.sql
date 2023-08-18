@@ -83,7 +83,8 @@ shop_week_activity AS (
 )
 
 SELECT
-    CONCAT(cohort_week, ' [', cohort_size, ' / ', to_varchar(cohort_starting_mrr, '$9,000'), ']') AS cohort_week,
+    cohort_week,
+    CONCAT(cohort_week, ' [', cohort_size, ' / ', to_varchar(cohort_starting_mrr, '$9,000'), ']') AS cohort_info,
     FLOOR(DATEDIFF(week, cohort_week, period_week)) as period,
     retained_shops,
     retained_shops / cohort_size::float AS retention_rate,
@@ -95,4 +96,4 @@ FROM cohort_info
 LEFT JOIN shop_week_activity USING (cohort_week)
 WHERE period IS NOT NULL
 AND cohort_week > CURRENT_DATE - INTERVAL '60 weeks'
-ORDER BY cohort_week ASC, 2
+ORDER BY 1, 2

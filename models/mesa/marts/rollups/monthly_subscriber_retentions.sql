@@ -81,7 +81,8 @@ shop_month_activity AS (
 )
 
 SELECT
-    CONCAT(cohort_month, ' [', cohort_size, ' / ', to_varchar(cohort_starting_mrr, '$9,000'), ']') AS cohort_month,
+    cohort_month,
+    CONCAT(cohort_month, ' [', cohort_size, ' / ', to_varchar(cohort_starting_mrr, '$9,000'), ']') AS cohort_info,
     FLOOR(DATEDIFF(month, cohort_month, period_month)) as period,
     retained_shops,
     retained_shops / cohort_size::float AS retention_rate,
