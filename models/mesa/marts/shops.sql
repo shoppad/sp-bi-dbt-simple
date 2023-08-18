@@ -309,10 +309,27 @@ first_journey_deliveries AS (
     FROM {{ ref('int_first_journey_deliveries') }}
 ),
 
+inc_amount_days_and_yesterdays AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        inc_amount,
+        LAG(inc_amount, 1, NULL) OVER (PARTITION BY shop_subdomain ORDER BY dt) AS yesterdays_inc_amount
+    FROM {{ ref('mesa_shop_days') }}
+),
+
+churn_dates AS (
+    SELECT
+        shop_subdomain,
+        MAX(dt) AS churned_on_pt
+    FROM inc_amount_days_and_yesterdays
+    WHERE inc_amount = 0 AND yesterdays_inc_amount > 0
+    GROUP BY 1
+),
 
 final AS (
     SELECT
-        * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd),
+        * EXCLUDE (has_had_launch_session, avg_current_gmv_usd, avg_initial_gmv_usd, churned_on_pt),
         NOT(activation_date_pt IS NULL) AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
         {{ dbt.datediff('first_installed_at_pt::DATE', 'activation_date_pt', 'days') }} AS days_to_activation,
@@ -398,7 +415,9 @@ final AS (
             COALESCE(first_journey_email_open_at_pt, current_timestamp()),
             COALESCE(first_journey_email_converted_at_pt, current_timestamp())
         ) < first_installed_at_pt, FALSE)
-            AS is_email_acquisition
+            AS is_email_acquisition,
+        IFF(HAS_EVER_UPGRADED_TO_PAID_PLAN AND NOT is_currently_paying, churned_on_pt, NULL) AS churned_on_pt
+
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
@@ -424,6 +443,7 @@ final AS (
     LEFT JOIN email_unsubscribe_details USING (shop_subdomain)
     LEFT JOIN first_newsletter_deliveries USING (shop_subdomain)
     LEFT JOIN first_journey_deliveries USING (shop_subdomain)
+    LEFT JOIN churn_dates USING (shop_subdomain)
     WHERE billing_accounts.plan_name IS NOT NULL
 )
 
