@@ -125,6 +125,7 @@ max_funnel_steps AS (
                 (step_order || '-' || name)
         END AS max_funnel_step_name,
         COALESCE(step_order, 0) >= 3 AS has_a_workflow,
+        COALESCE(step_order, 0) >= 4 AS has_saved_a_workflow,
         COALESCE(step_order, 0) >= 6 AS has_enabled_a_workflow
     FROM shops
     LEFT JOIN {{ ref('int_mesa_shop_funnel_achievements') }} USING (shop_subdomain)
@@ -276,7 +277,9 @@ first_workflow_keys AS (
 max_workflow_steps AS (
     SELECT
         shop_subdomain,
-        COALESCE(MAX(step_count), 0) AS max_workflow_steps
+        COALESCE(MAX(step_count), 0) AS max_workflow_steps,
+        COALESCE(MAX(step_count_with_deleted), 0) AS max_workflow_steps_with_deleted,
+        COALESCE(MAX(step_count) >= 2, FALSE) AS has_a_workflow
     FROM shops
     LEFT JOIN {{ ref('workflows') }} USING (shop_subdomain)
     GROUP BY 1
@@ -416,7 +419,10 @@ final AS (
             COALESCE(first_journey_email_converted_at_pt, current_timestamp())
         ) < first_installed_at_pt, FALSE)
             AS is_email_acquisition,
-        IFF(HAS_EVER_UPGRADED_TO_PAID_PLAN AND NOT is_currently_paying, churned_on_pt, NULL) AS churned_on_pt
+        IFF(HAS_EVER_UPGRADED_TO_PAID_PLAN AND NOT is_currently_paying, churned_on_pt, NULL) AS churned_on_pt,
+        FLOOR(DATEDIFF('day', first_plan_upgrade_date, churned_on_pt)) AS churned_customer_duration_in_days,
+        FLOOR(DATEDIFF('days', first_plan_upgrade_date, churned_on_pt) / 7) AS churned_customer_duration_in_weeks,
+        FLOOR(DATEDIFF('days', first_plan_upgrade_date, churned_on_pt) / 30) AS churned_customer_duration_in_months
 
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)

@@ -714,3 +714,19 @@ models:
         description: The timestamp of the Shop's last support reply.
       - name: days_until_first_trial
         description: The number of days until the Shop's first trial.
+      - name: churned_customer_duration_in_days
+        description: The number of days the Shop has been on a paid plan.
+      - name: churned_on_pt
+        description: The date the Shop churned.
+      - name: churned_customer_duration_in_weeks
+        description: The number of weeks the Shop has been/was on a paid plan.
+      - name: churned_customer_duration_in_months
+        description: The number of months the Shop has been on a paid plan.
+      - name: has_saved_a_workflow
+        description: Whether the Shop has ever saved a workflow.
+        tests:
+          - not_null
+      - name: max_workflow_steps_with_deleted
+        description: The maximum number of steps in any workflow for the Shop, including deleted steps.
+        tests:
+          - not_null

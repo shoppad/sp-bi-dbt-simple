@@ -179,3 +179,11 @@ models:
         description: The destination app in the workflow.
       - name: is_from_template
         description: Whether the workflow was created from a template.
+      - name: deleted_step_count
+        description: The number of steps that have been deleted from the workflow.
+      - name: app_chain_with_deleted
+        description: The ordered list of apps in the workflow, including deleted apps.
+      - name: step_chain_with_deleted
+        description: The ordered list of steps in the workflow, including deleted steps.
+      - name: step_count_with_deleted
+        description: The current number of steps in the workflow, including deleted steps.

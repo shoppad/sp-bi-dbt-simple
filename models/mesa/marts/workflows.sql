@@ -10,7 +10,6 @@ workflow_steps AS (
     SELECT *
     FROM {{ ref('stg_workflow_steps') }}
     WHERE NOT is_deleted
-
 ),
 
 thirty_day_workflow_runs AS (
@@ -22,7 +21,7 @@ thirty_day_workflow_runs AS (
 thirty_day_workflow_counts AS (
     SELECT
         workflow_id,
-        COUNT(DISTINCT workflow_steps.workflow_step_id) AS thirty_day_step_count,
+        SUM(executed_step_count) AS thirty_day_step_count,
         COUNT(
             DISTINCT IFF(thirty_day_workflow_runs.is_billable, thirty_day_workflow_runs.workflow_run_id, NULL)
         ) AS thirty_day_trigger_count,
@@ -123,7 +122,7 @@ workflow_triggers AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id) = 1
 ),
 
-workflow_destintaions AS (
+workflow_destinations AS (
     SELECT
         workflow_id,
         integration_app AS destination_app
@@ -144,7 +143,7 @@ final AS (
     LEFT JOIN workflow_enables USING (workflow_id)
     LEFT JOIN thirty_day_workflow_counts USING (workflow_id)
     LEFT JOIN workflow_triggers USING (workflow_id)
-    LEFT JOIN workflow_destintaions USING (workflow_id)
+    LEFT JOIN workflow_destinations USING (workflow_id)
 )
 
 SELECT *
