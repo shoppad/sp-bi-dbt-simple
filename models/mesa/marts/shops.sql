@@ -27,7 +27,9 @@ workflow_counts AS (
         COUNT_IF(workflows.step_count > 1) AS workflows_current_count,
         COUNT_IF(workflows.step_count > 1 AND workflows.is_enabled) AS workflows_enabled_current_count,
         COUNT(DISTINCT workflows.template_name) AS templates_installed_count,
-        COUNT_IF(workflows.has_pro_app AND workflows.is_enabled) > 0 AS is_using_pro_apps
+        COUNT_IF(workflows.has_pro_app AND workflows.is_enabled) > 0 AS is_using_pro_apps,
+        COALESCE(SUM(workflows.test_attempt_count) > 0, FALSE) AS has_attempted_a_test,
+        COALESCE(SUM(workflows.test_success_count) > 0, FALSE) AS has_successfully_run_a_test
     FROM shops
     LEFT JOIN workflows USING (shop_subdomain)
     GROUP BY
