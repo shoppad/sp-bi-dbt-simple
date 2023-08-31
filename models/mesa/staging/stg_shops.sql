@@ -6,6 +6,7 @@ raw_shops AS (
     WHERE
         NOT __hevo__marked_deleted
         AND shopify:plan_name NOT IN ('staff', 'staff_business', 'shopify_alumni')
+        AND status NOT IN ('banned')
 
 ),
 
