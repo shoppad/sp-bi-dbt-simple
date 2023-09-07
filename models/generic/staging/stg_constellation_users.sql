@@ -20,6 +20,7 @@ constellation_users AS (
         shopify_createdat,
         shopify_inactiveat,
         shopify_plandisplayname,
+        analytics_currency,
         shopify_planname,
         support_lastreplyat,
         COALESCE(support_lastreplyat IS NOT NULL, FALSE) AS has_contacted_support,
