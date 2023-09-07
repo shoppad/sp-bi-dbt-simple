@@ -1,6 +1,13 @@
 {%- set constellation_apps = ['blogstudio', 'bouncer', 'uploadery', 'infinite_options', 'coin', 'tracktor', 'pagestudio', 'smile', 'kitkarts'] -%}
 
-WITH constellation_users AS (
+WITH conversion_rates AS (
+    SELECT
+        currency AS analytics_currency,
+        in_usd
+    FROM {{ ref('currency_conversion_rates') }}
+),
+
+constellation_users AS (
     SELECT
         COALESCE(uuid, id) AS shop_subdomain,
         createdat AS first_in_constellation_at_utc,
@@ -8,7 +15,7 @@ WITH constellation_users AS (
         first_in_constellation_at_pt::DATE AS first_in_constellation_on_pt,
         date_trunc('week', first_in_constellation_on_pt) AS constellation_cohort_week,
         COALESCE(updatedat, createdat, uuid_ts) AS updated_at,
-        analytics_gmv,
+         1.0 * analytics_gmv * in_usd AS analytics_gmv,
         analytics_orders,
         shopify_createdat,
         shopify_inactiveat,
@@ -44,6 +51,7 @@ WITH constellation_users AS (
 
 
     FROM {{ source('php_segment', 'users') }}
+    LEFT JOIN conversion_rates USING (analytics_currency)
     QUALIFY ROW_NUMBER() OVER (PARTITION BY COALESCE(uuid, id) ORDER BY createdat DESC) = 1
 )
 
