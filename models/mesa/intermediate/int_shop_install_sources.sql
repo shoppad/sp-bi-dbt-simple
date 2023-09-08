@@ -162,4 +162,3 @@ final AS (
 SELECT *
 
 FROM final
-WHERE acquisition_content IS NOT NULL
