@@ -804,3 +804,13 @@ sources:
         identifier: EMAIL_UNSUBSCRIBED
       - name: email_sends
         identifier: EMAIL_sent
+
+  - name: mesa_ga4
+    description: Events from the GetMesa.com GA4 property from BigQuery
+    database: mongo
+    schema: public
+    loader: hevo
+    loaded_at_field: __HEVO__LOADED_AT
+    tables:
+      - name: events
+        identifier: GETMESA_GA4_EVENTS

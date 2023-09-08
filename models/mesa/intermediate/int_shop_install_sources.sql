@@ -27,6 +27,35 @@ first_segment_web_sessions AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY blended_user_id ORDER BY session_start_tstamp ASC) = 1
 ),
 
+app_store_pageviews AS (
+    SELECT
+        PARSE_URL(page_location) AS app_store_url_components,
+        user_pseudo_id
+    FROM {{ source('mesa_ga4', 'events') }}
+    WHERE page_location ILIKE 'https://apps.shopify.com/mesa?%'
+),
+
+app_store_params AS (
+    SELECT
+        user_pseudo_id,
+        app_store_url_components:parameters:surface_type::STRING AS app_store_surface_type,
+        app_store_url_components:parameters:surface_detail::STRING AS app_store_surface_term
+    FROM app_store_pageviews
+),
+
+app_store_installed_user_id_correlations AS (
+    SELECT
+        user_id AS shop_subdomain,
+        app_store_surface_type,
+        app_store_surface_term
+    FROM {{ source('mesa_ga4', 'events') }}
+    INNER JOIN app_store_params USING (user_pseudo_id)
+    WHERE
+        event_name ILIKE 'install_stage_permissions_accept'
+        AND (app_store_surface_type IS NOT NULL OR app_store_surface_term IS NOT NULL)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_timestamp ASC) = 1
+),
+
 raw_install_events AS (
     SELECT
         * EXCLUDE (uuid),
@@ -38,7 +67,7 @@ formatted_install_pageviews AS (
     SELECT
         shop_subdomain,
         {{ pacific_timestamp('tstamp') }} AS tstamp_pt,
-        utm_content AS acquisition_content,
+        COALESCE(app_store_surface_term, utm_content) AS acquisition_content,
         first_page_url_path AS acquisition_first_page_path,
         utm_campaign AS acquisition_campaign,
         referrer AS acquisition_referrer,
@@ -50,9 +79,10 @@ formatted_install_pageviews AS (
                 THEN 'Shopify App Store'
             ELSE COALESCE(referrer_source, utm_source)
         END AS acquisition_source,
-        COALESCE(referrer_medium, utm_medium) AS acquisition_medium
+        COALESCE(app_store_surface_type, referrer_medium, utm_medium) AS acquisition_medium
     FROM install_page_sessions
     LEFT JOIN first_segment_web_sessions USING (anonymous_id)
+    LEFT JOIN app_store_installed_user_id_correlations USING (shop_subdomain)
     LEFT JOIN shops USING (shop_subdomain)
     WHERE
         acquisition_source IS NOT NULL
@@ -130,4 +160,6 @@ final AS (
 )
 
 SELECT *
+
 FROM final
+WHERE acquisition_content IS NOT NULL
