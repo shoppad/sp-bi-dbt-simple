@@ -14,13 +14,6 @@ models:
           - not_null
           - accepted_values:
               values: ["shopify", "chargebee"]
-      - name: BILLING_OVERAGE_BUCKET_START_DATE_PT
-      - name: BILLING_OVERAGE_BUCKET_END_DATE_PT
-      - name: BILLING_OVERAGE_BYPASS_UNTIL
-        tests:
-          - dbt_utils.not_accepted_values:
-              values: ["null"]
-      - name: BILLING_OVERAGE_LAST_COUNT
       - name: DAILY_PLAN_REVENUE
       - name: BALANCE_USED
       - name: SHOPIFY_ID
@@ -33,8 +26,6 @@ models:
       - name: PERCENT_USED
       - name: OVERLIMIT_DATE_PT
       - name: BALANCE_REMAINING
-      - name: START_DATE_PT
-      - name: END_DATE_PT
       - name: TRIAL_ENDS_PT
       - name: CHARGEBEE_ID
       - name: PLAN_TYPE
