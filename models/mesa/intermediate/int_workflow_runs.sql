@@ -15,7 +15,7 @@ action_run_stats AS (
     SELECT
         workflow_run_id,
         COALESCE(COUNT(*), 0) + 1 AS executed_step_count, -- Plus 1 for the workflow trigger itself
-        SPLIT_PART(LISTAGG(LEFT(integration_name,64), ',') WITHIN GROUP (ORDER BY position_in_workflow_run DESC), ',', 1) AS destination_app {# Hack to get the step's app. #}
+        SPLIT_PART(LISTAGG(LEFT(integration_name, 64), ',') WITHIN GROUP (ORDER BY position_in_workflow_run DESC), ',', 1) AS destination_app {# Hack to get the step's app. #}
     FROM workflow_runs
     LEFT JOIN step_runs USING (workflow_run_id)
     GROUP BY
