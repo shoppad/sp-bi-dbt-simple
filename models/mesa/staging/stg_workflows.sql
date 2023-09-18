@@ -29,7 +29,7 @@ final AS (
         {{ pacific_timestamp('created_at') }} AS created_at_pt,
         created_at_pt::DATE AS created_on_pt,
         created_by,
-        CONTAINS(created_by, 'shoppad')
+        CONTAINS(created_by, 'shoppad') AS is_created_by_shoppad,
         shop_subdomain,
         name AS title,
         COALESCE(is_premium, FALSE) AS is_premium,
