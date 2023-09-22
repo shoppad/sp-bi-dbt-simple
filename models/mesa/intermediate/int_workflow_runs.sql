@@ -3,7 +3,7 @@ workflow_runs AS (
     SELECT
         {{ groomed_column_list(ref('stg_workflow_runs'), except=['is_test_run']) | join(',\n       ') }}
     FROM {{ ref('stg_workflow_runs') }}
-    WHERE NOT(is_test_run)
+    WHERE NOT is_test_run
 ),
 
 step_runs AS (
@@ -37,4 +37,3 @@ final AS (
 )
 
 SELECT * FROM final
-WHERE destination_app IS NULL
