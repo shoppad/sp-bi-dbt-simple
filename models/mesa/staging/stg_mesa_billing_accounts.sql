@@ -10,7 +10,7 @@ final AS (
     SELECT
         shop_subdomain,
         COALESCE(billing:method:name, 'shopify')::STRING AS billing_method_name,
-        billing:overage:last_count::FLOAT AS billing_overage_last_count,
+        COALESCE(billing:overage:last_count::FLOAT, 0) AS billing_overage_last_count,
         billing:plan:days_complete::FLOAT AS days_complete,
         billing:plan:id::STRING AS plan_id,
         billing:plan:percent_complete::FLOAT AS percent_complete,

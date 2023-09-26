@@ -94,8 +94,7 @@ final AS (
         1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
         COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported,
         first_trial_start_date - first_installed_on_pt AS days_until_first_trial,
-        first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade,
-        has_done_a_trial AND NOT has_ever_upgraded_to_paid_plan AS has_done_a_trial_but_not_upgraded_to_paid_plan
+        first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade
     FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)

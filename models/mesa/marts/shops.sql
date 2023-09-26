@@ -326,10 +326,11 @@ inc_amount_days_and_yesterdays AS (
 churn_dates AS (
     SELECT
         shop_subdomain,
+        yesterdays_inc_amount,
         MAX(dt) AS churned_on_pt
     FROM inc_amount_days_and_yesterdays
     WHERE inc_amount = 0 AND yesterdays_inc_amount > 0
-    GROUP BY 1
+    GROUP BY 1, 2
 ),
 
 final AS (
@@ -386,16 +387,17 @@ final AS (
             ELSE 'K-$2,500,000+'
         END AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
-        average_daily_revenue > 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
+        yesterdays_inc_amount > 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_currently_paying,
         average_daily_revenue = 0 AND NOT is_zombie_shopify_plan AND NOT is_in_trial AND billing_accounts.plan_name NOT ILIKE '%free%' AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
         plan_change_chain ILIKE '%$0' AS did_pay_and_then_downgrade_to_free,
         has_ever_upgraded_to_paid_plan AND NOT is_currently_paying AS has_churned,
         CASE
             WHEN NOT has_done_a_trial THEN '1-Has Not Done A Trial'
-            WHEN has_done_a_trial_but_not_upgraded_to_paid_plan THEN '2-Has Done A Trial But Not Upgraded To Paid Plan'
-            WHEN has_ever_upgraded_to_paid_plan AND NOT is_currently_paying THEN '3-Paid and Then Churned'
-            WHEN is_currently_paying THEN '4-Currently Paying'
-            ELSE '5-Not trial but a paid plan (should not happen)'
+            WHEN (install_status = 'uninstalled' OR NOT is_in_trial) AND has_done_a_trial AND NOT has_ever_upgraded_to_paid_plan THEN '3-Churned During Trial'
+            WHEN is_in_trial AND NOT is_currently_paying THEN '2-Currently In Trial'
+            WHEN has_churned OR did_pay_and_then_downgrade_to_free THEN '4-Paid and Then Churned'
+            WHEN is_currently_paying THEN '5-Currently Paying'
+            ELSE '6-Not trial but a paid plan (should not happen)'
         END AS plan_upgrade_funnel_status,
 
         CASE

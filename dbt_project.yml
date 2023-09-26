@@ -55,6 +55,12 @@ vars:
     - gorgias
     - webrequest
 
+  puc_apps:
+    - infiniteoptions
+    - tracktor
+    - googlesheets
+    - recharge
+
   etl_fields:
     [
       "__HEVO__DATABASE_NAME",

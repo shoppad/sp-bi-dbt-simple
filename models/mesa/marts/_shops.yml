@@ -690,8 +690,6 @@ models:
         description: The name of the first newsletter the Shop received.
       - name: has_done_a_trial
         description: Whether the Shop has ever been in trial.
-      - name: has_done_a_trial_but_not_upgraded_to_paid_plan
-        description: Whether the Shop has ever been in trial but not upgraded to a paid plan.
       - name: first_trial_start_date
         description: The date the Shop started their first trial.
       - name: paid_days_completed
@@ -716,3 +714,23 @@ models:
         description: The maximum number of steps in any workflow for the Shop, including deleted steps.
         tests:
           - not_null
+      - name: has_successfully_run_a_test
+        description: Whether the Shop has ever successfully run a test.
+        tests:
+          - not_null
+      - name: billing_overage_last_count
+        description: The number of times the Shop has been over their billing limit.
+        tests:
+          - not_null
+      - name: overlimit_date_pt
+        description: The date the Shop went over their billing limit.
+      - name: has_attempted_a_test
+        description: Whether the Shop has ever attempted to run a test.
+        tests:
+          - not_null
+      - name: yesterdays_inc_amount
+        description: The Shop's income amount from yesterday.
+        tests:
+          - not_null
+      - name: analytics_currency
+        description: The currency of the Shop's analytics.
