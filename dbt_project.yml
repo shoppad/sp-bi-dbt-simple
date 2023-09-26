@@ -165,6 +165,7 @@ models:
         stg_workflows:
           +unique_key: workflow_id
         stg_workflow_runs:
+          +materialized: incremental
           +on_schema_change: "sync_all_columns"
           +unique_key: workflow_run_id
           +cluster_by: ["shop_subdomain"]
