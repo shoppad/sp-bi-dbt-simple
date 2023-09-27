@@ -105,7 +105,8 @@ current_rolling_counts AS (
         COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total,
         COALESCE(total_workflow_steps_rolling_thirty_day_count, 0) AS total_workflow_steps_rolling_thirty_day_count,
         COALESCE(input_step_rolling_thirty_day_count, 0) AS input_step_rolling_thirty_day_count,
-        COALESCE(output_step_rolling_thirty_day_count, 0) AS output_step_rolling_thirty_day_count
+        COALESCE(output_step_rolling_thirty_day_count, 0) AS output_step_rolling_thirty_day_count,
+        COALESCE(0, inc_amount) AS yesterdays_inc_amount
     FROM shops
     LEFT JOIN yesterdays USING (shop_subdomain)
 ),
@@ -314,23 +315,24 @@ first_journey_deliveries AS (
     FROM {{ ref('int_first_journey_deliveries') }}
 ),
 
-inc_amount_days_and_yesterdays AS (
+inc_amount_days_and_day_befores AS (
     SELECT
         shop_subdomain,
         dt,
         inc_amount,
-        LAG(inc_amount, 1, NULL) OVER (PARTITION BY shop_subdomain ORDER BY dt) AS yesterdays_inc_amount
+        COALESCE(LAG(inc_amount, 1, NULL) OVER (PARTITION BY shop_subdomain ORDER BY dt), 0) AS day_before_inc_amount
     FROM {{ ref('mesa_shop_days') }}
 ),
 
 churn_dates AS (
     SELECT
         shop_subdomain,
-        yesterdays_inc_amount,
+        day_before_inc_amount,
         MAX(dt) AS churned_on_pt
-    FROM inc_amount_days_and_yesterdays
-    WHERE inc_amount = 0 AND yesterdays_inc_amount > 0
+    FROM inc_amount_days_and_day_befores
+    WHERE inc_amount = 0 AND day_before_inc_amount > 0
     GROUP BY 1, 2
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY churned_on_pt DESC) = 1
 ),
 
 final AS (
