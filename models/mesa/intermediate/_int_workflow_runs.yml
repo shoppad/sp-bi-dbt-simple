@@ -90,9 +90,17 @@ models:
         description: Whether the workflow run was successfully until the end or a safe exit.
       - name: destination_app
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">10"
         description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">10"
         description: The source and destination app integration in one string.
