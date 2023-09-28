@@ -33,6 +33,7 @@ workflow_runs AS (
         is_stop
     FROM {{ ref('int_workflow_runs') }}
     WHERE workflow_name NOT ILIKE '%report card%'
+    AND NOT is_time_travel
 ),
 
 daily_workflow_run_counts AS (
