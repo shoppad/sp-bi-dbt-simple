@@ -107,7 +107,7 @@ current_rolling_counts AS (
         COALESCE(total_workflow_steps_rolling_thirty_day_count, 0) AS total_workflow_steps_rolling_thirty_day_count,
         COALESCE(input_step_rolling_thirty_day_count, 0) AS input_step_rolling_thirty_day_count,
         COALESCE(output_step_rolling_thirty_day_count, 0) AS output_step_rolling_thirty_day_count,
-        COALESCE(0, inc_amount) AS yesterdays_inc_amount
+        COALESCE(inc_amount, 0) AS yesterdays_inc_amount
     FROM shops
     LEFT JOIN yesterdays USING (shop_subdomain)
 ),
@@ -328,7 +328,7 @@ inc_amount_days_and_day_befores AS (
 churn_dates AS (
     SELECT
         shop_subdomain,
-        day_before_inc_amount,
+        {# day_before_inc_amount, #}
         MAX(dt) AS churned_on_pt
     FROM inc_amount_days_and_day_befores
     WHERE inc_amount = 0 AND day_before_inc_amount > 0
