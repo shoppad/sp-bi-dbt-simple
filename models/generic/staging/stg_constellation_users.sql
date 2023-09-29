@@ -49,8 +49,7 @@ constellation_users AS (
             COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat, current_timestamp()){%- if not loop.last %}, {% endif -%}
         {% endfor %}, COALESCE(apps_mesa_installedat, current_timestamp())) AS first_shoppad_app_installed_at_utc,
         {{ pacific_timestamp('first_shoppad_app_installed_at_utc') }} AS first_shoppad_app_installed_at_pt,
-        apps_mesa_meta_appsused_value AS apps_used,
-        ARRAYS_OVERLAP(STRTOK_TO_ARRAY(apps_mesa_meta_appsused_value, ','), ARRAY_CONSTRUCT('{{ var('puc_apps') | join("','") }}')) AS has_puc_app
+        apps_mesa_meta_appsused_value AS apps_used
     FROM {{ source('php_segment', 'users') }}
     LEFT JOIN conversion_rates USING (analytics_currency)
     QUALIFY ROW_NUMBER() OVER (PARTITION BY COALESCE(uuid, id) ORDER BY createdat DESC) = 1
