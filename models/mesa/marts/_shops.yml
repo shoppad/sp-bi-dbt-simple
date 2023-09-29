@@ -734,3 +734,17 @@ models:
           - not_null
       - name: analytics_currency
         description: The currency of the Shop's analytics.
+      - name: day_before_inc_amount
+        description: The Shop's income amount from the day before yesterday.
+        tests:
+          - not_null
+      - name: is_pql
+        description: Whether the Shop is a PQL.
+        tests:
+          - not_null
+      - name: apps_used
+        description: The apps used by the Shop.
+      - name: has_puc_workflow
+        description: Whether the Shop has a workflow with a PUC step.
+        tests:
+          - not_null

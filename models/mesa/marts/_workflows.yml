@@ -187,3 +187,13 @@ models:
         description: The ordered list of steps in the workflow, including deleted steps.
       - name: step_count_with_deleted
         description: The current number of steps in the workflow, including deleted steps.
+      - name: is_puc
+        description: Whether the workflow is a PUC workflow.
+        tests:
+          - not_null
+      - name: is_created_by_shoppad
+        description: Whether the workflow was created by Shoppad.
+        tests:
+          - not_null
+      - name: created_by
+        description: The user who created the workflow.

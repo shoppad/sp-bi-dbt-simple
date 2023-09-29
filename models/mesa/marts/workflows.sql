@@ -135,7 +135,8 @@ final AS (
     SELECT
         *,
         trigger_app || ' - ' || destination_app AS source_destination_pair,
-        COALESCE(template_name IS NOT NULL AND template_name != '', FALSE) AS is_from_template
+        COALESCE(template_name IS NOT NULL AND template_name != '', FALSE) AS is_from_template,
+        COALESCE(app_chain ILIKE ANY('%googlesheets%', '%recharge%', '%infiniteoptions%', '%tracktor%'), FALSE) AS is_puc
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)
     LEFT JOIN test_counts USING (workflow_id)
