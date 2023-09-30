@@ -332,7 +332,7 @@ churn_dates AS (
         MAX(dt) AS churned_on_pt
     FROM inc_amount_days_and_day_befores
     WHERE inc_amount = 0 AND day_before_inc_amount > 0
-    GROUP BY 1, 2
+    GROUP BY 1
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY churned_on_pt DESC) = 1
 ),
 
