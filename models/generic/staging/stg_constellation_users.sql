@@ -36,7 +36,7 @@ constellation_users AS (
         COALESCE({%- for app in constellation_apps %}
          apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat < apps_mesa_installedat {%- if not loop.last %} OR {% endif -%}
         {% endfor %}, FALSE) AS did_install_another_shoppad_app_first,
-        did_install_another_shoppad_app_first AS is_pql,
+        COALESCE(did_install_another_shoppad_app_first, FALSE) AS is_pql,
         CASE
         {% for app in constellation_apps -%}
             WHEN apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat < apps_mesa_installedat THEN '{{ app }}'
