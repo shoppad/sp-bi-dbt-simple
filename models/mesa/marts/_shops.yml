@@ -494,6 +494,8 @@ models:
           metabase.display_name: Is Currently Paying?
         tests:
           - not_null
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              value: 2
       - name: currency_not_supported
         description: Whether the Shop's currency is not supported in the DBT/Snowflake currency conversion data.
         meta:
@@ -737,7 +739,8 @@ models:
       - name: is_pql
         description: Whether the Shop is a PQL.
         tests:
-          - not_null
+          - dbt_utils.not_null_proportion:
+              at_least: 0.9
       - name: apps_used
         description: The apps used by the Shop.
       - name: has_puc_workflow

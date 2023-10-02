@@ -462,3 +462,4 @@ final AS (
 
 SELECT *
 FROM final
+WHERE yesterdays_inc_amount > 0
