@@ -457,9 +457,9 @@ final AS (
     LEFT JOIN first_newsletter_deliveries USING (shop_subdomain)
     LEFT JOIN first_journey_deliveries USING (shop_subdomain)
     LEFT JOIN churn_dates USING (shop_subdomain)
-    WHERE billing_accounts.plan_name IS NOT NULL
+
 )
 
 SELECT *
 FROM final
-WHERE yesterdays_inc_amount > 0
+WHERE is_currently_paying
