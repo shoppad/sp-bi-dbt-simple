@@ -126,6 +126,7 @@ models:
           +on_schema_change: "sync_all_columns"
           +cluster_by: ["shop_subdomain"]
           +unique_key: step_run_id
+          +materialized: incremental
 
         workflow_runs:
           +cluster_by: ["shop_subdomain", "workflow_id"]

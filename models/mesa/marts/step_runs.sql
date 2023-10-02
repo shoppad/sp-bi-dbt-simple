@@ -19,6 +19,12 @@ final AS (
     FROM step_runs
     INNER JOIN workflows USING (workflow_id)
     LEFT JOIN workflow_steps USING (workflow_step_id)
+
+{% if is_incremental() %}
+-- this filter will only be applied on an incremental run
+    WHERE  updated_at > '{{ get_max_updated_at() }}'
+{% endif %}
+
 )
 
 SELECT *

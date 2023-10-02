@@ -97,3 +97,7 @@ models:
         description: The customer-provided name of the originating workflow.
       - name: integration_key
         description: The code-friendly string of the app this step integrates with.
+      - name: step_run_on_utc
+        description: The date for when the step was run in UTC.
+      - name: is_time_travel
+        description: Whether the step was run as a part of Time Travel.
