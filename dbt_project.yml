@@ -143,6 +143,7 @@ models:
         +schema: support
         int_shop_calendar:
         int_step_runs:
+          +materialized: incremental
           +on_schema_change: "sync_all_columns"
           +unique_key: step_run_id
           +cluster_by: ["workflow_run_id"]
