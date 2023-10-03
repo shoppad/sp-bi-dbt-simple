@@ -462,4 +462,3 @@ final AS (
 
 SELECT *
 FROM final
-WHERE is_currently_paying
