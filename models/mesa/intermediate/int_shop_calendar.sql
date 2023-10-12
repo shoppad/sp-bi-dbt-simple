@@ -28,7 +28,8 @@ shop_trial_days AS (
         dt,
         TRUE AS is_in_trial
     FROM calendar_dates
-    INNER JOIN {{ ref('stg_trial_periods') }} ON calendar_dates.dt BETWEEN started_on AND COALESCE(ended_on, CURRENT_DATE)
+    INNER JOIN {{ ref('stg_trial_periods') }}
+        ON calendar_dates.dt BETWEEN started_on_pt AND COALESCE(ended_on_pt, {{ pacific_timestamp('CURRENT_DATE') }}::DATE)
 ),
 
 shop_calendar AS (
@@ -36,7 +37,7 @@ shop_calendar AS (
         shop_subdomain,
         dt,
         COALESCE(IFF(
-                is_zombie OR is_in_trial,
+                is_zombie OR COALESCE(is_in_trial, FALSE),
                 0,
                 daily_plan_revenue
             ), 0) AS daily_plan_revenue,
@@ -52,6 +53,7 @@ shop_calendar AS (
     LEFT JOIN shop_plan_days USING (shop_subdomain, dt)
     LEFT JOIN shops USING (shop_subdomain)
     LEFT JOIN shop_trial_days USING (shop_subdomain, dt)
+    ORDER BY dt
 )
 
 SELECT *
