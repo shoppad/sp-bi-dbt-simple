@@ -30,8 +30,8 @@ final AS (
         integration_app,
         COUNT(DISTINCT workflow_id) AS workflow_count,
         COUNT(DISTINCT workflow_id) > 1 AS is_multi_workflow,
-        COUNT(workflow_steps.*) AS workflow_step_count,
-        COUNT(workflow_steps.*) > 1 AS is_multi_workflow_step
+        COUNT(*) AS workflow_step_count,
+        COUNT(*) > 1 AS is_multi_workflow_step
     FROM int_shops
     INNER JOIN workflow_steps USING (shop_subdomain)
     {# QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain, integration_app ORDER BY shop_subdomain) = 1 #}
