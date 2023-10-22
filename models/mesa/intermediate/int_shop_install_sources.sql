@@ -1,4 +1,11 @@
 {#- cSpell:words INITCAP -#}
+{#
+   1. Get the first visit source for each shop (first touch).
+   2. Get the session start source for each shop (last touch).
+   3. Get the first install event for each shop.
+   4. TODO: For pre-GA installs, get the first pageview for each shop from Segment.
+   5. Reformat columns to match the schema.
+#}
 
 WITH
 shops AS (
