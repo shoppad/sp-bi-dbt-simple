@@ -3,72 +3,60 @@
 WITH
 shops AS (
     SELECT
-        shop_subdomain,
+        stg_shops.shop_subdomain,
         first_installed_at_pt
     FROM {{ ref('stg_shops') }}
 ),
 
-install_page_sessions AS (
-
+first_visits_ga4 AS (
     SELECT
-        session_id,
-        tstamp,
-        anonymous_id
-    FROM {{ ref('segment_web_page_views__sessionized') }}
-    WHERE page_url_path ILIKE '%/apps/mesa/install%'
-
+        * EXCLUDE (page_location),
+        page_location AS acquisition_first_page_path
+    FROM {{ ref('stg_ga_first_visits') }}
 ),
 
-first_segment_web_sessions AS (
+ga_installations AS (
     SELECT
-        * EXCLUDE (blended_user_id),
-        blended_user_id AS shop_subdomain
-    FROM {{ ref('segment_web_sessions') }}
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY blended_user_id ORDER BY session_start_tstamp ASC) = 1
+        * EXCLUDE (event_timestamp),
+        event_timestamp AS created_at
+    FROM {{ ref('stg_ga_install_events') }}
+    {# LEFT JOIN {{ ref('stg_ga_app_store_page_events') }} USING (user_pseudo_id) #}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ASC, referrer_host, utm_medium) = 1
 ),
 
-app_store_pageviews AS (
+unified_install_events AS (
     SELECT
-        PARSE_URL(page_location) AS app_store_url_components,
-        user_pseudo_id
-    FROM {{ source('mesa_ga4', 'events') }}
-    WHERE page_location ILIKE 'https://apps.shopify.com/mesa?%'
-),
-
-app_store_params AS (
-    SELECT
-        user_pseudo_id,
-        app_store_url_components:parameters:surface_type::STRING AS app_store_surface_type,
-        app_store_url_components:parameters:surface_detail::STRING AS app_store_surface_term
-    FROM app_store_pageviews
-),
-
-app_store_installed_user_id_correlations AS (
-    SELECT
-        user_id AS shop_subdomain,
+        shop_subdomain,
         app_store_surface_type,
-        app_store_surface_term
-    FROM {{ source('mesa_ga4', 'events') }}
-    INNER JOIN app_store_params USING (user_pseudo_id)
-    WHERE
-        event_name ILIKE 'install_stage_permissions_accept'
-        AND (app_store_surface_type IS NOT NULL OR app_store_surface_term IS NOT NULL)
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_timestamp ASC) = 1
-),
+        NULL AS app_store_search_term,
+        utm_content,
+        referrer,
+        referrer_host,
+        referrer_source,
+        referrer_medium,
+        utm_medium
+    FROM first_visits_ga4
 
-raw_install_events AS (
-    SELECT
-        * EXCLUDE (uuid),
-        uuid AS shop_subdomain
-    FROM {{ source('mongo_sync', 'mesa_install_events') }}
+    UNION
+
+     SELECT
+        shop_subdomain,
+        NULL AS app_store_surface_type,
+        NULL AS app_store_search_term,
+        utm_content,
+        referrer,
+        referrer_host,
+        referrer_source,
+        referrer_medium,
+        utm_medium
+    FROM ga_installations
 ),
 
 formatted_install_pageviews AS (
     SELECT
-        shop_subdomain,
-        {{ pacific_timestamp('tstamp') }} AS tstamp_pt,
-        COALESCE(app_store_surface_term, utm_content) AS acquisition_content,
-        first_page_url_path AS acquisition_first_page_path,
+        ga_installations.shop_subdomain,
+        {{ pacific_timestamp('event_timestamp') }} AS tstamp_pt,
+        COALESCE(app_store_search_term, utm_content) AS acquisition_content,
         utm_campaign AS acquisition_campaign,
         referrer AS acquisition_referrer,
         referrer_host,
@@ -80,9 +68,8 @@ formatted_install_pageviews AS (
             ELSE COALESCE(referrer_source, utm_source)
         END AS acquisition_source,
         COALESCE(app_store_surface_type, referrer_medium, utm_medium) AS acquisition_medium
-    FROM install_page_sessions
-    LEFT JOIN first_segment_web_sessions USING (anonymous_id)
-    LEFT JOIN app_store_installed_user_id_correlations USING (shop_subdomain)
+    FROM ga_installations
+    LEFT JOIN first_visits_ga4 USING (shop_subdomain)
     LEFT JOIN shops USING (shop_subdomain)
     WHERE
         acquisition_source IS NOT NULL
@@ -90,13 +77,22 @@ formatted_install_pageviews AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY tstamp_pt ASC) = 1
 ),
 
+m3_mesa_installs_templates AS (
+    SELECT
+        uuid AS shop_subdomain,
+        {# template AS acquisition_template, #}
+        {# referer, #}
+        *
+    FROM {{ source('mongo_sync', 'mesa_install_events') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY created_at ASC) = 1
+),
+
 formatted_install_events AS (
     SELECT
-        shop_subdomain,
+        ga_installations.shop_subdomain,
         {{ pacific_timestamp('created_at') }} AS tstamp_pt,
-        template AS acquisition_template,
+        acquisition_template,
         NULL AS acquisition_content,
-        NULL AS acquisition_first_page_path,
         NULLIF(utm_campaign, '') AS acquisition_campaign,
         NULLIF(referer, '') AS acquisition_referrer,
         NULLIF(utm_medium, '') AS acquisition_medium,
@@ -105,8 +101,9 @@ formatted_install_events AS (
                 THEN 'Shopify App Store'
             ELSE NULLIF(COALESCE(utm_source, referer), '')
         END AS acquisition_source
-    FROM raw_install_events
+    FROM ga_installations
     LEFT JOIN shops USING (shop_subdomain)
+    LEFT JOIN m3_mesa_installs_templates USING (shop_subdomain)
     WHERE tstamp_pt <= first_installed_at_pt + INTERVAL '60seconds'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY tstamp_pt ASC) = 1
 ),
@@ -120,7 +117,7 @@ combined_install_sources AS (
         COALESCE(formatted_install_pageviews.acquisition_campaign, formatted_install_events.acquisition_campaign) AS acquisition_campaign,
         COALESCE(formatted_install_pageviews.acquisition_content, formatted_install_events.acquisition_content) AS acquisition_content,
         COALESCE(formatted_install_pageviews.acquisition_referrer, formatted_install_events.acquisition_referrer) AS acquisition_referrer,
-        COALESCE(formatted_install_pageviews.acquisition_first_page_path, formatted_install_events.acquisition_first_page_path) AS acquisition_first_page_path,
+        {# COALESCE(formatted_install_pageviews.acquisition_first_page_path, formatted_install_events.acquisition_first_page_path) AS acquisition_first_page_path, #}
         COALESCE(formatted_install_pageviews.acquisition_source, formatted_install_events.acquisition_source) AS acquisition_source,
         COALESCE(formatted_install_pageviews.acquisition_medium, formatted_install_events.acquisition_medium) AS acquisition_medium
     FROM formatted_install_pageviews
@@ -134,11 +131,10 @@ referrer_mapping as (
 
 final AS (
     SELECT
-        shop_subdomain,
+        shops.shop_subdomain,
         acquisition_referrer,
         acquisition_template,
         acquisition_content,
-        acquisition_first_page_path,
         INITCAP(REPLACE(acquisition_campaign, '_', ' ')) AS acquisition_campaign,
         INITCAP(REPLACE(COALESCE(referrer_mapping.medium, acquisition_medium), '_', ' ')) AS acquisition_medium,
         INITCAP(COALESCE(referrer_mapping.source, acquisition_source)) AS acquisition_source,
@@ -152,13 +148,16 @@ final AS (
                 ' - '
             )
         ) AS acquisition_source_medium,
-        COALESCE(acquisition_first_page_path ILIKE '/blog/%', FALSE) AS is_blog_referral
+        COALESCE(acquisition_first_page_path ILIKE '/blog/%', FALSE) AS is_blog_referral,
+        first_visits_ga4.* EXCLUDE (shop_subdomain)
     FROM shops
+    LEFT JOIN first_visits_ga4 USING (shop_subdomain)
     LEFT JOIN combined_install_sources USING (shop_subdomain)
     LEFT JOIN referrer_mapping
         ON combined_install_sources.referrer_host = referrer_mapping.host
 )
 
-SELECT *
+SELECT * FROM unified_install_events
+{# SELECT COUNT(DISTINCT shop_subdomain)
 
-FROM final
+FROM app_store_installed_user_id_correlations #}
