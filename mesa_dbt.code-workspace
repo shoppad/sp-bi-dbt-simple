@@ -849,7 +849,11 @@
     "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true,
     "sqlfluff.env.useDotEnvFile": true,
     "WizardForDbtCore(TM).trace.server": "messages",
-    "dbt.queryScale": 0.87
+    "dbt.queryScale": 0.87,
+    "editor.selectionHighlight": true,
+    "workbench.colorTheme": "GitHub Light",
+    "turntable.dbtVersion": "1.6",
+    "turntable.warehouse": "snowflake"
   },
   "extensions": {
       "recommendations": [

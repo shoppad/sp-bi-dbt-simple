@@ -73,3 +73,73 @@ models:
         description: The bucket of the Shop's age at install.
       - name: age_of_store_at_install_in_days
         description: The age (in days) of the store at the initial install.
+      - name: FIRST_INSTALLED_AT_UTC
+        description:
+          The date and time (in Coordinated Universal Time) when the app
+          was first installed on the store.
+      - name: LATEST_INSTALLED_AT_UTC
+        description:
+          The date and time (in Coordinated Universal Time) of the app's
+          most recent install on the store.
+      - name: FIRST_INSTALLED_ON_PT
+        description:
+          The date (in the Pacific Time zone) when the app was first installed
+          on the store.
+      - name: IS_CUSTOM_APP
+        description:
+          Indicates whether the app was built as a custom integration for
+          the store. TRUE means it was, FALSE means it was not.
+      - name: SHOPIFY_SHOP_COUNTRY
+        description: The country where the Shopify store is located.
+      - name: INITIAL_SHOPIFY_PLAN_NAME
+        description:
+          The name of the Shopify plan the store was on when the app was
+          first installed.
+      - name: IS_ZOMBIE_SHOPIFY_PLAN
+        description:
+          Indicates whether the store is on a 'frozen', 'fraudulent', 'paused',
+          'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means
+          they are not.
+      - name: FIRST_PLAN_IDENTIFIER
+        description: The identifier for the store's first paid plan upgrade.
+      - name: PAID_DAYS_COMPLETED
+        description:
+          The total number of days the store has been on a paid Shopify
+          plan.
+      - name: HAS_EVER_UPGRADED_TO_PAID_PLAN
+        description:
+          Indicates whether the store has ever upgraded to a paid plan.
+          TRUE means they have, FALSE means they have not.
+      - name: FIRST_TRIAL_START_DATE
+        description: The date when the store's first free trial of a paid plan began.
+      - name: FIRST_TRIAL_PLAN_IDENTIFIER
+        description: The identifier for the store's first free trial plan.
+      - name: TRIAL_DAYS_COMPLETED
+        description:
+          The total number of days the store has been on a free trial of
+          a Shopify paid plan.
+      - name: HAS_DONE_A_TRIAL
+        description:
+          Indicates whether the store has ever started a free trial of
+          a paid plan. TRUE means they have, FALSE means they have not.
+      - name: CURRENCY_NOT_SUPPORTED
+        description:
+          Indicates whether the store's currency is supported for conversion
+          to USD. TRUE means the currency is not supported, FALSE means it is supported.
+      - name: DAYS_UNTIL_FIRST_TRIAL
+        description:
+          The number of days between the app's first install and the start
+          of the store's first free trial of a paid plan.
+      - name: DAYS_UNTIL_FIRST_PLAN_UPGRADE
+        description:
+          The number of days between the app's first install and the store's
+          first paid plan upgrade.
+    description:
+      The int_shops model is a comprehensive database that provides detailed
+      insights into the behavior and performance of online shops. It tracks key metrics
+      such as the number of orders, total sales, and the shop's lifecycle from installation
+      to uninstallation. It also categorizes shops based on their age and status,
+      and monitors changes in their subscription plans. This information can be used
+      to identify trends, understand customer behavior, and make informed business
+      decisions. For example, it can help identify which shops are most profitable,
+      or when shops are most likely to upgrade their plans.
