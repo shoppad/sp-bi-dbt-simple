@@ -192,6 +192,8 @@ models:
     customer_io:
       staging:
         +schema: support
+      intermediate:
+        +schema: support
 
 tests:
   shoppad:
