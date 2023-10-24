@@ -54,7 +54,7 @@ constellation_users AS (
             REGEXP_REPLACE(
                 REGEXP_REPLACE(
                     ',' || apps_used || ',',
-                    ',({%- for app in var('glue_apps') -%}{{ app }}{%- if not loop.last %}|{% endif -%}{% endfor %}),',
+                    ',({%- for app in var('glue_apps') -%}{{ app }}{%- if not loop.last %}|{% endif -%}{% endfor %})(,|$)',
                     ','
                 ),
                 ',,',
