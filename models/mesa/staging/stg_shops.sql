@@ -107,6 +107,7 @@ final AS (
         COALESCE(shops.status, custom_apps.status) AS status,
         shop_metas.aggregated_meta AS meta,
         COALESCE(shops.shopify, custom_apps.shopify) AS shopify,
+        shopify:id::VARIANT AS shopify_id,
         TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
         IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall,
         COALESCE(is_custom_app, FALSE) AS is_custom_app
