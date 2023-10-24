@@ -496,7 +496,6 @@ models:
           - not_null
           - dbt_expectations.expect_column_distinct_count_to_equal:
               value: 2
-              {# row_condition: "id is not null" # (Optional) #}
       - name: currency_not_supported
         description: Whether the Shop's currency is not supported in the DBT/Snowflake currency conversion data.
         meta:
