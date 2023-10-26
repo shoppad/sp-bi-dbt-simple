@@ -5,3 +5,4 @@ sqlfluff
 dbt-metabase
 pre-commit
 sqlfluff-templater-dbt
+shandy-sqlfmt[jinjafmt]

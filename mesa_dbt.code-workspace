@@ -18,6 +18,11 @@
     "[sql]": {
         "editor.defaultFormatter": "dorzey.vscode-sqlfluff"
     },
+    "[jinja-sql]": {
+      "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
+      "editor.formatOnSave": true
+    }
+
     "files.associations": {
       "*.sql": "jinja-sql",
       "*.yml": "jinja-yaml"
@@ -848,11 +853,12 @@
     ],
     "WizardForDbtCore(TM).enableSnowflakeSyntaxCheck": true,
     "sqlfluff.env.useDotEnvFile": true,
-    "WizardForDbtCore(TM).trace.server": "messages",
+    "WizardForDbtCore(TM).trace.server": "verbose",
     "dbt.queryScale": 0.87,
     "editor.selectionHighlight": true,
     "turntable.dbtVersion": "1.6",
-    "turntable.warehouse": "snowflake"
+    "turntable.warehouse": "snowflake",
+    "editor.defaultFormatter": "Fivetran.dbt-language-server"
   },
   "extensions": {
       "recommendations": [
