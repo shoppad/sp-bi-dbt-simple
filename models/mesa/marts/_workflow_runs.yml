@@ -42,8 +42,6 @@ models:
         description: The status of the step run. `success` or `failure`.
       - name: workflow_id
         description: The foreign key to the originating workflow
-      - name: shop_subdomain
-        description: The foreign key for the Shop.
       - name: workflow_run_at_utc
         tests:
           - not_null
