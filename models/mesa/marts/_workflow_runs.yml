@@ -31,6 +31,10 @@ models:
           - relationships:
               to: ref('shops')
               field: shop_subdomain
+              config:
+                severity: error
+                error_if: ">300"
+                warn_if: ">100"
         description: The foreign key for the Shop.
       - name: run_status
         test:
@@ -140,3 +144,7 @@ models:
                 where: WORKFLOW_RUN_AT_UTC > '2022-12-06'
       - name: is_time_travel
         description: Indicates whether the workflow run was a part of Time Travel execution.
+      - name: is_stop
+        description: Indicates whether the workflow run ended with an expected Stop/Filter.
+      - name: is_failure
+        description: Indicates whether the workflow run ended with an unexpected Failure.
