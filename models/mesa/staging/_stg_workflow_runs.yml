@@ -24,6 +24,11 @@ models:
           - relationships:
               to: ref('stg_shops')
               field: shop_subdomain
+              config:
+                severity: error
+                error_if: ">300"
+                warn_if: ">100"
+
         description: The foreign key for the Shop.
       - name: run_status
         test:

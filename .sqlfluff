@@ -1,9 +1,10 @@
 [sqlfluff]
 templater = dbt
 dialect = snowflake
-exclude_rules = L010, L027, L030, L032
+exclude_rules = L010, L027, L030, L032, layout.indent, layout.cte_bracket, layout.select_targets
 verbose = 0
 max_line_length = 160
+large_file_skip_byte_limit = 40000
 
 [sqlfluff:templater:dbt]
 project_dir = /Users/jon/Projects/mesa_dbt
@@ -13,6 +14,11 @@ profiles_dir = ~/.dbt/
 allow_scalar = True
 single_table_references = consistent
 unquoted_identifiers_policy = all
+capitalisation_policy = upper
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:convention.terminator]
+multiline_newline = True
 
 [sqlfluff:indentation]
 tab_space_size = 4

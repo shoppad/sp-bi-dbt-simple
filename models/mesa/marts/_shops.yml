@@ -558,14 +558,12 @@ models:
           - not_null
       - name: first_workflow_sort_title
         description: The sort title of the first workflow in the Shop. (Cleaned title or marked as DELETED.)
-      - name: trigger_destination_app_pair
+      - name: first_workflow_trigger_destination_app_pair
         description: The app pair of the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: trigger_destination_key_pair
+      - name: first_workflow_trigger_destination_key_pair
         description: The key pair of the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_destination_name
         description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: first_workflow_destination_key
-        description: The key of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_trigger_name
         description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: max_workflow_steps
@@ -582,7 +580,7 @@ models:
         description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_destination_app
         description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
-      - name: trigger_destination_name_pair
+      - name: first_workflow_trigger_destination_name_pair
         description: The name pair of the Shop's first workflow. Gives a clue to their MESA use case.
       - name: first_workflow_app_chain
         description: The app chain of the Shop's first workflow. Gives a clue to their MESA use case.
@@ -743,7 +741,11 @@ models:
               at_least: 0.9
       - name: apps_used
         description: The apps used by the Shop.
+      - name: apps_used_without_glue
+        description: The apps used by the Shop, excluding glue apps such as "filter". (See project var['glue_apps'])
       - name: has_puc_workflow
         description: Whether the Shop has a workflow with a PUC step.
         tests:
           - not_null
+      - name: source_destination_pairs_list
+        description: A list of the Shop's source/destination app pairs from all workflows (enabled or not).

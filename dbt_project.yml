@@ -61,6 +61,14 @@ vars:
     - googlesheets
     - recharge
 
+  glue_apps:
+    - transform
+    - filter
+    - loop
+    - delay
+    - logs
+    - iterator
+
   etl_fields:
     [
       "__HEVO__DATABASE_NAME",
