@@ -59,4 +59,3 @@ constellation_users AS (
 
 SELECT *
 FROM constellation_users
-WHERE apps_used IS NOT NULL
