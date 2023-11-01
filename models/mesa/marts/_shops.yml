@@ -749,3 +749,7 @@ models:
           - not_null
       - name: source_destination_pairs_list
         description: A list of the Shop's source/destination app pairs from all workflows (enabled or not).
+      - name: has_csm_support
+        description: Whether the Shop has CSM support and exists in our Book-of-Business (BOB)
+        tests:
+          - not_null

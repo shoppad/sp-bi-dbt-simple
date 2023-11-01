@@ -9,6 +9,13 @@ with
         where "name" = 'price_per_action'
     ),
 
+    csm_support as (
+        select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
+        from shops
+        left join {{ ref("stg_shop_entitlements") }} using (shop_subdomain)
+        where "name" = 'support'
+    ),
+
     workflows as (select * from {{ ref("workflows") }}),
 
     workflow_counts as (
@@ -602,6 +609,7 @@ with
         from shops
         left join billing_accounts using (shop_subdomain)
         left join price_per_actions using (shop_subdomain)
+        left join csm_support using (shop_subdomain)
         left join workflow_counts using (shop_subdomain)
         left join workflow_run_counts using (shop_subdomain)
         left join successful_workflow_run_counts using (shop_subdomain)
