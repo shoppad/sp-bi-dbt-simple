@@ -16,7 +16,7 @@ with
         where "name" = 'support'
     ),
 
-    workflows as (select * from {{ ref("workflows") }}),
+    workflows as (select * from {{ ref("workflows") }} where is_deleted = false),
 
     workflow_counts as (
         select
@@ -369,8 +369,11 @@ with
 
     workflow_source_destination_pairs as (
         select
-            listagg(distinct source_destination_pair, ',') within group (
-                order by source_destination_pair asc
+            nullif(
+                listagg(distinct source_destination_pair, ',') within group (
+                    order by source_destination_pair asc
+                ),
+                ''
             ) as source_destination_pairs_list,
             shop_subdomain
         from workflows

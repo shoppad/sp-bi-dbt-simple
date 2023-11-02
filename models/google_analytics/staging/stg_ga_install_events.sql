@@ -1,22 +1,23 @@
-WITH installation_events AS (
+with
+    shop_anonymous_keys as (
+        select * from {{ ref("stg_anonymous_to_known_user_matching") }}
+    ),
 
-    SELECT
-        user_pseudo_id,
-        user_id AS shop_subdomain,
-        event_timestamp,
-        PARSE_URL(page_location) AS page_params,
-        page_params:parameters:utm_content::STRING AS utm_content,
-        page_params:parameters:utm_campaign::STRING AS utm_campaign,
-        page_params:parameters:utm_medium::STRING AS utm_medium,
-        page_params:parameters:utm_source::STRING AS utm_source,
-        page_params:parameters:page_referrer::STRING AS referrer,
-        page_params:host::STRING AS referrer_host,
-        page_params:parameters:referrer_source::STRING AS referrer_source,
-        page_params:parameters:referrer_medium::STRING AS referrer_medium,
-        shop_id
-    FROM {{ source('mesa_ga4', 'events') }}
-    WHERE event_name = 'getmesa_install_convert'
-)
+    installation_events as (
+        select
+            user_pseudo_id,
+            {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}
+            as event_timestamp_pt
+        from {{ source("mesa_ga4", "events") }}
+        where event_name = 'getmesa_install_convert'
+        qualify
+            row_number() over (
+                partition by user_pseudo_id, event_timestamp
+                order by param_source, name, __hevo__loaded_at
+            )
+            = 1
 
-SELECT *
-FROM installation_events
+    )
+select *
+from installation_events
+inner join shop_anonymous_keys using (user_pseudo_id)
