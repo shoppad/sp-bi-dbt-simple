@@ -12,8 +12,13 @@ with
     csm_support as (
         select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
         from shops
-        left join {{ ref("stg_shop_entitlements") }} using (shop_subdomain)
-        where "name" = 'support'
+        left join
+            (
+                select *
+                from {{ ref("stg_shop_entitlements") }}
+                where "name" = 'support'
+            ) using (shop_subdomain)
+
     ),
 
     workflows as (select * from {{ ref("workflows") }}),
