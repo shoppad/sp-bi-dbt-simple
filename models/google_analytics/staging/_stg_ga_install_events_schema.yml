@@ -1,0 +1,33 @@
+version: 2
+models:
+  - name: stg_ga_install_events
+    description: ""
+    columns:
+      - name: USER_PSEUDO_ID
+        description: The anonymouse Google Analytics user ID
+        tests:
+          - not_null
+      - name: SHOP_SUBDOMAIN
+        description: The subdomain of the shop
+      - name: EVENT_TIMESTAMP
+        description: ""
+      - name: PAGE_PARAMS
+        description: ""
+      - name: UTM_CONTENT
+        description: ""
+      - name: UTM_CAMPAIGN
+        description: ""
+      - name: UTM_MEDIUM
+        description: ""
+      - name: UTM_SOURCE
+        description: ""
+      - name: REFERRER
+        description: ""
+      - name: REFERRER_HOST
+        description: ""
+      - name: REFERRER_SOURCE
+        description: ""
+      - name: REFERRER_MEDIUM
+        description: ""
+      - name: SHOP_ID
+        description: ""

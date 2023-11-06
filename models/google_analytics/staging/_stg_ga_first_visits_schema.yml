@@ -1,0 +1,41 @@
+version: 2
+models:
+  - name: stg_ga_first_visits
+    description: ""
+    columns:
+      - name: USER_PSEUDO_ID
+        decription: The anonymous Google Analytics ID
+        description: The anonymouse Google Analytics user ID
+      - name: FIRST_TOUCH_AT_PT
+        description: ""
+      - name: FIRST_TOUCH_URL
+        description: ""
+      - name: FIRST_TOUCH_HOST
+        description: ""
+      - name: FIRST_TOUCH_PATH
+        description: ""
+      - name: first_touch_CONTENT
+        description: ""
+      - name: first_touch_CAMPAIGN
+        description: ""
+      - name: first_touch_MEDIUM
+        description: ""
+      - name: first_touch_SOURCE
+        description: ""
+      - name: FIRST_TOUCH_REFERRER_HOST
+        description: ""
+      - name: FIRST_TOUCH_APP_STORE_SEARCH_TERM
+        description: ""
+      - name: FIRST_TOUCH_APP_STORE_SURFACE_TYPE
+        description: ""
+      - name: FIRST_TOUCH_APP_STORE_SURFACE_INTRA_POSITION
+        description: ""
+      - name: FIRST_TOUCH_APP_STORE_SURFACE_INTER_POSITION
+        description: ""
+      - name: FIRST_TOUCH_APP_STORE_LOCALE
+        description: ""
+      - name: SHOP_SUBDOMAIN
+        description: The subdomain of the shop
+        tests:
+          - not_null
+          - unique

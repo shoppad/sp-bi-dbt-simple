@@ -1,13 +1,8 @@
 with
+
     shops as (select * from {{ ref("int_shops") }}),
 
     billing_accounts as (select * from {{ ref("stg_mesa_billing_accounts") }}),
-
-    price_per_actions as (
-        select shop_subdomain, "value" as price_per_action
-        from {{ ref("stg_shop_entitlements") }}
-        where "name" = 'price_per_action'
-    ),
 
     csm_support as (
         select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
@@ -19,6 +14,19 @@ with
                 where "name" = 'support'
             ) using (shop_subdomain)
 
+    ),
+
+    price_per_actions as (
+        select shop_subdomain, "value" as price_per_action
+        from {{ ref("stg_shop_entitlements") }}
+        where "name" = 'price_per_action'
+    ),
+
+    csm_support as (
+        select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
+        from shops
+        left join {{ ref("stg_shop_entitlements") }} using (shop_subdomain)
+        where "name" = 'support'
     ),
 
     workflows as (select * from {{ ref("workflows") }} where is_deleted = false),
@@ -444,7 +452,8 @@ with
                 avg_initial_gmv_usd,
                 churned_on_pt
             ),
-            not (activation_date_pt is null) as is_activated,
+            not activation_date_pt
+            is null as is_activated,
             iff(is_activated, 'activated', 'onboarding') as funnel_phase,
             {{
                 dbt.datediff(

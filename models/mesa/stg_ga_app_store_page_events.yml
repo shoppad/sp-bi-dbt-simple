@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: stg_ga_app_store_page_events
+    columns:
+      - name: user_pseudo_id
+      - name: shopify_id
+        description: The official shopify identifier for the shop.
+      - name: utm_source
+      - name: app_store_locale
+      - name: app_store_search_term
+      - name: event_name
+      - name: utm_campaign
+      - name: app_store_surface_type

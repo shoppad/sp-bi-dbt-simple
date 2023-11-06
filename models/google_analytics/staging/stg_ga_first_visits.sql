@@ -3,28 +3,37 @@ with
         select * from {{ ref("stg_anonymous_to_known_user_matching") }}
     ),
 
+    shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
+
     first_visits as (
+        select *
+        from {{ source("mesa_ga4", "events") }}
+        where event_name = 'first_visit' and not page_location ilike '%.pages.dev%'
+    ),
+
+    shop_first_visits as (
 
         select
-            user_pseudo_id,
-            page_location,
-            {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}
+            user_pseudo_id::string as user_pseudo_id,
+            page_location::string as page_location,
+            {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}::timestamp
             as event_timestamp_pt,
-            parse_url(page_location) as page_params,
+            parse_url(page_location::string) as page_params,
             page_params:parameters:utm_content::string as utm_content,
             page_params:parameters:utm_campaign::string as utm_campaign,
             page_params:parameters:utm_medium::string as utm_medium,
             page_params:parameters:utm_source::string as utm_source,
-            page_params:host::string as referrer_host,
             page_params:parameters:surface_detail::string as app_store_search_term,
             page_params:parameters:surface_type::string as app_store_surface_type,
             page_params:parameters:surface_intra_position::string
             as app_store_surface_intra_position,
             page_params:parameters:surface_inter_position::string
             as app_store_surface_inter_position,
-            page_params:parameters:locale::string as app_store_locale
-        from {{ source("mesa_ga4", "events") }}
-        where event_name = 'first_visit' and not page_location ilike '%.pages.dev%'
+            page_params:parameters:locale::string as app_store_locale,
+            page_referrer as first_touch_referrer,
+            parse_url(first_touch_referrer):host::string as first_touch_referrer_host
+        from shops
+        left join first_visits
         qualify
             row_number() over (
                 partition by user_pseudo_id, event_name, event_timestamp
@@ -41,19 +50,20 @@ with
             split_part(page_location, '//', 2) as first_touch_url,
             split_part(first_touch_url, '/', 1) as first_touch_host,
             split_part(first_touch_url, '?', 1) as first_touch_path,
-            utm_content as first_touch_utm_content,
-            utm_campaign as first_touch_utm_campaign,
-            utm_medium as first_touch_utm_medium,
-            utm_source as first_touch_utm_source,
-            referrer_host as first_touch_referrer_host,
+            utm_content as first_touch_content,
+            utm_campaign as first_touch_campaign,
+            utm_medium as first_touch_medium,
+            utm_source as first_touch_source,
             app_store_search_term as first_touch_app_store_search_term,
             app_store_surface_type as first_touch_app_store_surface_type,
             app_store_surface_intra_position
             as first_touch_app_store_surface_intra_position,
             app_store_surface_inter_position
             as first_touch_app_store_surface_inter_position,
-            app_store_locale as first_touch_app_store_locale
-        from first_visits
+            app_store_locale as first_touch_app_store_locale,
+            first_touch_referrer,
+            first_touch_referrer_host
+        from shop_first_visits
     )
 
 select *

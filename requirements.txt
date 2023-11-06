@@ -1,5 +1,5 @@
+dbt-snowflake == 1.6.5
 dbt-core
-dbt-snowflake
 dbt-rpc
 sqlfluff
 dbt-metabase

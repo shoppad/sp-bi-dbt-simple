@@ -9,6 +9,7 @@ models:
     columns:
       - name: DT
       - name: SHOP_SUBDOMAIN
+        description: The subdomain of the shop
       - name: DAILY_PLAN_REVENUE
       - name: MESA_PLAN
       - name: IS_SHOPIFY_ZOMBIE_PLAN

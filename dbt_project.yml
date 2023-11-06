@@ -188,6 +188,7 @@ models:
         +schema: support
       intermediate:
         +schema: support
+        +materialized: ephemeral
 
     customer_io:
       staging:

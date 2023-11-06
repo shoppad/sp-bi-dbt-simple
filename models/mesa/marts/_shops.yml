@@ -58,15 +58,15 @@ models:
       - name: plan_price
         description: The current mesa plan's monthly cost.
       - name: plan_used
-        description: "The number of automation runs used in the current billing bucket"
+        description: The number of automation runs used in the current billing bucket
       - name: percent_complete
-        description: "The percent of the days in the month that have been completed"
+        description: The percent of the days in the month that have been completed
       - name: billing_on_pt
         description: "From Shopify: The date this billing period will rollover"
       - name: plan_name
         description: The mesa plan the shop is currently subscribed to.
       - name: percent_used
-        description: "The perecent of automtions used in the current billing bucket."
+        description: The perecent of automtions used in the current billing bucket.
       - name: balance_remaining
         description: "From: Shopify: The dollars reminaing in this billing cycle's hard_limit"
       - name: shopify_shop_gmv_initial_total_usd
@@ -155,20 +155,22 @@ models:
         description: The timestamp of the latest uninstallation of the app.
       - name: first_plan_upgrade_date
         description: The date of the first plan upgrade action.
-      - name: acquisition_campaign
+      - name: first_touch_campaign
         description: The campaign that the shop was acquired through.
-      - name: acquisition_content
+      - name: first_touch_content
         description: The content that the shop was acquired through.
       - name: acquisition_first_page_path
         description: The first page path that the shop was acquired through.
-      - name: acquisition_referrer
-        description: The referrer that the shop was acquired through.
-      - name: acquisition_medium
+      - name: first_touch_referrer
+        description: The referrer URL that referred the Shop's first visit.
+      - name: first_touch_referrer_host
+        description: The referrer host that referrered the shop's first visit.
+      - name: first_touch_medium
         description: The medium that the shop was acquired through.
-      - name: acquisition_source
+      - name: first_touch_source
         description: The source that the shop was acquired through.
-      - name: acquisition_source_medium
-        description: The source & medium that the shop was acquired through.
+      - name: first_touch_source_medium
+        description: The source & medium that drove the Shop's first visit.
       - name: funnel_phase
         description: The top-level step in the funnel that the shop is currently in.
         tests:
@@ -245,7 +247,6 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.9
-
       - name: has_tracktor
         description: whether the shop has an account for this app.
         tests:
@@ -349,8 +350,8 @@ models:
           metabase.display_name: Estimated Shop Sales (Store Leads)
       - name: store_leads_monthly_app_spend
         description:
-          The estimated amount the Shop spends on Shopify apps (pulled in from
-          Store Leads).†≤
+          "The estimated amount the Shop spends on Shopify apps (pulled in\
+          \ from Store Leads).\u2020\u2264"
         meta:
           metabase.semantic_type: type/Currency
           metabase.display_name: Monthly App Spend (Store Leads)
@@ -433,15 +434,21 @@ models:
       - name: first_in_constellation_at_utc
         description: The timestamp of the Shop's first install in the constellation.
       - name: first_in_constellation_on_pt
-        description: The date of the Shop's first install in the constellation apart from MESA.
+        description:
+          The date of the Shop's first install in the constellation apart from
+          MESA.
         meta:
           metabase.display_name: First In Constellation On (PT)
       - name: first_in_constellation_at_pt
-        description: The timestamp of the Shop's first install in the constellation apart from MESA.
+        description:
+          The timestamp of the Shop's first install in the constellation apart
+          from MESA.
         meta:
           metabase.display_name: First In Constellation At (PT)
       - name: constellation_cohort_week
-        description: The week of the Shop's first install in the constellation apart from MESA.
+        description:
+          The week of the Shop's first install in the constellation apart from
+          MESA.
         meta:
           metabase.display_name: Constellation Cohort Week
       - name: last_journey_email_converted_at_pt
@@ -497,7 +504,9 @@ models:
           - dbt_expectations.expect_column_distinct_count_to_equal:
               value: 2
       - name: currency_not_supported
-        description: Whether the Shop's currency is not supported in the DBT/Snowflake currency conversion data.
+        description:
+          Whether the Shop's currency is not supported in the DBT/Snowflake
+          currency conversion data.
         meta:
           metabase.display_name: Currency Not Supported?
         tests:
@@ -513,41 +522,63 @@ models:
           The number of successful workflow run attempts initiated in the last
           year as of this day.
       - name: average_daily_usage_revenue
-        description: The average daily usage revenue for the Shop (calculated by the average of the last 30 billable days).
+        description:
+          The average daily usage revenue for the Shop (calculated by the average
+          of the last 30 billable days).
       - name: workflow_run_attempt_rolling_thirty_day_count
         description:
           The number of successful workflow run attempts initiated in the last
           30 days as of this day.
       - name: input_step_rolling_thirty_day_count
-        description: The total number of Workflow Steps started in the last 30 days as of Yesterday.
+        description:
+          The total number of Workflow Steps started in the last 30 days as
+          of Yesterday.
         tests:
           - not_null
       - name: output_step_rolling_thirty_day_count
-        description: The total number of "input" (Trigge) Workflow Steps completed in the last 30 days as of Yesterday.
+        description:
+          The total number of "input" (Trigge) Workflow Steps completed in
+          the last 30 days as of Yesterday.
         tests:
           - not_null
       - name: total_workflow_steps_rolling_thirty_day_count
-        description: The total number of Workflow Steps completed in the last 30 days as of Yesterday.
+        description:
+          The total number of Workflow Steps completed in the last 30 days
+          as of Yesterday.
         tests:
           - not_null
       - name: first_workflow_trigger_key
-        description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The key of the first step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: total_thirty_day_revenue
         description: The total revenue for the Shop in the last 30 days as of Yesterday.
         tests:
           - not_null
       - name: first_workflow_trigger_app
-        description: The app of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The app of the first step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_destination_key
-        description: The key of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The key of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_destination_app
-        description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The app of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_destination_name
-        description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The name of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: average_daily_revenue
-        description: The average daily revenue for the Shop (calculated by the average of the last 30 billable days).
+        description:
+          The average daily revenue for the Shop (calculated by the average
+          of the last 30 billable days).
       - name: first_workflow_trigger_name
-        description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The name of the first step in the Shop's first workflow. Gives a
+          clue to their MESA use case.
       - name: integration_apps_enabled_count
         description: The number of unique integration apps enabled for the Shop.
         tests:
@@ -557,37 +588,61 @@ models:
         tests:
           - not_null
       - name: first_workflow_sort_title
-        description: The sort title of the first workflow in the Shop. (Cleaned title or marked as DELETED.)
+        description:
+          The sort title of the first workflow in the Shop. (Cleaned title
+          or marked as DELETED.)
       - name: first_workflow_trigger_destination_app_pair
-        description: The app pair of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The app pair of the Shop's first workflow. Gives a clue to their
+          MESA use case.
       - name: first_workflow_trigger_destination_key_pair
-        description: The key pair of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The key pair of the Shop's first workflow. Gives a clue to their
+          MESA use case.
       - name: first_workflow_destination_name
-        description: The name of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The name of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_trigger_name
-        description: The name of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The name of the first step in the Shop's first workflow. Gives a
+          clue to their MESA use case.
       - name: max_workflow_steps
         description: The maximum number of steps in any workflow for the Shop.
         tests:
           - not_null
       - name: first_workflow_title
-        description: The title of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The title of the Shop's first workflow. Gives a clue to their MESA
+          use case.
       - name: is_using_pro_apps
         description: Whether the Shop is using any pro apps.
         tests:
           - not_null
       - name: first_workflow_trigger_key
-        description: The key of the first step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The key of the first step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_destination_app
-        description: The app of the last step in the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The app of the last step in the Shop's first workflow. Gives a clue
+          to their MESA use case.
       - name: first_workflow_trigger_destination_name_pair
-        description: The name pair of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The name pair of the Shop's first workflow. Gives a clue to their
+          MESA use case.
       - name: first_workflow_app_chain
-        description: The app chain of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The app chain of the Shop's first workflow. Gives a clue to their
+          MESA use case.
       - name: first_workflow_step_chain
-        description: The step chain of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The step chain of the Shop's first workflow. Gives a clue to their
+          MESA use case.
       - name: first_workflow_id
-        description: The ID of the Shop's first workflow. Gives a clue to their MESA use case.
+        description:
+          The ID of the Shop's first workflow. Gives a clue to their MESA use
+          case.
       - name: has_ever_installed_coin
         description: Whether the Shop has ever installed Coin.
       - name: has_shoppad_constellation_app
@@ -613,45 +668,67 @@ models:
       - name: has_ever_installed_blogstudio
         description: Whether the Shop has ever installed Blog Studio.
       - name: did_install_another_shoppad_app_first
-        description: Whether the Shop installed another Shoppad app before installing their first Shoppad Constellation app.
+        description:
+          Whether the Shop installed another Shoppad app before installing
+          their first Shoppad Constellation app.
       - name: has_ever_installed_uploadery
         description: Whether the Shop has ever installed Uploadery.
       - name: first_shoppad_app_installed
         description: The first Shoppad app installed by the Shop.
       - name: did_pay_and_then_downgrade_to_free
-        description: Whether the Shop has ever paid for a plan and then downgraded to the free plan.
+        description:
+          Whether the Shop has ever paid for a plan and then downgraded to
+          the free plan.
       - name: virtual_plan
         description: The v10 plan the Shop's usage qualifies for.
         tests:
           - not_null
       - name: virtual_plan_workflow_run_attempt_qualifier
-        description: The qualifier for the Shop's virtual plan based on their workflow run attempts/triggers.
+        description:
+          The qualifier for the Shop's virtual plan based on their workflow
+          run attempts/triggers.
       - name: virtual_plan_pro_app_qualifier
-        description: The qualifier for the Shop's virtual plan based on their pro app usage.
+        description:
+          The qualifier for the Shop's virtual plan based on their pro app
+          usage.
       - name: virtual_plan_step_qualifier
-        description: The qualifier for the Shop's virtual plan based on their workflow step usage.
+        description:
+          The qualifier for the Shop's virtual plan based on their workflow
+          step usage.
       - name: workflow_runs_stop_count
         description: The number of workflow runs that have resulted in Stop.
         tests:
           - not_null
       - name: is_likely_shopify_plus_dev_store
-        description: Whether the Shop is likely a Shopify Plus dev store and therefore not valuable.
+        description:
+          Whether the Shop is likely a Shopify Plus dev store and therefore
+          not valuable.
       - name: workflow_run_failure_rolling_year_count
-        description: The number of workflow runs that have resulted in Failure in the last year.
+        description:
+          The number of workflow runs that have resulted in Failure in the
+          last year.
       - name: workflow_run_stop_rolling_year_count
-        description: The number of workflow runs that have resulted in Stop in the last year.
+        description:
+          The number of workflow runs that have resulted in Stop in the last
+          year.
       - name: workflow_run_stop_rolling_thirty_day_count
-        description: The number of workflow runs that have resulted in Stop in the last 30 days.
+        description:
+          The number of workflow runs that have resulted in Stop in the last
+          30 days.
       - name: workflow_runs_fail_count
         description: The number of workflow runs that have resulted in Failure.
       - name: workflow_run_failure_rolling_thirty_day_count
-        description: The number of workflow runs that have resulted in Failure in the last 30 days.
+        description:
+          The number of workflow runs that have resulted in Failure in the
+          last 30 days.
       - name: email_unsubscribe_email_name
         description: The name of the email the Shop unsubscribed from.
       - name: first_shoppad_app_installed_at_pt
         description: The date/time the Shop installed their first Shoppad app.
       - name: is_email_acquisition
-        description: Whether the Shop was acquired via email/email played a role in their journey.
+        description:
+          Whether the Shop was acquired via email/email played a role in their
+          journey.
       - name: has_unsubscribed_from_email
         description: Whether the Shop has unsubscribed from email.
       - name: first_shoppad_app_installed_at_utc
@@ -675,7 +752,9 @@ models:
       - name: first_trial_plan_identifier
         description: The identifier of the Shop's first trial plan.
       - name: plan_upgrade_funnel_status
-        description: The status of the Shop's plan upgrade funnel through trial, paying and churn.
+        description:
+          The status of the Shop's plan upgrade funnel through trial, paying
+          and churn.
       - name: first_journey_sent_name
         description: The name of the first journey email the Shop received.
       - name: first_journey_sent_subject
@@ -711,7 +790,9 @@ models:
         tests:
           - not_null
       - name: max_workflow_steps_with_deleted
-        description: The maximum number of steps in any workflow for the Shop, including deleted steps.
+        description:
+          The maximum number of steps in any workflow for the Shop, including
+          deleted steps.
         tests:
           - not_null
       - name: has_successfully_run_a_test
@@ -742,14 +823,82 @@ models:
       - name: apps_used
         description: The apps used by the Shop.
       - name: apps_used_without_glue
-        description: The apps used by the Shop, excluding glue apps such as "filter". (See project var['glue_apps'])
+        description:
+          The apps used by the Shop, excluding glue apps such as "filter".
+          (See project var['glue_apps'])
       - name: has_puc_workflow
         description: Whether the Shop has a workflow with a PUC step.
         tests:
           - not_null
       - name: source_destination_pairs_list
-        description: A list of the Shop's source/destination app pairs from all workflows (enabled or not).
+        description:
+          A list of the Shop's source/destination app pairs from all workflows
+          (enabled or not).
       - name: has_csm_support
-        description: Whether the Shop has CSM support and exists in our Book-of-Business (BOB)
+        description:
+          Whether the Shop has CSM support and exists in our Book-of-Business
+          (BOB)
         tests:
           - not_null
+      - name: last_touch_app_store_surface_type
+        description: The type of surface for the last touch in the app store.
+      - name: first_touch_app_store_surface_intra_position
+        description: The intra position of the first touch on the app store surface.
+      - name: last_touch_source_medium
+        description: The source medium of the last touch.
+      - name: first_touch_app_store_surface_type
+        description: The type of surface for the first touch in the app store.
+      - name: last_touch_content
+        description: The content of the last touch.
+      - name: first_touch_app_store_search_term
+        description: The search term of the first touch in the app store.
+      - name: days_to_install
+        description: The number of days it took to install.
+      - name: first_touch_path
+        description: The path of the first touch.
+      - name: install_event_source
+        description: The source of the install event.
+      - name: last_touch_url
+        description: The URL of the last touch.
+      - name: last_touch_campaign
+        description: The campaign of the last touch.
+      - name: first_touch_at_pt
+        description: The timestamp of the first touch.
+      - name: last_touch_app_store_surface_intra_position
+        description: The intra position of the last touch on the app store surface.
+      - name: last_touch_host
+        description: The host of the last touch.
+      - name: last_touch_app_store_search_term
+        description: The search term of the last touch in the app store.
+      - name: last_touch_referrer_host
+        description: The referrer host of the last touch.
+      - name: last_touch_path
+        description: The path of the last touch.
+      - name: is_app_store_search_ad_referral
+        description: Whether the referral is from an app store search ad.
+      - name: first_touch_host
+        description: The host of the first touch.
+      - name: acq_info_source
+        description: The source of acquisition information.
+      - name: last_touch_medium
+        description: The medium of the last touch.
+      - name: last_touch_referrer
+        description: The referrer of the last touch.
+      - name: first_touch_app_store_locale
+        description: The locale of the first touch in the app store.
+      - name: sessions_til_install
+        description: The number of sessions until installation.
+      - name: last_touch_at_pt
+        description: The timestamp of the last touch.
+      - name: last_touch_app_store_surface_inter_position
+        description: The inter position of the last touch on the app store surface.
+      - name: is_app_store_referral
+        description: Whether the referral is from the app store.
+      - name: first_touch_url
+        description: The URL of the first touch.
+      - name: first_touch_app_store_surface_inter_position
+        description: The inter position of the first touch on the app store surface.
+      - name: last_touch_app_store_locale
+        description: The locale of the last touch in the app store.
+      - name: last_touch_source
+        description: The source of the last touch.
