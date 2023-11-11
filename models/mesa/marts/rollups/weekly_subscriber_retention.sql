@@ -1,99 +1,90 @@
-WITH
-shops AS (
-    SELECT
-        shop_subdomain
-    FROM {{ ref('shops') }}
-    WHERE is_mql
-    AND NOT IS_ZOMBIE_SHOPIFY_PLAN
-),
+with
+    shops as (
+        select shop_subdomain
+        from {{ ref("shops") }}
+        where is_mql and not is_shopify_zombie_plan
+    ),
 
-calendar AS (
-    SELECT
-        DISTINCT DATE_TRUNC(week, date_day) AS dt
-    FROM {{ ref('calendar_dates') }}
-),
+    calendar as (
+        select distinct date_trunc(week, date_day) as dt
+        from {{ ref("calendar_dates") }}
+    ),
 
-ends_of_weeks AS (
-    SELECT
-        DATEADD(day, 6, dt)
-     FROM calendar
-),
+    ends_of_weeks as (select dateadd(day, 6, dt) from calendar),
 
-shop_days AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        inc_amount
-     FROM {{ ref('mesa_shop_days') }}
-     LEFT JOIN shops USING (shop_subdomain)
+    shop_days as (
+        select shop_subdomain, dt, inc_amount
+        from {{ ref("mesa_shop_days") }}
+        left join shops using (shop_subdomain)
 
-     WHERE inc_amount > 0
+        where inc_amount > 0
 
-),
+    ),
 
-first_shop_weeks AS (
-    SELECT
-        shop_subdomain,
-        DATE_TRUNC(week, MIN(dt)) AS cohort_week
-    FROM shop_days
-    GROUP BY 1
-),
+    first_shop_weeks as (
+        select shop_subdomain, date_trunc(week, min(dt)) as cohort_week
+        from shop_days
+        group by 1
+    ),
 
-decorated_first_shop_weeks AS (
-    SELECT
-        shop_subdomain,
-        cohort_week,
-        AVG(inc_amount) * 30 AS mrr
-    FROM shop_days
-    LEFT JOIN first_shop_weeks USING (shop_subdomain)
-    WHERE DATE_PART(year, cohort_week) = DATE_PART(year, dt)
-        AND DATE_PART(week, cohort_week) = DATE_PART(week, dt)
-    GROUP BY 1, 2
-),
+    decorated_first_shop_weeks as (
+        select shop_subdomain, cohort_week, avg(inc_amount) * 30 as mrr
+        from shop_days
+        left join first_shop_weeks using (shop_subdomain)
+        where
+            date_part(year, cohort_week) = date_part(year, dt)
+            and date_part(week, cohort_week) = date_part(week, dt)
+        group by 1, 2
+    ),
 
-cohort_info AS (
-   SELECT
-        cohort_week,
-        COUNT(DISTINCT shop_subdomain) AS cohort_size,
-        ROUND(SUM(mrr)) AS cohort_starting_mrr
-    FROM decorated_first_shop_weeks
-    GROUP BY 1
-),
+    cohort_info as (
+        select
+            cohort_week,
+            count(distinct shop_subdomain) as cohort_size,
+            round(sum(mrr)) as cohort_starting_mrr
+        from decorated_first_shop_weeks
+        group by 1
+    ),
 
-shop_weeks AS (
-    SELECT
-        DISTINCT DATE_TRUNC(week, dt) AS period_week,
-        shop_subdomain,
-        first_shop_weeks.cohort_week,
-        inc_amount * 30 AS week_mrr
+    shop_weeks as (
+        select distinct
+            date_trunc(week, dt) as period_week,
+            shop_subdomain,
+            first_shop_weeks.cohort_week,
+            inc_amount * 30 as week_mrr
 
-     FROM shop_days
-     LEFT JOIN first_shop_weeks USING (shop_subdomain)
-     WHERE dt IN (SELECT * FROM ends_of_weeks)
-),
+        from shop_days
+        left join first_shop_weeks using (shop_subdomain)
+        where dt in (select * from ends_of_weeks)
+    ),
 
-shop_week_activity AS (
-    SELECT
-        cohort_week,
-        period_week,
-        COUNT(DISTINCT shop_subdomain) AS retained_shops,
-        SUM(week_mrr) AS retained_mrr
-    FROM shop_weeks
-    GROUP BY 1, 2
-)
+    shop_week_activity as (
+        select
+            cohort_week,
+            period_week,
+            count(distinct shop_subdomain) as retained_shops,
+            sum(week_mrr) as retained_mrr
+        from shop_weeks
+        group by 1, 2
+    )
 
-SELECT
+select
     cohort_week,
-    CONCAT(cohort_week, ' [', cohort_size, ' / ', to_varchar(cohort_starting_mrr, '$9,000'), ']') AS cohort_info,
-    FLOOR(DATEDIFF(week, cohort_week, period_week)) as period,
+    concat(
+        cohort_week,
+        ' [',
+        cohort_size,
+        ' / ',
+        to_varchar(cohort_starting_mrr, '$9,000'),
+        ']'
+    ) as cohort_info,
+    floor(datediff(week, cohort_week, period_week)) as period,
     retained_shops,
-    retained_shops / cohort_size::float AS retention_rate,
+    retained_shops / cohort_size::float as retention_rate,
     retained_mrr,
-    retained_mrr / cohort_starting_mrr AS revenue_retention_rate
-FROM cohort_info
+    retained_mrr / cohort_starting_mrr as revenue_retention_rate
+from cohort_info
 
-
-LEFT JOIN shop_week_activity USING (cohort_week)
-WHERE period IS NOT NULL
-AND cohort_week > CURRENT_DATE - INTERVAL '60 weeks'
-ORDER BY 1, 2
+left join shop_week_activity using (cohort_week)
+where period is not null and cohort_week > current_date - interval '60 weeks'
+order by 1, 2

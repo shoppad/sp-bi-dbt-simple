@@ -19,3 +19,5 @@ models:
         description: Month of the cohort
       - name: retained_shops
         description: Number of retained shops
+      - name: cohort_info
+        description: Cohort information

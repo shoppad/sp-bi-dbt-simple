@@ -1,92 +1,104 @@
-WITH
-workflow_run_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(workflow_run_on_pt) AS first_dt,
-        MAX(workflow_run_on_pt) AS last_dt
-    FROM {{ ref('int_workflow_runs') }}
-    GROUP BY 1
-),
+with
+    workflow_run_dates as (
+        select
+            shop_subdomain,
+            min(workflow_run_on_pt) as source_first_dt,
+            max(workflow_run_on_pt) as source_last_dt
+        from {{ ref("int_workflow_runs") }}
+        group by 1
+    ),
 
-charge_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(charged_on_pt) AS first_dt,
-        MAX(charged_on_pt) AS last_dt
-    FROM {{ ref('stg_mesa_charges') }}
-    GROUP BY 1
-),
+    charge_dates as (
+        select
+            shop_subdomain,
+            min(charged_on_pt) as source_first_dt,
+            max(charged_on_pt) as source_last_dt
+        from {{ ref("stg_mesa_charges") }}
+        group by 1
+    ),
 
-plan_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS first_dt,
-        MAX(dt) AS last_dt
-    FROM {{ ref('int_mesa_shop_plan_days') }}
-    GROUP BY 1
-),
+    plan_dates as (
+        select shop_subdomain, min(dt) as source_first_dt, max(dt) as source_last_dt
+        from {{ ref("int_mesa_shop_plan_days") }}
+        group by 1
+    ),
 
-shop_dates AS (
-    SELECT
-        shop_subdomain,
-        first_installed_at_pt AS first_dt,
-        CASE
-            WHEN uninstalled_at_pt IS NULL OR status = 'active'
-                THEN {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}
-            ELSE
-                uninstalled_at_pt
-        END::DATE AS last_dt
-    FROM {{ ref('stg_shops') }}
-),
+    shop_dates as (
+        select
+            shop_subdomain,
+            first_installed_at_pt as source_first_dt,
+            case
+                when is_shopify_zombie_plan
+                then shopify_last_updated_at_pt
+                when uninstalled_at_pt is null or status = 'active'
+                then {{ pacific_timestamp("CURRENT_TIMESTAMP()") }}
+                else uninstalled_at_pt
+            end::date as source_last_dt
+        from {{ ref("stg_shops") }}
+    ),
 
-custom_app_revenue AS (
+    custom_app_revenue as (
 
-    SELECT
-        shop_subdomain,
-        first_dt,
-        last_dt
+        select shop_subdomain, first_dt as source_first_dt, last_dt as source_last_dt
         {# TODO: Add start/end dates to custom apps seed file. #}
         {# ?: Some custom apps can't connect to real stores. This probably means some Workflows aren't being attributed to a Store either. #}
-    FROM {{ ref('custom_app_daily_revenues') }}
+        from {{ ref("custom_app_daily_revenues") }}
 
-),
+    ),
 
-combined_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(first_dt) AS first_dt,
-        MAX(last_dt) AS last_dt
-    FROM (
-        SELECT *
-        FROM charge_dates
-        UNION ALL
-        SELECT *
-        FROM workflow_run_dates
-        UNION ALL
-        SELECT *
-        FROM shop_dates
-        UNION ALL
-        SELECT *
-        FROM custom_app_revenue
-        UNION ALL
-        SELECT *
-        FROM plan_dates
+    combined_dates as (
+        select
+            shop_subdomain,
+            min(source_first_dt) as source_first_dt,
+            min_by(source, source_first_dt) as first_dt_source,
+            max(source_last_dt) as source_last_dt,
+            max_by(source, source_last_dt) as last_dt_source
+        from
+            (
+                select *, 'charge_dates' as source
+                from charge_dates
+                union all
+                select *, 'workflow_run_dates' as source
+                from workflow_run_dates
+                union all
+                select *, 'shop_dates' as source
+                from shop_dates
+                union all
+                select *, 'custom_app_revenue' as source
+                from custom_app_revenue
+                union all
+                select *, 'plan_dates' as source
+                from plan_dates
+            )
+        group by 1
+    ),
+
+    final as (
+        select
+            shop_subdomain,
+            combined_dates.source_first_dt::date as first_dt,
+            least(
+                coalesce(
+                    combined_dates.source_last_dt,
+                    {{ pacific_timestamp("CURRENT_TIMESTAMP()") }}::date
+                ),
+                coalesce(
+                    shop_dates.source_last_dt,
+                    {{ pacific_timestamp("CURRENT_TIMESTAMP()") }}::date
+                )
+            ) as last_dt,
+            {{
+                datediff(
+                    "first_dt",
+                    "COALESCE(last_dt, "
+                    ~ pacific_timestamp("CURRENT_TIMESTAMP()")
+                    ~ ")::DATE",
+                    "day",
+                )
+            }} + 1 as lifespan_length
+        from combined_dates
+        left join shop_dates using (shop_subdomain)  -- Added to override in case of uninstall.
     )
-    GROUP BY 1
-),
 
-final AS (
-    SELECT
-        shop_subdomain,
-        combined_dates.first_dt::DATE AS first_dt,
-        LEAST(
-            COALESCE(combined_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE),
-            COALESCE(shop_dates.last_dt, {{ pacific_timestamp('CURRENT_TIMESTAMP()') }}::DATE)
-        ) AS last_dt,
-        {{ datediff('first_dt', 'COALESCE(last_dt, ' ~ pacific_timestamp('CURRENT_TIMESTAMP()') ~ ')::DATE', 'day') }} + 1 AS lifespan_length
-    FROM combined_dates
-    LEFT JOIN shop_dates USING (shop_subdomain)-- Added to override in case of uninstall.
-)
-
-SELECT *
-FROM final
+select *
+from final

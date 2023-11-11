@@ -58,5 +58,5 @@ models:
         description: The week of the Shop's first app installation.
       - name: cohort_month
         description: The month of the Shop's first app installation.
-      - name: trial_end_dt
+      - name: trial_end_dt_utc
         description: The date the Shop's trial ended.

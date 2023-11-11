@@ -22,13 +22,6 @@ with
         where "name" = 'price_per_action'
     ),
 
-    csm_support as (
-        select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
-        from shops
-        left join {{ ref("stg_shop_entitlements") }} using (shop_subdomain)
-        where "name" = 'support'
-    ),
-
     workflows as (select * from {{ ref("workflows") }} where is_deleted = false),
 
     workflow_counts as (
@@ -542,12 +535,12 @@ with
             end as store_leads_estimated_monthly_sales_bucket,
             coalesce(trial_ends_pt >= current_date, false) as is_in_trial,
             yesterdays_inc_amount > 0
-            and not is_zombie_shopify_plan
+            and not is_shopify_zombie_plan
             and not is_in_trial
             and billing_accounts.plan_name not ilike '%free%'
             and install_status = 'active' as is_currently_paying,
             average_daily_revenue = 0
-            and not is_zombie_shopify_plan
+            and not is_shopify_zombie_plan
             and not is_in_trial
             and billing_accounts.plan_name not ilike '%free%'
             and install_status = 'active' as is_likely_shopify_plus_dev_store,

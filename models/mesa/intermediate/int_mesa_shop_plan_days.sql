@@ -155,7 +155,6 @@ with
                 custom_app_daily_revenue_dates.mesa_plan_identifier
             ) as mesa_plan_identifier,
             shopify_plan,
-            is_zombie,
             coalesce(is_zombie, false) as is_shopify_zombie_plan
         from mesa_plan_calendar_dates
         full outer join custom_app_daily_revenue_dates using (shop_subdomain, dt)

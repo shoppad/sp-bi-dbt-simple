@@ -222,7 +222,7 @@ models:
           or disabled).
         tests:
           - not_null
-      - name: trial_end_dt
+      - name: trial_end_dt_utc
         description: The date the Shop's trial ended.
         meta:
           metabase.display_name: Trial End Date (UTC)
@@ -302,7 +302,7 @@ models:
         tests:
           - not_null
       - name: shopify_shop_orders_initial_count
-        description: The number of orders the Shop had at the time of install.
+        description: The 30-day order count volume at the time of app installation.
       - name: age_of_store_at_install_bucket
         description: The bucket of the Shop's age at install.
       - name: age_of_store_at_install_in_days
@@ -310,7 +310,7 @@ models:
       - name: shopify_shop_created_at_pt
         description: The timestamp of the Shopify Shop's creation.
       - name: shopify_shop_orders_current_count
-        description: The last-30-day order volume of the Shop.
+        description: The current monthly order volume of the shop.
       - name: age_of_store_at_install_in_weeks
         description: The age (in weeks) of the store at the initial install.
       - name: store_leads_category
@@ -511,8 +511,8 @@ models:
           metabase.display_name: Currency Not Supported?
         tests:
           - not_null
-      - name: is_zombie_shopify_plan
-        description: Whether the Shop is on a zombie Shopify plan.
+      - name: is_shopify_zombie_plan
+        description: Indicates whether the store is on a 'frozen', 'fraudulent', 'paused', 'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means they are not.
         meta:
           metabase.display_name: Is Zombie Shopify Plan?
         tests:

@@ -29,7 +29,6 @@ with
                     ",\n       "
                 )
             }},
-            shopify:plan_name::string as shopify_plan_name,
             shopify:currency::string as currency,
             {{ pacific_timestamp("cast(shopify:created_at AS TIMESTAMP_LTZ)") }}
             as shopify_shop_created_at_pt,
@@ -69,12 +68,7 @@ with
                 when age_of_store_at_install_in_days <= 730
                 then '8-First 2 Years (After 18 Months)'
                 else '9-2nd Year+'
-            end as age_of_store_at_install_bucket,
-            coalesce(
-                shopify_plan_name
-                in ({{ "'" ~ var("zombie_store_shopify_plans") | join("', '") ~ "'" }}),
-                false
-            ) as is_zombie_shopify_plan
+            end as age_of_store_at_install_bucket
         from {{ source_table }}
     ),
 
