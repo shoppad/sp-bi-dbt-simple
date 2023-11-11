@@ -16,8 +16,8 @@ with
             shopify_plan_name as plan,
             shop_subdomain,
             null as oldplan,
-            null as shopify_plan_change_id,
-            null as plandisplayname,
+            shop_subdomain || '-current' as shopify_plan_change_id,
+            shopify_plan_name as plandisplayname,
             shopify_last_updated_at_pt as changed_at_pt,
             cast(shopify_last_updated_at_pt as date) as changed_on_pt
         from {{ ref("stg_shops") }}
@@ -38,3 +38,4 @@ with
 
 select *
 from final
+WHERE shopify_plan_change_id ILIKE '%-current'
