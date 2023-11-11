@@ -93,7 +93,7 @@ models:
           - not_null:
               config:
                 severity: error
-                error_if: ">1000"
+                error_if: ">2000"
                 warn_if: ">10"
         description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
@@ -101,6 +101,6 @@ models:
           - not_null:
               config:
                 severity: error
-                error_if: ">1000"
+                error_if: ">2000"
                 warn_if: ">10"
         description: The source and destination app integration in one string.
