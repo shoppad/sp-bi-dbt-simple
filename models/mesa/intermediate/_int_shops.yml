@@ -55,7 +55,7 @@ models:
         description: The week of the Shop's first app installation.
       - name: cohort_month
         description: The month of the Shop's first app installation.
-      - name: trial_end_dt
+      - name: trial_end_dt_utc
         description: The date the Shop's trial ended.
       - name: launch_session_date
         description: The date of the launch session with customer success.
@@ -64,7 +64,7 @@ models:
       - name: shopify_shop_gmv_initial_total_usd
         description: The 30-day gmv of the shop at the time of installation.
       - name: shopify_shop_gmv_current_total_usd
-        description: the current 30-day gmv of the shop.
+        description: The current 30-day GMV of the Shopify Shop.
       - name: shopify_shop_created_at_pt
         description: The timestamp of the Shopify Shop's creation.
       - name: age_of_store_at_install_in_weeks
@@ -95,7 +95,7 @@ models:
         description:
           The name of the Shopify plan the store was on when the app was
           first installed.
-      - name: IS_ZOMBIE_SHOPIFY_PLAN
+      - name: is_shopify_zombie_plan
         description:
           Indicates whether the store is on a 'frozen', 'fraudulent', 'paused',
           'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means

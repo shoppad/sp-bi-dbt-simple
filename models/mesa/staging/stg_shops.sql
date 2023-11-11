@@ -1,121 +1,138 @@
-WITH
-raw_shops AS (
-    SELECT
-        * RENAME uuid AS shop_subdomain
-    FROM {{ source('mongo_sync', 'shops') }}
-    WHERE
-        NOT __hevo__marked_deleted
-        AND shopify:plan_name NOT IN ('staff', 'staff_business', 'shopify_alumni')
-        AND status NOT IN ('banned')
+with
+    raw_shops as (
+        select * rename uuid as shop_subdomain
+        from {{ source("mongo_sync", "shops") }}
+        where
+            not __hevo__marked_deleted
+            and shopify:plan_name not in ('staff', 'staff_business', 'shopify_alumni')
+            and status not in ('banned')
 
-),
+    ),
 
-trimmed_shops AS (
-    {% set exclude = ['_id', '_created_at', 'timestamp', 'method'] + var('etl_fields') -%}
+    trimmed_shops as (
+        {% set exclude = ["_id", "_created_at", "timestamp", "method"] + var(
+            "etl_fields"
+        ) -%}
 
-    SELECT
-        * EXCLUDE ({{ exclude | join(', ') }}),
-        _created_at AS created_at
-    FROM raw_shops
-),
+        select * exclude ({{ exclude | join(", ") }}), _created_at as created_at
+        from raw_shops
+    ),
 
-staff_subdomains AS (
-    SELECT shop_subdomain
-    FROM {{ ref('staff_subdomains') }}
-),
+    staff_subdomains as (select shop_subdomain from {{ ref("staff_subdomains") }}),
 
-custom_apps AS (
-    SELECT
-        shop_subdomain,
-        TRUE AS is_custom_app,
-        'Custom App' AS status,
-        PARSE_JSON('{"plan_name": "None (Custom App)", "currency": "USD"}') AS shopify,
-        first_dt,
-        last_dt
-    FROM {{ ref('custom_app_daily_revenues') }}
-),
-
-install_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(COALESCE(created_at, first_dt)) AS first_installed_at_utc,
-        MAX(COALESCE(created_at, first_dt)) AS latest_installed_at_utc,
-        {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }} AS first_installed_at_pt,
-        {{ pacific_timestamp('MIN(COALESCE(created_at, first_dt))') }}::DATE AS first_installed_on_pt,
-        {{ pacific_timestamp('MAX(COALESCE(created_at, first_dt))') }} AS latest_installed_at_pt,
-        DATE_TRUNC('week', first_installed_at_pt)::DATE AS cohort_week,
-        DATE_TRUNC('month', first_installed_at_pt)::DATE AS cohort_month
-    FROM trimmed_shops
-    FULL OUTER JOIN custom_apps USING (shop_subdomain)
-    GROUP BY 1
-),
-
-
-shop_metas AS (
-    SELECT
-        shop_subdomain,
-        ARRAY_UNION_AGG(meta) AS aggregated_meta
-    FROM trimmed_shops
-    GROUP BY 1
-),
-
-shops AS (
-    SELECT * EXCLUDE ("META")
-    FROM trimmed_shops
-    WHERE
-        NOT shop_subdomain IN (SELECT * FROM staff_subdomains)
-        AND shopify:plan_name NOT IN ('affiliate', 'partner_test', 'plus_partner_sandbox')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at DESC) = 1
-),
-
-uninstall_data_points AS (
-    SELECT
-        shop_subdomain,
-        IFF(shops.status = 'active', NULL, uninstalled_at_pt) AS uninstalled_at_pt
-    FROM shops
-    LEFT JOIN (
-        SELECT
-            id AS shop_subdomain,
-            apps_mesa_uninstalledat AS uninstalled_at_pt-- NOTE: This timestamp is already in PST
-        FROM {{ source('php_segment', 'users') }}
-
-        UNION ALL
-        SELECT
+    custom_apps as (
+        select
             shop_subdomain,
-            uninstalled_at_pt -- NOTE: This timestamp is already in PST
-        FROM {{ ref('stg_mesa_uninstalls') }}
+            true as is_custom_app,
+            'custom app' as status,
+            parse_json(
+                '{"plan_name": "none (custom app)", "currency": "usd"}'
+            ) as shopify,
+            first_dt,
+            last_dt
+        from {{ ref("custom_app_daily_revenues") }}
+    ),
 
-        UNION ALL
-        SELECT
+    install_dates as (
+        select
             shop_subdomain,
-            last_dt AS uninstalled_at_pt
-        FROM custom_apps
-    ) USING (shop_subdomain)
-),
+            min(coalesce(created_at, first_dt)) as first_installed_at_utc,
+            max(coalesce(created_at, first_dt)) as latest_installed_at_utc,
+            {{ pacific_timestamp("min(coalesce(created_at, first_dt))") }}
+            as first_installed_at_pt,
+            {{ pacific_timestamp("min(coalesce(created_at, first_dt))") }}::date
+            as first_installed_on_pt,
+            {{ pacific_timestamp("max(coalesce(created_at, first_dt))") }}
+            as latest_installed_at_pt,
+            date_trunc('week', first_installed_at_pt)::date as cohort_week,
+            date_trunc('month', first_installed_at_pt)::date as cohort_month
+        from trimmed_shops
+        full outer join custom_apps using (shop_subdomain)
+        group by 1
+    ),
 
-uninstall_dates AS (
-    SELECT
-        shop_subdomain,
-        MAX(uninstalled_at_pt) AS uninstalled_at_pt
-    FROM uninstall_data_points
-    GROUP BY 1
-),
+    shop_metas as (
+        select shop_subdomain, array_union_agg(meta) as aggregated_meta
+        from trimmed_shops
+        group by 1
+    ),
 
-final AS (
-    SELECT
-        * EXCLUDE (created_at, "GROUP", aggregated_meta, is_custom_app, first_dt, last_dt, shopify, status),
-        COALESCE(shops.status, custom_apps.status) AS status,
-        shop_metas.aggregated_meta AS meta,
-        COALESCE(shops.shopify, custom_apps.shopify) AS shopify,
-        shopify:id::VARIANT AS shopify_id,
-        TO_TIMESTAMP_NTZ(billing:plan:trial_ends::VARCHAR)::DATE AS trial_end_dt,
-        IFF(uninstalled_at_pt IS NULL, NULL, {{ datediff('first_installed_at_pt', 'uninstalled_at_pt', 'minute') }}) AS minutes_until_uninstall,
-        COALESCE(is_custom_app, FALSE) AS is_custom_app
-    FROM shops
-    FULL OUTER JOIN custom_apps USING (shop_subdomain)
-    LEFT JOIN shop_metas USING (shop_subdomain)
-    LEFT JOIN install_dates USING (shop_subdomain)
-    LEFT JOIN uninstall_dates USING (shop_subdomain)
-)
+    shops as (
+        select * exclude ("META")
+        from trimmed_shops
+        where
+            not shop_subdomain in (select * from staff_subdomains)
+            and shopify:plan_name
+            not in ('affiliate', 'partner_test', 'plus_partner_sandbox')
+        qualify
+            row_number() over (partition by shop_subdomain order by created_at desc) = 1
+    ),
 
-SELECT * FROM final
+    uninstall_data_points as (
+        select
+            shop_subdomain,
+            iff(shops.status = 'active', null, uninstalled_at_pt) as uninstalled_at_pt
+        from shops
+        left join
+            (
+                select
+                    id as shop_subdomain, apps_mesa_uninstalledat as uninstalled_at_pt  -- note: this timestamp is already in pst
+                from {{ source("php_segment", "users") }}
+
+                union all
+                select shop_subdomain, uninstalled_at_pt  -- note: this timestamp is already in pst
+                from {{ ref("stg_mesa_uninstalls") }}
+
+                union all
+                select shop_subdomain, last_dt as uninstalled_at_pt
+                from custom_apps
+            ) using (shop_subdomain)
+    ),
+
+    uninstall_dates as (
+        select shop_subdomain, max(uninstalled_at_pt) as uninstalled_at_pt
+        from uninstall_data_points
+        group by 1
+    ),
+
+    final as (
+        select
+            * exclude (
+                created_at,
+                "GROUP",
+                aggregated_meta,
+                is_custom_app,
+                first_dt,
+                last_dt,
+                shopify,
+                status
+            ),
+            coalesce(shops.status, custom_apps.status) as status,
+            shop_metas.aggregated_meta as meta,
+            coalesce(shops.shopify, custom_apps.shopify) as shopify,
+            shopify:id::variant as shopify_id,
+            shopify:plan_name::string as shopify_plan_name,
+            coalesce(
+                shopify_plan_name
+                in ({{ "'" ~ var("zombie_store_shopify_plans") | join("', '") ~ "'" }}),
+                false
+            ) as is_shopify_zombie_plan,
+            {{ pacific_timestamp("to_timestamp(shopify:updated_at)") }}
+            as shopify_last_updated_at_pt,
+            to_timestamp_ntz(billing:plan:trial_ends::varchar)::date
+            as trial_end_dt_utc,
+            iff(
+                uninstalled_at_pt is null,
+                null,
+                {{ datediff("latest_installed_at_pt", "uninstalled_at_pt", "minute") }}
+            ) as minutes_until_uninstall,
+            coalesce(is_custom_app, false) as is_custom_app
+        from shops
+        full outer join custom_apps using (shop_subdomain)
+        left join shop_metas using (shop_subdomain)
+        left join install_dates using (shop_subdomain)
+        left join uninstall_dates using (shop_subdomain)
+    )
+
+select *
+from final

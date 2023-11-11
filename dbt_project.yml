@@ -186,8 +186,6 @@ models:
     mesa_segment:
       staging:
         +schema: support
-      intermediate:
-        +schema: support
 
     customer_io:
       staging:

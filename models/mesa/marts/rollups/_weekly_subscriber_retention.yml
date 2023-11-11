@@ -19,3 +19,5 @@ models:
         description: MRR of retained shops
       - name: period
         description: Period of the cohort
+      - name: cohort_info
+        description: Cohort information
