@@ -15,7 +15,7 @@ constellation_users AS (
         first_in_constellation_at_pt::DATE AS first_in_constellation_on_pt,
         date_trunc('week', first_in_constellation_on_pt) AS constellation_cohort_week,
         COALESCE(updatedat, createdat, uuid_ts) AS updated_at,
-         1.0 * analytics_gmv * in_usd AS analytics_gmv,
+        1.0 * analytics_gmv * in_usd AS analytics_gmv,
         analytics_orders,
         shopify_createdat,
         shopify_inactiveat,
@@ -24,7 +24,7 @@ constellation_users AS (
         shopify_planname,
         support_lastreplyat,
         COALESCE(support_lastreplyat IS NOT NULL, FALSE) AS has_contacted_support,
-        COALESCE(analytics_gmv > 3000, FALSE) OR shopify_planname IN ('professional', 'unlimited', 'shopify_plus') AS is_mql,
+        COALESCE((1.0 * analytics_gmv * in_usd) > 3000, FALSE) OR shopify_planname IN ('professional', 'unlimited', 'shopify_plus') AS is_mql,
         {%- for app in constellation_apps %}
             COALESCE(COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_isactive, apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL), FALSE) AS has_{{ app }},
             COALESCE(apps_{% if app == "infinite_options" %}customizery{% else %}{{ app }}{% endif %}_installedat IS NOT NULL, FALSE) AS has_ever_installed_{{ app }}{%- if not loop.last %}, {% endif -%}
