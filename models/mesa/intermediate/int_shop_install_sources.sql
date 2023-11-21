@@ -85,6 +85,35 @@ with
         group by 1
     ),
 
+    app_store_organic_clicks as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "name",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_organic_click_{{ column_name }},
+            {% endfor %}
+            name as app_store_organic_click_campaign_name
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where
+            page_location ilike '%surface_type=%'
+            and page_location not ilike '%search_ad%'
+            and event_name = 'session_start'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
+            )
+            = 1
+    ),
+
     mesa_install_events as (
         select
             *
@@ -264,7 +293,24 @@ with
         left join app_store_ad_click_counts using (shop_subdomain)
     )
 
-select *
+select
+    *,
+    coalesce(
+        app_store_ad_click_app_store_surface_type is not null, false
+    ) as has_app_store_ad_click,
+    coalesce(
+        app_store_organic_click_app_store_surface_type is not null, false
+    ) as has_app_store_organic_click,
+    case
+        when has_app_store_ad_click = true and has_app_store_organic_click = true
+        then 'app_store_ad_click_and_organic_click'
+        when has_app_store_ad_click = true
+        then 'app_store_ad_click'
+        when has_app_store_organic_click = true
+        then 'app_store_organic_click'
+        else '(direct or predates tracking)'
+    end as app_store_click_type
 from final
 left join app_store_ad_clicks using (shop_subdomain)
 left join app_store_install_events using (shop_subdomain)
+left join app_store_organic_clicks using (shop_subdomain)
