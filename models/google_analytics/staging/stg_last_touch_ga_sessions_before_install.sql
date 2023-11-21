@@ -1,9 +1,15 @@
 with
     first_install_events as (
-        select * rename event_timestamp_pt as first_install_timestamp_pt
+        select
+            * rename(
+                getmesa_install_convert_event_timestamp_pt as first_install_timestamp_pt
+            )
         from {{ ref("stg_ga_install_events") }}
         qualify
-            row_number() over (partition by shop_subdomain order by event_timestamp_pt)
+            row_number() over (
+                partition by shop_subdomain
+                order by getmesa_install_convert_event_timestamp_pt
+            )
             = 1
     ),
 

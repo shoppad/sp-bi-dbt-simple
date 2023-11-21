@@ -19,10 +19,10 @@ with
     )
 
 select
-    installation_events.* exclude (shop_subdomain),
+    installation_events.* exclude (shop_subdomain, shopify_id)
+    rename event_timestamp_pt as getmesa_install_convert_event_timestamp_pt,
     user_matching.shop_subdomain,
-    user_matching.shopify_id,
-    installation_events.event_timestamp_pt
+    user_matching.shopify_id
 from installation_events
 inner join
     user_matching
