@@ -26,10 +26,10 @@ with
     shop_dates as (
         select
             shop_subdomain,
-            first_installed_at_pt as source_first_dt,
+            first_installed_at_pt::date as source_first_dt,
             case
                 when is_shopify_zombie_plan
-                then shopify_last_updated_at_pt
+                then greatest(first_installed_at_pt, shopify_last_updated_at_pt)
                 when uninstalled_at_pt is null or status = 'active'
                 then {{ pacific_timestamp("CURRENT_TIMESTAMP()") }}
                 else uninstalled_at_pt
