@@ -43,21 +43,21 @@ with
                 coalesce(
                     coalesce(
                         apps_
-                        {% if app == "infinite_options" %} customizery
-                        {% else %} {{ app }}
-                        {% endif %} _isactive,
+                        {%- if app == "infinite_options" -%} customizery
+                        {%- else -%} {{ app }}
+                        {%- endif -%} _isactive,
                         apps_
-                        {% if app == "infinite_options" %} customizery
-                        {% else %} {{ app }}
-                        {% endif %} _installedat is not null
+                        {%- if app == "infinite_options" -%} customizery
+                        {%- else -%} {{ app }}
+                        {%- endif -%} _installedat is not null
                     ),
                     false
                 ) as has_{{ app }},
                 coalesce(
                     apps_
-                    {% if app == "infinite_options" %} customizery
-                    {% else %} {{ app }}
-                    {% endif %} _installedat is not null,
+                    {%- if app == "infinite_options" -%} customizery
+                    {%- else -%} {{ app }}
+                    {%- endif -%} _installedat is not null,
                     false
                 ) as has_ever_installed_{{ app }}
                 {%- if not loop.last %}, {% endif -%}
@@ -72,9 +72,9 @@ with
             coalesce(
                 {%- for app in constellation_apps %}
                     apps_
-                    {% if app == "infinite_options" %} customizery
-                    {% else %} {{ app }}
-                    {% endif %} _installedat < apps_mesa_installedat
+                    {%- if app == "infinite_options" -%} customizery
+                    {%- else -%} {{ app }}
+                    {%- endif -%} _installedat < apps_mesa_installedat
                     {%- if not loop.last %} or {% endif -%}
                 {% endfor %},
                 false
@@ -84,9 +84,9 @@ with
                 {% for app in constellation_apps -%}
                     when
                         apps_
-                        {% if app == "infinite_options" %} customizery
-                        {% else %} {{ app }}
-                        {% endif %} _installedat < apps_mesa_installedat
+                        {%- if app == "infinite_options" -%} customizery
+                        {%- else -%} {{ app }}
+                        {%- endif -%} _installedat < apps_mesa_installedat
                     then '{{ app }}'
                 {% endfor -%}
                 else 'mesa'
@@ -96,9 +96,9 @@ with
                 {%- for app in constellation_apps %}
                     coalesce(
                         apps_
-                        {% if app == "infinite_options" %} customizery
-                        {% else %} {{ app }}
-                        {% endif %} _installedat,
+                        {%- if app == "infinite_options" -%} customizery
+                        {%- else -%} {{ app }}
+                        {%- endif -%} _installedat,
                         current_timestamp()
                     )
                     {%- if not loop.last %}, {% endif -%}
