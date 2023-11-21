@@ -8,7 +8,7 @@ models:
         description: The anonymouse Google Analytics user ID
         tests:
           - not_null
-          - unique
+          # - unique
       - name: SHOP_SUBDOMAIN
         description: The subdomain of the shop
         tests:

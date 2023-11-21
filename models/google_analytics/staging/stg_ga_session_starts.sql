@@ -3,9 +3,7 @@ with
         select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}
     ),
 
-    shop_anonymous_keys as (
-        select * from {{ ref("stg_anonymous_to_known_user_matching") }}
-    ),
+    user_matching as (select * from {{ ref("stg_anonymous_to_known_user_matching") }}),
 
     session_starts as (
         select
@@ -43,4 +41,4 @@ with
 
 select * exclude page_params
 from session_starts
-inner join shop_anonymous_keys using (user_pseudo_id)
+inner join user_matching using (user_pseudo_id)

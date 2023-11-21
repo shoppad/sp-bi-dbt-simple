@@ -1,6 +1,9 @@
 {# Note: This is the primary attribution channel before May 10, 2023 #}
 with
-    shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
+    shops as (
+        select shop_subdomain, first_installed_at_pt, shopify_id
+        from {{ ref("stg_shops") }}
+    ),
 
     segment_sessions as (
         select
@@ -36,7 +39,7 @@ with
     ),
 
     last_touches_segment as (
-        select * exclude first_installed_at_pt
+        select * exclude first_installed_at_pt, shopify_id
         from {{ ref("stg_segment_last_touch_sessions_before_install") }}
         inner join shops using (shop_subdomain)
         where last_touch_at_pt <= first_installed_at_pt + interval '60min'

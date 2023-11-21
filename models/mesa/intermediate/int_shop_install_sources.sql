@@ -1,14 +1,15 @@
 {#- cspell:words initcap -#}
 {#
-   [x] get the first visit source for each shop (first touch).
-   [x] look at install events. find the session *right* before that as the last touch. is it the same as the first touch?
-   [x] get the session start source for each shop (last touch).
-   [x] get the first install event for each shop.
-   [x] todo: for pre-ga installs, get the first pageview for each shop from segment.
-   [x] count the number of sessions before install.
-   [x] tally the number of days from first to install.
-   [ ] reformat columns to match the existing schema.
-   [x] re-add acquisition template.
+[x] get the first visit source for each shop (first touch).
+[x] look at install events. find the session *right* before that as the last touch. is it the same as the first touch?
+[x] get the session start source for each shop (last touch).
+[x] get the first install event for each shop.
+[x] todo: for pre-ga installs, get the first pageview for each shop from segment.
+[x] count the number of sessions before install.
+[x] tally the number of days from first to install.
+[x] reformat columns to match the existing schema.
+[x] re-add acquisition template.
+[ ] Look for any and all pre-install search_ad surface_type events.
 #}
 with
     shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
@@ -16,6 +17,73 @@ with
     ga_attribution as (select * from {{ ref("int_ga_attribution") }}),
 
     segment_attribution as (select * from {{ ref("int_segment_attribution") }}),
+
+    app_store_install_events as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "name",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_install_{{ column_name }},
+            {% endfor %}
+            name as app_store_install_campaign_name
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where event_name = 'shopify_app_install'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
+            )
+            = 1
+    ),
+
+    app_store_ad_clicks as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "name",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_ad_click_{{ column_name }},
+            {% endfor %}
+            name as app_store_ad_click_campaign_name
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where page_location ilike '%search_ad%' or event_name = 'shopify_ad_click'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
+            )
+            = 1
+    ),
+
+    app_store_ad_click_counts as (
+        select
+            shop_subdomain,
+            count_if(
+                app_store_ad_click_event_timestamp_pt
+                <= first_installed_at_pt + interval '60min'
+            )
+            > 0 as did_click_app_store_ad_before_install,
+            count(app_store_ad_clicks.app_store_ad_click_page_location)
+            > 0 as did_click_app_store_ad
+        from shops
+        left join app_store_ad_clicks using (shop_subdomain)
+        group by 1
+    ),
 
     mesa_install_events as (
         select
@@ -34,10 +102,10 @@ with
             nullif(utm_campaign, '') as install_event_campaign,
             nullif(utm_medium, '') as install_event_medium,
             {# case
-            when (referer ilike '%apps.shopify.com%')
-                then 'shopify app store'
-            else nullif(coalesce(utm_source, referer), '')
-        end as acquisition_source #}
+        when (referer ilike '%apps.shopify.com%')
+            then 'shopify app store'
+        else nullif(coalesce(utm_source, referer), '')
+    end as acquisition_source #}
             nullif(utm_source, '') as install_event_source,
             'mesa_event' as acq_info_source
         from mesa_install_events
@@ -167,7 +235,7 @@ with
                 )
             ) as last_touch_source_medium,
             coalesce(
-                acquisition_first_page_path ilike '/blog/%', false
+                acquisition_first_page_path ilike '%/blog/%', false
             ) as is_blog_referral,
             timediff(
                 'days', first_touch_at_pt, first_installed_at_pt
@@ -181,7 +249,8 @@ with
                 first_touch_app_store_surface_type = 'search_ad'
                 or last_touch_app_store_surface_type = 'search_ad',
                 false
-            ) as is_app_store_search_ad_referral
+            ) as is_app_store_search_ad_referral,
+            app_store_ad_click_counts.* exclude (shop_subdomain)
         from shops
         left join combined_attribution using (shop_subdomain)
         left join
@@ -192,7 +261,10 @@ with
             referrer_mapping as last_touch_referrer_mapping
             on combined_attribution.last_touch_referrer_host
             = last_touch_referrer_mapping.host
+        left join app_store_ad_click_counts using (shop_subdomain)
     )
 
 select *
 from final
+left join app_store_ad_clicks using (shop_subdomain)
+left join app_store_install_events using (shop_subdomain)

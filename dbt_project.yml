@@ -189,6 +189,10 @@ models:
     mesa_segment:
       staging:
         +schema: support
+
+    google_analytics:
+      staging:
+        +schema: support
       intermediate:
         +schema: support
         +materialized: ephemeral
