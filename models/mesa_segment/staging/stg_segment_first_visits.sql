@@ -33,9 +33,9 @@ with
             utm_campaign as first_touch_campaign,
             coalesce(utm_medium, referrer_medium) as first_touch_medium,
             coalesce(utm_source, referrer_source) as first_touch_source,
-            to_varchar(
+            lower(to_varchar(
                 page_params:parameters:surface_detail
-            ) as first_touch_app_store_search_term,
+            )) as first_touch_app_store_search_term,
             to_varchar(
                 page_params:parameters:surface_type
             ) as first_touch_app_store_surface_type,

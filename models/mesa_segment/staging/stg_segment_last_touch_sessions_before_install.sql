@@ -61,14 +61,14 @@ with
             utm_campaign as last_touch_campaign,
             coalesce(utm_medium, referrer_medium) as last_touch_medium,
             coalesce(utm_source, referrer_source) as last_touch_source,
-            page_params:parameters:surface_detail::string
-            as last_touch_app_store_search_term,
+            lower(page_params:parameters:surface_detail::string)
+                as last_touch_app_store_search_term,
             page_params:parameters:surface_type::string
-            as last_touch_app_store_surface_type,
+                as last_touch_app_store_surface_type,
             page_params:parameters:surface_intra_position::string
-            as last_touch_app_store_surface_intra_position,
+                as last_touch_app_store_surface_intra_position,
             page_params:parameters:surface_inter_position::string
-            as last_touch_app_store_surface_inter_position,
+                as last_touch_app_store_surface_inter_position,
             page_params:parameters:locale::string as last_touch_app_store_locale,
             referrer as last_touch_referrer,
             referrer_host as last_touch_referrer_host

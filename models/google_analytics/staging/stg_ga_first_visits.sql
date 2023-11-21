@@ -23,12 +23,12 @@ with
             page_params:parameters:utm_campaign::string as utm_campaign,
             page_params:parameters:utm_medium::string as utm_medium,
             page_params:parameters:utm_source::string as utm_source,
-            page_params:parameters:surface_detail::string as app_store_search_term,
+            lower(page_params:parameters:surface_detail::string) as app_store_search_term,
             page_params:parameters:surface_type::string as app_store_surface_type,
             page_params:parameters:surface_intra_position::string
-            as app_store_surface_intra_position,
+                as app_store_surface_intra_position,
             page_params:parameters:surface_inter_position::string
-            as app_store_surface_inter_position,
+                as app_store_surface_inter_position,
             page_params:parameters:locale::string as app_store_locale,
             page_referrer as first_touch_referrer,
             parse_url(first_touch_referrer):host::string as first_touch_referrer_host
