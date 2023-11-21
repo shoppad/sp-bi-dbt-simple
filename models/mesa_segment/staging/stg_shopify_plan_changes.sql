@@ -38,4 +38,3 @@ with
 
 select *
 from final
-WHERE shopify_plan_change_id ILIKE '%-current'
