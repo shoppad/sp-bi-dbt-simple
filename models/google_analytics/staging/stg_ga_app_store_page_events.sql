@@ -12,8 +12,12 @@ with
                 as event_timestamp_pt,
             page_location,
             parse_url(page_location) as page_params,
-            lower(parse_url(page_location):parameters:surface_detail::string)
-                as app_store_surface_detail,
+            NULLIF(
+                LOWER(
+                    url_decode(
+                        page_params:parameters:surface_detail::string
+                    )
+                ), 'undefined') as app_store_surface_detail,
             parse_url(page_location):parameters:surface_type::string
                 as app_store_surface_type,
             parse_url(page_location):parameters:surface_intra_position::string

@@ -20,7 +20,7 @@ with
             page_params:parameters:utm_campaign::string as utm_campaign,
             coalesce(page_params:parameters:utm_medium::string, medium) as utm_medium,
             coalesce(page_params:parameters:utm_source::string, source) as utm_source,
-            lower(page_params:parameters:surface_detail::string) as app_store_surface_detail,
+            NULLIF(lower(url_decode(page_params:parameters:surface_detail::string)), 'undefined') as app_store_surface_detail,
             page_params:parameters:surface_type::string as app_store_surface_type,
             page_params:parameters:surface_intra_position::string
             as app_store_surface_intra_position,

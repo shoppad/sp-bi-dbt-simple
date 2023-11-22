@@ -61,8 +61,7 @@ with
             utm_campaign as last_touch_campaign,
             coalesce(utm_medium, referrer_medium) as last_touch_medium,
             coalesce(utm_source, referrer_source) as last_touch_source,
-            lower(page_params:parameters:surface_detail::string)
-                as last_touch_app_store_search_term,
+            nullif(lower(URL_DECODE(page_params:parameters:surface_detail::string)), 'undefined') as last_touch_app_store_search_term,
             page_params:parameters:surface_type::string
                 as last_touch_app_store_surface_type,
             page_params:parameters:surface_intra_position::string
