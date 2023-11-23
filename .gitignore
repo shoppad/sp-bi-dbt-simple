@@ -14,3 +14,4 @@ __pycache__
 None.yml
 *.log
 .cursorignore
+.vscode/
