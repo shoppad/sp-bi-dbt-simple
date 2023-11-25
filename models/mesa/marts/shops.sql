@@ -435,11 +435,19 @@ with
 
     final as (
         select
-            * exclude (
+            *
+            exclude (
                 has_had_launch_session,
                 avg_current_gmv_usd,
                 avg_initial_gmv_usd,
                 churned_on_pt
+            )
+            replace (
+                (
+                    coalesce((1.0 * shopify_shop_gmv_initial_total_usd) > 3000, false)
+                    or
+                    SHOPIFY_PLAN_NAME in ('professional', 'unlimited', 'shopify_plus')
+                ) as is_mql
             ),
             not (activation_date_pt is null) as is_activated,
             iff(is_activated, 'activated', 'onboarding') as funnel_phase,
