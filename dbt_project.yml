@@ -26,6 +26,9 @@ clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+on-run-start:
+  - "{{ url_decode_udf() }}"
+
 vars:
   "dbt_date:time_zone": "America/Los_Angeles"
   pro_apps:

@@ -9,17 +9,19 @@ with
             name,
             shop_id as shopify_id,
             {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}
-                as event_timestamp_pt,
+            as event_timestamp_pt,
             page_location,
             parse_url(page_location) as page_params,
-            NULLIF(
-                LOWER(
-                    url_decode(
+            nullif(
+                lower(
+                    {{ target.schema }}.url_decode(
                         page_params:parameters:surface_detail::string
                     )
-                ), 'undefined') as app_store_surface_detail,
+                ),
+                'undefined'
+            ) as app_store_surface_detail,
             parse_url(page_location):parameters:surface_type::string
-                as app_store_surface_type,
+            as app_store_surface_type,
             parse_url(page_location):parameters:surface_intra_position::string
             as app_store_surface_intra_position,
             parse_url(page_location):parameters:surface_inter_position::string
