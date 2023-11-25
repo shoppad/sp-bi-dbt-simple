@@ -64,18 +64,23 @@ with
             nullif(
                 lower(
                     {{ target.schema }}.url_decode(
-                        page_params:parameters:surface_detail::string
+                        cast(page_params:parameters:surface_detail as string)
                     )
                 ),
                 'undefined'
             ) as last_touch_app_store_search_term,
-            page_params:parameters:surface_type::string
-            as last_touch_app_store_surface_type,
-            page_params:parameters:surface_intra_position::string
-            as last_touch_app_store_surface_intra_position,
-            page_params:parameters:surface_inter_position::stringff
-            as last_touch_app_store_surface_inter_position,
-            page_params:parameters:locale::string as last_touch_app_store_locale,
+            cast(
+                page_params:parameters:surface_type as string
+            ) as last_touch_app_store_surface_type,
+            cast(
+                page_params:parameters:surface_intra_position as string
+            ) as last_touch_app_store_surface_intra_position,
+            cast(
+                page_params:parameters:surface_inter_position as string
+            ) as last_touch_app_store_surface_inter_position,
+            cast(
+                page_params:parameters:locale as string
+            ) as last_touch_app_store_locale,
             referrer as last_touch_referrer,
             referrer_host as last_touch_referrer_host
         from last_touch_sessions

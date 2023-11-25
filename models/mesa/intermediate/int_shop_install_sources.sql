@@ -186,7 +186,9 @@ with
                 formatted_install_events.acq_info_source
             ) as acq_info_source,
             acquisition_template,
-            install_event_source
+            install_event_source,
+            install_event_medium,
+            install_event_campaign
         from shops
         left join formatted_install_events using (shop_subdomain)
         left join data_pipeline_attributions using (shop_subdomain)

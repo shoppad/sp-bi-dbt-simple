@@ -48,20 +48,14 @@ with
     final as (
 
         select
-            user_pseudo_id,
-            page_location,
-            shopify_id,
-            event_timestamp_pt,
-            app_store_surface_type,
-            name,
+            source.* exclude (utm_source, utm_campaign),
+            user_matching.shop_subdomain,
             case
                 when app_store_surface_type is not null
                 then 'Shopify App Store'
                 else utm_source
             end as utm_source,
-            app_store_locale,
-            app_store_surface_detail,
-            event_name,
+
             case
                 when app_store_surface_intra_position is not null
                 then
@@ -74,13 +68,13 @@ with
                 else utm_campaign
             end as utm_campaign
         from source
+        inner join
+            user_matching
+            on (
+                source.user_pseudo_id = user_matching.user_pseudo_id
+                or source.shopify_id = user_matching.shopify_id
+            )
     )
 
-select final.*, user_matching.shop_subdomain
+select *
 from final
-inner join
-    user_matching
-    on (
-        final.user_pseudo_id = user_matching.user_pseudo_id
-        or final.shopify_id = user_matching.shopify_id
-    )
