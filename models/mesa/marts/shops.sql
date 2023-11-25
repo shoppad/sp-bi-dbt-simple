@@ -444,7 +444,7 @@ with
             )
             replace (
                 (
-                    coalesce((1.0 * shopify_shop_gmv_initial_total_usd) > 3000, false)
+                    coalesce((1.0 * shopify_shop_gmv_initial_total_usd) = 3000, false)
                     or
                     SHOPIFY_PLAN_NAME in ('professional', 'unlimited', 'shopify_plus')
                 ) as is_mql
