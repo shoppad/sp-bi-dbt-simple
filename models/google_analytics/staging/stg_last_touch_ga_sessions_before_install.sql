@@ -40,7 +40,9 @@ with
             event_timestamp_pt as last_touch_at_pt,
             split_part(page_location, '//', 2) as last_touch_url,
             split_part(last_touch_url, '/', 1) as last_touch_host,
-            split_part(last_touch_url, '?', 1) as last_touch_path,
+            '/' || split_part(
+                split_part(last_touch_url, '/', 2), '?', 1
+            ) as last_touch_path,
             utm_content as last_touch_content,
             utm_campaign as last_touch_campaign,
             utm_medium as last_touch_medium,

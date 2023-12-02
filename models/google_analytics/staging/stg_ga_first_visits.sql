@@ -40,7 +40,9 @@ with
             page_location as acquisition_first_page_path,
             split_part(page_location, '//', 2) as first_touch_url,
             split_part(first_touch_url, '/', 1) as first_touch_host,
-            split_part(first_touch_url, '?', 1) as first_touch_path,
+            '/' || split_part(
+                split_part(first_touch_url, '/', 2), '?', 1
+            ) as first_touch_path,
             utm_content as first_touch_content,
             utm_campaign as first_touch_campaign,
             utm_medium as first_touch_medium,
