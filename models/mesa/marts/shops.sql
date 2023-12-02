@@ -1,13 +1,8 @@
 with
+
     shops as (select * from {{ ref("int_shops") }}),
 
     billing_accounts as (select * from {{ ref("stg_mesa_billing_accounts") }}),
-
-    price_per_actions as (
-        select shop_subdomain, "value" as price_per_action
-        from {{ ref("stg_shop_entitlements") }}
-        where "name" = 'price_per_action'
-    ),
 
     csm_support as (
         select shop_subdomain, coalesce("value" = 'csm', false) as has_csm_support
@@ -19,6 +14,12 @@ with
                 where "name" = 'support'
             ) using (shop_subdomain)
 
+    ),
+
+    price_per_actions as (
+        select shop_subdomain, "value" as price_per_action
+        from {{ ref("stg_shop_entitlements") }}
+        where "name" = 'price_per_action'
     ),
 
     workflows as (select * from {{ ref("workflows") }} where is_deleted = false),
@@ -151,7 +152,19 @@ with
         left join yesterdays using (shop_subdomain)
     ),
 
-    install_sources as (select * from {{ ref("int_shop_install_sources") }}),
+    install_sources as (
+        {% set table_name = ref("int_shop_install_sources") %}
+        {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+            from=table_name, except=["shop_subdomain"]
+        ) %}
+        select
+            shop_subdomain,
+            {% for column_name in column_names %}
+                {{ column_name }} as acq_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %}
+        from {{ table_name }}
+    ),
 
     max_funnel_steps as (
         select
@@ -215,7 +228,7 @@ with
         select
             shop_subdomain,
             coalesce(avg(daily_usage_revenue), 0) as average_daily_usage_revenue,
-            coalesce(avg(inc_amount), 0) as average_daily_revenue,
+            coalesce(avg(inc_amount::float), 0) as average_daily_revenue,
             average_daily_revenue * 30 as projected_mrr,
             coalesce(sum(inc_amount), 0) as total_thirty_day_revenue
         from shops
@@ -374,8 +387,11 @@ with
 
     workflow_source_destination_pairs as (
         select
-            listagg(distinct source_destination_pair, ',') within group (
-                order by source_destination_pair asc
+            nullif(
+                listagg(distinct source_destination_pair, ',') within group (
+                    order by source_destination_pair asc
+                ),
+                ''
             ) as source_destination_pairs_list,
             shop_subdomain
         from workflows
@@ -397,6 +413,15 @@ with
             ) within group (order by changed_at_pt asc) as plan_change_chain
         from shops
         left join {{ ref("stg_mesa_plan_changes") }} using (shop_subdomain)
+        group by 1
+    ),
+
+    last_plan_prices as (
+        select
+            shop_subdomain,
+            round(max_by(daily_plan_revenue, dt) * 30) as last_plan_price
+        from {{ ref("int_shop_calendar") }}
+        where daily_plan_revenue > 0
         group by 1
     ),
 
@@ -440,6 +465,8 @@ with
                 has_had_launch_session,
                 avg_current_gmv_usd,
                 avg_initial_gmv_usd,
+                churned_on_pt,
+                last_plan_price
                 churned_on_pt
             )
             replace (
@@ -449,7 +476,8 @@ with
                     SHOPIFY_PLAN_NAME in ('professional', 'unlimited', 'shopify_plus')
                 ) as is_mql
             ),
-            not (activation_date_pt is null) as is_activated,
+            not activation_date_pt
+            is null as is_activated,
             iff(is_activated, 'activated', 'onboarding') as funnel_phase,
             {{
                 dbt.datediff(
@@ -617,7 +645,10 @@ with
             ) as churned_customer_duration_in_weeks,
             floor(
                 datediff('days', first_plan_upgrade_date, churned_on_pt) / 30
-            ) as churned_customer_duration_in_months
+            ) as churned_customer_duration_in_months,
+            coalesce(
+                iff(projected_mrr > 0, projected_mrr, last_plan_price), 0
+            ) as shop_value_per_month
 
         from shops
         left join billing_accounts using (shop_subdomain)
@@ -647,6 +678,7 @@ with
         left join first_journey_deliveries using (shop_subdomain)
         left join churn_dates using (shop_subdomain)
         left join workflow_source_destination_pairs using (shop_subdomain)
+        left join last_plan_prices using (shop_subdomain)
     )
 
 select *

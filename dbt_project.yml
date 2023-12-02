@@ -9,7 +9,7 @@ config-version: 2
 profile: "shoppad"
 
 dbt-cloud:
-    project-id: 184721
+  project-id: 184721
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -25,6 +25,9 @@ target-path: "target" # directory which will store compiled SQL files
 clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+
+on-run-start:
+  - "{{ url_decode_udf() }}"
 
 vars:
   "dbt_date:time_zone": "America/Los_Angeles"
@@ -95,8 +98,11 @@ vars:
     ]
   zombie_store_shopify_plans: [frozen, fraudulent, paused, dormant, cancelled]
 
-  segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
-  segment_sessionization_trailing_window: 3
+  dbt_segment:
+    segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
+    segment_sessionization_trailing_window: 3
+    segment_inactivity_cutoff: 30 * 60
+    segment_pass_through_columns: []
 
 seeds:
   +schema: seed_data
@@ -189,6 +195,13 @@ models:
     mesa_segment:
       staging:
         +schema: support
+
+    google_analytics:
+      staging:
+        +schema: support
+      intermediate:
+        +schema: support
+        +materialized: ephemeral
 
     customer_io:
       staging:

@@ -1,171 +1,369 @@
-{#- cSpell:words INITCAP -#}
+{#- cspell:words initcap -#}
 {#
-   1. Get the first visit source for each shop (first touch).
-   2. Get the session start source for each shop (last touch).
-   3. Get the first install event for each shop.
-   4. TODO: For pre-GA installs, get the first pageview for each shop from Segment.
-   5. Reformat columns to match the schema.
+[x] get the first visit source for each shop (first touch).
+[x] look at install events. find the session *right* before that AS the last touch. is it the same AS the first touch?
+[x] get the session start source for each shop (last touch).
+[x] get the first install event for each shop.
+[x] todo: for pre-ga installs, get the first pageview for each shop FROM segment.
+[x] count the number of sessions before install.
+[x] tally the number of days FROM first to install.
+[x] reformat columns to match the existing schema.
+[x] re-add acquisition template.
+[ ] Look for any and all pre-install search_ad surface_type events.
 #}
+with
+    shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
 
-WITH
-shops AS (
-    SELECT
-        shop_subdomain,
-        first_installed_at_pt
-    FROM {{ ref('stg_shops') }}
-),
+    ga_attribution as (select * from {{ ref("int_ga_attribution") }}),
 
-install_page_sessions AS (
+    segment_attribution as (select * from {{ ref("int_segment_attribution") }}),
 
-    SELECT
-        session_id,
-        tstamp,
-        anonymous_id
-    FROM {{ ref('segment_web_page_views__sessionized') }}
-    WHERE page_url_path ILIKE '%/apps/mesa/install%'
-
-),
-
-first_segment_web_sessions AS (
-    SELECT
-        * EXCLUDE (blended_user_id),
-        blended_user_id AS shop_subdomain
-    FROM {{ ref('segment_web_sessions') }}
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY blended_user_id ORDER BY session_start_tstamp ASC) = 1
-),
-
-app_store_pageviews AS (
-    SELECT
-        PARSE_URL(page_location) AS app_store_url_components,
-        user_pseudo_id
-    FROM {{ source('mesa_ga4', 'events') }}
-    WHERE page_location ILIKE 'https://apps.shopify.com/mesa?%'
-),
-
-app_store_params AS (
-    SELECT
-        user_pseudo_id,
-        app_store_url_components:parameters:surface_type::STRING AS app_store_surface_type,
-        app_store_url_components:parameters:surface_detail::STRING AS app_store_surface_term
-    FROM app_store_pageviews
-),
-
-app_store_installed_user_id_correlations AS (
-    SELECT
-        user_id AS shop_subdomain,
-        app_store_surface_type,
-        app_store_surface_term
-    FROM {{ source('mesa_ga4', 'events') }}
-    INNER JOIN app_store_params USING (user_pseudo_id)
-    WHERE
-        event_name ILIKE 'install_stage_permissions_accept'
-        AND (app_store_surface_type IS NOT NULL OR app_store_surface_term IS NOT NULL)
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_timestamp ASC) = 1
-),
-
-raw_install_events AS (
-    SELECT
-        * EXCLUDE (uuid),
-        uuid AS shop_subdomain
-    FROM {{ source('mongo_sync', 'mesa_install_events') }}
-),
-
-formatted_install_pageviews AS (
-    SELECT
-        shop_subdomain,
-        {{ pacific_timestamp('tstamp') }} AS tstamp_pt,
-        COALESCE(app_store_surface_term, utm_content) AS acquisition_content,
-        first_page_url_path AS acquisition_first_page_path,
-        utm_campaign AS acquisition_campaign,
-        referrer AS acquisition_referrer,
-        referrer_host,
-        CASE
-            WHEN utm_source IS NOT NULL AND utm_source != ''
-                THEN utm_source
-            WHEN referrer ILIKE '%apps.shopify.com%'
-                THEN 'Shopify App Store'
-            ELSE COALESCE(referrer_source, utm_source)
-        END AS acquisition_source,
-        COALESCE(app_store_surface_type, referrer_medium, utm_medium) AS acquisition_medium
-    FROM install_page_sessions
-    LEFT JOIN first_segment_web_sessions USING (anonymous_id)
-    LEFT JOIN app_store_installed_user_id_correlations USING (shop_subdomain)
-    LEFT JOIN shops USING (shop_subdomain)
-    WHERE
-        acquisition_source IS NOT NULL
-        AND tstamp_pt <= first_installed_at_pt + INTERVAL '60seconds'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY tstamp_pt ASC) = 1
-),
-
-formatted_install_events AS (
-    SELECT
-        shop_subdomain,
-        {{ pacific_timestamp('created_at') }} AS tstamp_pt,
-        template AS acquisition_template,
-        NULL AS acquisition_content,
-        NULL AS acquisition_first_page_path,
-        NULLIF(utm_campaign, '') AS acquisition_campaign,
-        NULLIF(referer, '') AS acquisition_referrer,
-        NULLIF(utm_medium, '') AS acquisition_medium,
-        CASE
-            WHEN (referer ILIKE '%apps.shopify.com%')
-                THEN 'Shopify App Store'
-            ELSE NULLIF(COALESCE(utm_source, referer), '')
-        END AS acquisition_source
-    FROM raw_install_events
-    LEFT JOIN shops USING (shop_subdomain)
-    WHERE tstamp_pt <= first_installed_at_pt + INTERVAL '60seconds'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY tstamp_pt ASC) = 1
-),
-
-combined_install_sources AS (
-    SELECT
-        shop_subdomain,
-        acquisition_template,
-        referrer_host,
-        COALESCE(formatted_install_pageviews.tstamp_pt, formatted_install_events.tstamp_pt) AS tstamp_pt,
-        COALESCE(formatted_install_pageviews.acquisition_campaign, formatted_install_events.acquisition_campaign) AS acquisition_campaign,
-        COALESCE(formatted_install_pageviews.acquisition_content, formatted_install_events.acquisition_content) AS acquisition_content,
-        COALESCE(formatted_install_pageviews.acquisition_referrer, formatted_install_events.acquisition_referrer) AS acquisition_referrer,
-        COALESCE(formatted_install_pageviews.acquisition_first_page_path, formatted_install_events.acquisition_first_page_path) AS acquisition_first_page_path,
-        COALESCE(formatted_install_pageviews.acquisition_source, formatted_install_events.acquisition_source) AS acquisition_source,
-        COALESCE(formatted_install_pageviews.acquisition_medium, formatted_install_events.acquisition_medium) AS acquisition_medium
-    FROM formatted_install_pageviews
-    FULL OUTER JOIN formatted_install_events USING (shop_subdomain)
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY COALESCE(formatted_install_pageviews.tstamp_pt, formatted_install_events.tstamp_pt) ASC) = 1
-),
-
-referrer_mapping as (
-    SELECT * FROM {{ ref('referrer_mapping') }}
-),
-
-final AS (
-    SELECT
-        shop_subdomain,
-        acquisition_referrer,
-        acquisition_template,
-        acquisition_content,
-        acquisition_first_page_path,
-        INITCAP(REPLACE(acquisition_campaign, '_', ' ')) AS acquisition_campaign,
-        INITCAP(REPLACE(COALESCE(referrer_mapping.medium, acquisition_medium), '_', ' ')) AS acquisition_medium,
-        INITCAP(COALESCE(referrer_mapping.source, acquisition_source)) AS acquisition_source,
-        INITCAP(
-            NULLIF(
-                (
-                    COALESCE(referrer_mapping.source, acquisition_source)
-                    || ' - '
-                    || COALESCE(referrer_mapping.medium, acquisition_medium)
-                ),
-                ' - '
+    app_store_install_events as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "referrer_term",
+                    "app_store_surface_intra_position",
+                    "app_store_surface_inter_position",
+                    "utm_medium",
+                    "utm_campaign",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_install_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %},
+            initcap(
+                utm_source || ' - ' || utm_medium
+            ) as app_store_install_source_medium
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where event_name = 'shopify_app_install'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
             )
-        ) AS acquisition_source_medium,
-        COALESCE(acquisition_first_page_path ILIKE '/blog/%', FALSE) AS is_blog_referral
-    FROM shops
-    LEFT JOIN combined_install_sources USING (shop_subdomain)
-    LEFT JOIN referrer_mapping
-        ON combined_install_sources.referrer_host = referrer_mapping.host
-)
+            = 1
+    ),
 
-SELECT *
+    app_store_ad_clicks as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "surface_type",
+                    "surface_detail",
+                    "utm_term",
+                    "referrer",
+                    "referrer_term",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_ad_click_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %},
+            initcap(
+                utm_source || ' - ' || utm_medium
+            ) as app_store_ad_click_source_medium
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where page_location ilike '%search_ad%' or event_name = 'shopify_ad_click'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
+            )
+            = 1
+    ),
 
-FROM final
+    app_store_ad_click_counts as (
+        select
+            shop_subdomain,
+            count_if(
+                app_store_ad_click_event_timestamp_pt
+                <= first_installed_at_pt + interval '60min'
+            )
+            > 0 as app_store_did_click_ad_before_install,
+            count(app_store_ad_clicks.app_store_ad_click_page_location)
+            > 0 as app_store_did_click_ad
+        from shops
+        left join app_store_ad_clicks using (shop_subdomain)
+        group by 1
+    ),
+
+    app_store_organic_clicks as (
+        select
+            shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=ref("stg_ga_app_store_page_events"),
+                except=[
+                    "user_pseudo_id",
+                    "shopify_id",
+                    "shop_subdomain",
+                    "event_name",
+                    "name",
+                    "referrer_source",
+                    "utm_term",
+                    "referrer",
+                    "referrer_medium",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                {{ column_name }} as app_store_organic_click_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %}
+        from {{ ref("stg_ga_app_store_page_events") }}
+        where
+            page_location ilike '%surface_type=%'
+            and page_location not ilike '%search_ad%'
+            and event_name = 'session_start'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by event_timestamp_pt asc
+            )
+            = 1
+    ),
+
+    mesa_install_events as (
+        select
+            uuid as shop_subdomain,
+            {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+                from=source("mongo_sync", "mesa_install_events"),
+                except=[
+                    "created_at",
+                    "template",
+                    "state",
+                    "uuid",
+                    "mesa_id",
+                    "__hevo__ingested_at",
+                    "__hevo__loaded_at",
+                    "__hevo__database_name",
+                    "updated_at",
+                    "utm_term",
+                    "route",
+                    "ip",
+                    "__hevo__marked_deleted",
+                    "_created_at",
+                    "_id",
+                ],
+            ) %}
+            {% for column_name in column_names %}
+                iff(
+                    {{ column_name }}::varchar = '', null, {{ column_name }}
+                ) as mesa_install_event_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %},
+            {{ pacific_timestamp("created_at") }} as mesa_install_event_timestamp_pt,
+            template as acquisition_template,
+            'mesa_install_event' as install_event_info_source
+        from {{ source("mongo_sync", "mesa_install_events") }}
+        where install_completed
+    ),
+
+    formatted_install_events as (
+        select mesa_install_events.*
+        from mesa_install_events
+        left join shops using (shop_subdomain)
+        having
+            mesa_install_event_timestamp_pt
+            <= first_installed_at_pt + interval '60seconds'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by mesa_install_event_timestamp_pt asc
+            )
+            = 1
+    ),
+
+    data_pipeline_attributions as (
+        select
+            * rename ga4_sessions_til_install as sessions_til_install,
+            'ga4' as install_event_info_source
+        from ga_attribution
+
+        union
+
+        select
+            * rename segment_sessions_til_install as sessions_til_install,
+            'segment' as install_event_info_source
+        from segment_attribution
+    ),
+
+    combined_attribution as (
+        select
+            shops.shop_subdomain,
+            data_pipeline_attributions.* exclude (
+                shop_subdomain,
+                first_touch_campaign,
+                last_touch_campaign,
+                first_touch_medium,
+                last_touch_medium,
+                first_touch_source,
+                last_touch_source,
+                install_event_info_source
+            ),
+            coalesce(
+                first_touch_campaign, mesa_install_event_utm_campaign
+            ) as first_touch_campaign,
+            coalesce(
+                last_touch_campaign, mesa_install_event_utm_campaign
+            ) as last_touch_campaign,
+            coalesce(
+                first_touch_medium, mesa_install_event_utm_medium
+            ) as first_touch_medium,
+            coalesce(
+                last_touch_medium, mesa_install_event_utm_medium
+            ) as last_touch_medium,
+            coalesce(
+                first_touch_source, mesa_install_event_utm_source
+            ) as first_touch_source,
+            coalesce(
+                last_touch_source, mesa_install_event_utm_source
+            ) as last_touch_source,
+            coalesce(
+                data_pipeline_attributions.install_event_info_source,
+                formatted_install_events.install_event_info_source
+            ) as install_event_info_source,
+            formatted_install_events.* exclude (install_event_info_source)
+        from shops
+        left join formatted_install_events using (shop_subdomain)
+        left join data_pipeline_attributions using (shop_subdomain)
+        having
+            first_touch_at_pt is null
+            or first_touch_at_pt <= first_installed_at_pt + interval '60min'
+        qualify
+            row_number() over (
+                partition by shop_subdomain order by first_touch_at_pt asc
+            )
+            = 1
+    ),
+
+    referrer_mapping as (select * from {{ ref("referrer_mapping") }}),
+
+    combined as (
+        select
+            shop_subdomain,
+            combined_attribution.* exclude (
+                shop_subdomain,
+                first_touch_medium,
+                last_touch_medium,
+                first_touch_source,
+                last_touch_source
+            ) replace (
+                initcap(
+                    replace(first_touch_campaign, '_', ' ')
+                ) as first_touch_campaign,
+                initcap(replace(last_touch_campaign, '_', ' ')) as last_touch_campaign
+            ),
+            initcap(
+                replace(
+                    coalesce(first_touch_referrer_mapping.medium, first_touch_medium),
+                    '_',
+                    ' '
+                )
+            ) as first_touch_medium,
+            initcap(
+                replace(
+                    coalesce(last_touch_referrer_mapping.medium, last_touch_medium),
+                    '_',
+                    ' '
+                )
+            ) as last_touch_medium,
+            initcap(
+                coalesce(first_touch_referrer_mapping.source, first_touch_source)
+            ) as first_touch_source,
+            initcap(
+                coalesce(last_touch_referrer_mapping.source, last_touch_source)
+            ) as last_touch_source,
+            initcap(
+                nullif(
+                    (
+                        coalesce(
+                            first_touch_referrer_mapping.source, first_touch_source
+                        )
+                        || ' - '
+                        || coalesce(
+                            last_touch_referrer_mapping.medium, first_touch_medium
+                        )
+                    ),
+                    ' - '
+                )
+            ) as first_touch_source_medium,
+            initcap(
+                nullif(
+                    (
+                        coalesce(first_touch_referrer_mapping.source, last_touch_source)
+                        || ' - '
+                        || coalesce(
+                            last_touch_referrer_mapping.medium, last_touch_medium
+                        )
+                    ),
+                    ' - '
+                )
+            ) as last_touch_source_medium,
+            coalesce(
+                acquisition_first_page_path ilike '%/blog/%', false
+            ) as is_blog_referral,
+            timediff(
+                'days', first_touch_at_pt, first_installed_at_pt
+            ) as days_to_install,
+            coalesce(
+                first_touch_app_store_surface_type = true
+                or last_touch_app_store_surface_type = true,
+                false
+            ) as is_app_store_referral,
+            coalesce(
+                first_touch_app_store_surface_type = 'search_ad'
+                or last_touch_app_store_surface_type = 'search_ad',
+                false
+            ) as is_app_store_search_ad_referral,
+            app_store_ad_click_counts.* exclude (shop_subdomain)
+        from shops
+        left join combined_attribution using (shop_subdomain)
+        left join
+            referrer_mapping as first_touch_referrer_mapping
+            on combined_attribution.first_touch_referrer_host
+            = first_touch_referrer_mapping.host
+        left join
+            referrer_mapping as last_touch_referrer_mapping
+            on combined_attribution.last_touch_referrer_host
+            = last_touch_referrer_mapping.host
+        left join app_store_ad_click_counts using (shop_subdomain)
+    ),
+
+    final as (
+
+        select
+            *,
+            coalesce(
+                app_store_ad_click_app_store_surface_type is not null, false
+            ) as app_store_has_ad_click,
+            coalesce(
+                app_store_organic_click_app_store_surface_type is not null, false
+            ) as has_app_store_organic_click,
+
+            case
+                when
+                    app_store_has_ad_click = true and has_app_store_organic_click = true
+                then 'app_store_ad_click_and_organic_click'
+                when app_store_has_ad_click = true
+                then 'app_store_ad_click'
+                when has_app_store_organic_click = true
+                then 'app_store_organic_click'
+                else '(direct or predates tracking)'
+            end as app_store_click_type
+        from combined
+        left join app_store_ad_clicks using (shop_subdomain)
+        left join app_store_install_events using (shop_subdomain)
+        left join app_store_organic_clicks using (shop_subdomain)
+    )
+
+select *
+from final

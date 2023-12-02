@@ -11,17 +11,19 @@ models:
         tests:
           - not_null
         description: The foreign key for the Shop.
-      - name: acquisition_campaign
+      - name: first_touch_campaign
         description: The campaign that the shop was acquired through.
-      - name: acquisition_content
+      - name: first_touch_content
         description: The content that the shop was acquired through.
-      - name: acquisition_referrer
-        description: The referrer that the shop was acquired through.
-      - name: acquisition_first_page_path
+      - name: first_touch_referrer
+        description: The referrer URL that referred the Shop's first visit.
+      - name: first_touch_referrer_host
+        description: The referrer host that referrered the shop's first visit.
+      - name: first_touch_first_page_path
         description: The first page path that the shop was acquired through.
-      - name: acquisition_source
+      - name: first_touch_source
         description: The source that the shop was acquired through.
-      - name: acquisition_medium
+      - name: first_touch_medium
         tests:
           - not_null:
               config:
@@ -30,15 +32,15 @@ models:
               value_set:
                 - ""
         description: The medium that the shop was acquired through.
-      - name: acquisition_source_medium
-        description: The source & medium that the shop was acquired through.
+      - name: first_touch_source_medium
+        description: The source & medium that drove the Shop's first visit.
       - name: is_blog_referral
         tests:
           - not_null
         description:
           Whether the Shop was referred/entered the marketing site by a blog
           post.
-      - name: acquisition_template
+      - name: first_touch_template
         description:
           The template the Shop intended to use when they first installed the
           app.

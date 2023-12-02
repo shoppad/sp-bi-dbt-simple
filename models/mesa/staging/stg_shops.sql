@@ -111,7 +111,8 @@ with
             shop_metas.aggregated_meta as meta,
             coalesce(shops.shopify, custom_apps.shopify) as shopify,
             shopify:id::variant as shopify_id,
-            coalesce(custom_apps.shopify:plan_name, shops.shopify:plan_name)::string AS shopify_plan_name,
+            coalesce(custom_apps.shopify:plan_name, shops.shopify:plan_name)::string
+            as shopify_plan_name,
             coalesce(
                 shopify_plan_name
                 in ({{ "'" ~ var("zombie_store_shopify_plans") | join("', '") ~ "'" }}),

@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: stg_segment_first_visits
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: first_touch_at_pt
+        description: The timestamp of the first touch.
+      - name: acquisition_first_page_path
+        description: The first page path that the shop was acquired through.
+      - name: first_touch_url
+        description: The URL of the first touch.
+      - name: first_touch_host
+        description: The host of the first touch.
+      - name: first_touch_path
+        description: The path of the first touch.
+      - name: first_touch_content
+        description: The content that the shop was acquired through.
+      - name: first_touch_campaign
+        description: The campaign that the shop was acquired through.
+      - name: first_touch_medium
+        description: The medium that the shop was acquired through.
+      - name: first_touch_source
+        description: The source that the shop was acquired through.
+      - name: first_touch_referrer_host
+        description: The referrer host that referrered the shop's first visit.
+      - name: first_touch_app_store_search_term
+        description: The search term of the first touch in the app store.
+      - name: first_touch_app_store_surface_type
+        description: The type of surface for the first touch in the app store.
+      - name: first_touch_app_store_surface_intra_position
+        description: The intra position of the first touch on the app store surface.
+      - name: first_touch_app_store_surface_inter_position
+        description: The inter position of the first touch on the app store surface.
+      - name: first_touch_app_store_locale
+        description: The locale of the first touch in the app store.

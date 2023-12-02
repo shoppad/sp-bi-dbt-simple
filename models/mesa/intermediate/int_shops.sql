@@ -72,77 +72,85 @@ with
         from {{ source_table }}
     ),
 
-activation_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS activation_date_pt
-    FROM {{ ref('int_mesa_shop_days') }}
-    WHERE is_active
-    GROUP BY
-        1
-),
+    activation_dates as (
+        select shop_subdomain, min(dt) as activation_date_pt
+        from {{ ref("int_mesa_shop_days") }}
+        where is_active
+        group by 1
+    ),
 
-launch_session_dates AS (
-    SELECT
-        shop_subdomain,
-        IFF(
-            meta_attribs.value:name = 'launchsessiondate',
-            meta_attribs.value:value::DATE,
-            NULL
-        ) AS launch_session_date,
-        NOT launch_session_date IS NULL AS has_had_launch_session
-    FROM {{ ref('stg_shops') }},
-        LATERAL FLATTEN(input => meta) AS meta_attribs
-),
+    launch_session_dates as (
+        select
+            shop_subdomain,
+            iff(
+                meta_attribs.value:name = 'launchsessiondate',
+                meta_attribs.value:value::date,
+                null
+            ) as launch_session_date,
+            not launch_session_date
+            is null as has_had_launch_session
+        from {{ ref("stg_shops") }}, lateral flatten(input => meta) as meta_attribs
+    ),
 
-plan_upgrade_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS first_plan_upgrade_date,
-        MIN_BY(mesa_plan_identifier, dt) AS first_plan_identifier,
-        COUNT_IF(inc_amount > 0) AS paid_days_completed,
-        paid_days_completed > 0 AS has_ever_upgraded_to_paid_plan
-    FROM decorated_shops
-    LEFT JOIN (SELECT * FROM {{ ref('int_mesa_shop_days') }} WHERE inc_amount > 0) USING (shop_subdomain)
-    GROUP BY 1
-),
+    paid_shop_days as (
+        select * from {{ ref("int_mesa_shop_days") }} where inc_amount > 0
+    ),
 
-trial_dates AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS first_trial_start_date,
-        MIN_BY(mesa_plan_identifier, dt) AS first_trial_plan_identifier,
-        COUNT_IF(is_in_trial) AS trial_days_completed,
-        trial_days_completed > 0 AS has_done_a_trial
-    FROM decorated_shops
-    LEFT JOIN (SELECT * FROM {{ ref('int_mesa_shop_days') }} WHERE is_in_trial) USING (shop_subdomain)
+    plan_upgrade_dates as (
+        select
+            shop_subdomain,
+            min(dt) as first_plan_upgrade_date,
+            min_by(mesa_plan_identifier, dt) as first_plan_identifier,
+            count_if(inc_amount > 0) as paid_days_completed,
+            paid_days_completed > 0 as has_ever_upgraded_to_paid_plan
+        from decorated_shops
+        left join paid_shop_days using (shop_subdomain)
+        group by 1
+    ),
 
-    GROUP BY 1
-),
+    trial_shop_days as (
+        select * from {{ ref("int_mesa_shop_days") }} where is_in_trial
+    ),
 
-conversion_rates AS (
-    SELECT
-        currency,
-        in_usd
-    FROM {{ ref('currency_conversion_rates') }}
-),
+    trial_dates as (
+        select
+            shop_subdomain,
+            min(dt) as first_trial_start_date,
+            min_by(mesa_plan_identifier, dt) as first_trial_plan_identifier,
+            count_if(is_in_trial) as trial_days_completed,
+            trial_days_completed > 0 as has_done_a_trial
+        from decorated_shops
+        left join trial_shop_days using (shop_subdomain)
+        group by 1
+    ),
 
-final AS (
-    SELECT
-        * EXCLUDE (shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd),
-        1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
-        1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
-        COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported,
-        first_trial_start_date - first_installed_on_pt AS days_until_first_trial,
-        first_plan_upgrade_date - first_installed_on_pt AS days_until_first_plan_upgrade
-    FROM decorated_shops
-    LEFT JOIN activation_dates USING (shop_subdomain)
-    LEFT JOIN launch_session_dates USING (shop_subdomain)
-    LEFT JOIN conversion_rates USING (currency)
-    LEFT JOIN plan_upgrade_dates USING (shop_subdomain)
-    LEFT JOIN trial_dates USING (shop_subdomain)
+    conversion_rates as (
+        select currency, in_usd from {{ ref("currency_conversion_rates") }}
+    ),
 
-)
+    final as (
+        select
+            * exclude (
+                shopify_shop_gmv_current_total, shopify_shop_gmv_initial_total, in_usd
+            ),
+            1.0
+            * shopify_shop_gmv_initial_total
+            * in_usd as shopify_shop_gmv_initial_total_usd,
+            1.0
+            * shopify_shop_gmv_current_total
+            * in_usd as shopify_shop_gmv_current_total_usd,
+            coalesce(in_usd is null, false) as currency_not_supported,
+            first_trial_start_date - first_installed_on_pt as days_until_first_trial,
+            first_plan_upgrade_date
+            - first_installed_on_pt as days_until_first_plan_upgrade
+        from decorated_shops
+        left join activation_dates using (shop_subdomain)
+        left join launch_session_dates using (shop_subdomain)
+        left join conversion_rates using (currency)
+        left join plan_upgrade_dates using (shop_subdomain)
+        left join trial_dates using (shop_subdomain)
 
-SELECT *
-FROM final
+    )
+
+select *
+from final

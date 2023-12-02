@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_anonymous_to_known_user_matching
+    description: Matches Google anonymous IDs and shop_subdomains. May contain multiple rows for the same subdomain.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1000
+    columns:
+      - name: USER_PSEUDO_ID
+        description: The anonymouse Google Analytics user ID
+        tests:
+          - not_null
+          # - unique
+      - name: SHOP_SUBDOMAIN
+        description: The foreign key of the Shop.
+        tests:
+          - not_null

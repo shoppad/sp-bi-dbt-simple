@@ -8,7 +8,7 @@ models:
             - shop_subdomain
     columns:
       - name: shop_subdomain
-        description: The subdomain of the shop that the workflow is running on
+        description: The foreign key of the Shop.
         tests:
           - not_null
       - name: dt

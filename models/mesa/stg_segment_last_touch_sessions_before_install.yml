@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: stg_segment_last_touch_sessions_before_install
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: last_touch_at_pt
+        description: The timestamp of the last touch.
+      - name: last_touch_url
+        description: The URL of the last touch.
+      - name: last_touch_host
+        description: The host of the last touch.
+      - name: last_touch_path
+        description: The path of the last touch.
+      - name: last_touch_content
+        description: The content of the last touch.
+      - name: last_touch_campaign
+        description: The campaign of the last touch.
+      - name: last_touch_medium
+        description: The medium of the last touch.
+      - name: last_touch_source
+        description: The source of the last touch.
+      - name: last_touch_app_store_search_term
+        description: The search term of the last touch in the app store.
+      - name: last_touch_app_store_surface_type
+        description: The type of surface for the last touch in the app store.
+      - name: last_touch_app_store_surface_intra_position
+        description: The intra position of the last touch on the app store surface.
+      - name: last_touch_app_store_surface_inter_position
+        description: The inter position of the last touch on the app store surface.
+      - name: last_touch_app_store_locale
+        description: The locale of the last touch in the app store.
+      - name: last_touch_referrer
+        description: The referrer of the last touch.
+      - name: last_touch_referrer_host
+        description: The referrer host of the last touch.

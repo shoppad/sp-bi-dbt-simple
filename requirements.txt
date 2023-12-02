@@ -1,5 +1,5 @@
-dbt-core
 dbt-snowflake
+dbt-core
 dbt-rpc
 sqlfluff
 dbt-metabase
