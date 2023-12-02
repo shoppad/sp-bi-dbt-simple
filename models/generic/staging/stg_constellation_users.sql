@@ -68,7 +68,6 @@ with
                 {% endfor %},
                 false
             ) as has_shoppad_constellation_app,
-
             coalesce(
                 {%- for app in constellation_apps %}
                     apps_
