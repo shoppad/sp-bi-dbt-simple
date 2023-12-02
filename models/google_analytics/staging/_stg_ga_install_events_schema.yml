@@ -8,10 +8,8 @@ models:
         tests:
           - not_null
       - name: SHOP_SUBDOMAIN
-        description: The subdomain of the shop
+        description: The foreign key of the Shop.
       - name: EVENT_TIMESTAMP
-        description: ""
-      - name: PAGE_PARAMS
         description: ""
       - name: UTM_CONTENT
         description: ""

@@ -98,8 +98,11 @@ vars:
     ]
   zombie_store_shopify_plans: [frozen, fraudulent, paused, dormant, cancelled]
 
-  segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
-  segment_sessionization_trailing_window: 3
+  dbt_segment:
+    segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
+    segment_sessionization_trailing_window: 3
+    segment_inactivity_cutoff: 30 * 60
+    segment_pass_through_columns: []
 
 seeds:
   +schema: seed_data

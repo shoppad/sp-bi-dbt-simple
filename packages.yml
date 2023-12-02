@@ -1,6 +1,6 @@
 packages:
   - package: calogica/dbt_date
-    version: [">=0.9.0", "<0.10.0"]
+    version: 0.10.0
   - package: calogica/dbt_expectations
     version: [">=0.7.0"]
   #- package: tnightengale/dbt_meta_testing
@@ -10,8 +10,8 @@ packages:
   #- git: "https://github.com/JonCrawford/dbt_segment"
   #  warn-unpinned: false
   - package: Fleetio/dbt_segment
-    version: 0.1.1
-  - package: dbt-labs/codegen
-    version: 0.10.0
+    version: 0.3.0
+  #- package: dbt-labs/codegen
+  #  version: 0.11.0
   # - package: dbt-labs/dbt_project_evaluator
   #  version: 0.6.2

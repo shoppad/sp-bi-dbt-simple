@@ -1,0 +1,37 @@
+version: 2
+models:
+  - name: ga4_events
+    columns:
+      - name: page_location
+      - name: page_title
+      - name: traffic_source_name
+      - name: event_name
+      - name: user_pseudo_id
+        description: the anonymouse google analytics user id
+      - name: traffic_source_medium
+      - name: traffic_source_source
+      - name: device_category
+      - name: event_id
+      - name: shop_subdomain
+        description: The foreign key of the Shop.
+      - name: param_campaign
+      - name: param_source
+      - name: param_medium
+      - name: page_referrer
+      - name: shopify_id
+        description: The official shopify identifier for the shop.
+      - name: ga_session_id
+      - name: ga_session_number
+      - name: app_store_surface_type
+      - name: event_timestamp_pt
+      - name: param_content
+      - name: param_term
+      - name: referrer
+      - name: referrer_host
+      - name: referrer_source
+      - name: referrer_medium
+      - name: referrer_term
+      - name: app_store_surface_detail
+      - name: app_store_surface_intra_position
+      - name: app_store_surface_inter_position
+      - name: app_store_locale

@@ -14,7 +14,7 @@ models:
         tests:
           - not_null
           - unique
-        description: The foreign key for the Shop.
+        description: The foreign key of the Shop.
       - name: first_installed_at_pt
         tests:
           - not_null
@@ -155,21 +155,21 @@ models:
         description: The timestamp of the latest uninstallation of the app.
       - name: first_plan_upgrade_date
         description: The date of the first plan upgrade action.
-      - name: first_touch_campaign
+      - name: acq_first_touch_campaign
         description: The campaign that the shop was acquired through.
-      - name: first_touch_content
+      - name: acq_first_touch_content
         description: The content that the shop was acquired through.
-      - name: acquisition_first_page_path
+      - name: acq_acquisition_first_page_path
         description: The first page path that the shop was acquired through.
-      - name: first_touch_referrer
+      - name: acq_first_touch_referrer
         description: The referrer URL that referred the Shop's first visit.
-      - name: first_touch_referrer_host
+      - name: acq_first_touch_referrer_host
         description: The referrer host that referrered the shop's first visit.
-      - name: first_touch_medium
+      - name: acq_first_touch_medium
         description: The medium that the shop was acquired through.
-      - name: first_touch_source
+      - name: acq_first_touch_source
         description: The source that the shop was acquired through.
-      - name: first_touch_source_medium
+      - name: acq_first_touch_source_medium
         description: The source & medium that drove the Shop's first visit.
       - name: funnel_phase
         description: The top-level step in the funnel that the shop is currently in.
@@ -287,11 +287,11 @@ models:
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.9
-      - name: acquisition_template
+      - name: acq_acquisition_template
         description:
           The template the Shop intended to use when they first installed the
           app.
-      - name: is_blog_referral
+      - name: acq_is_blog_referral
         description:
           Whether the Shop was referred/entered the marketing site by a blog
           post.
@@ -512,7 +512,10 @@ models:
         tests:
           - not_null
       - name: is_shopify_zombie_plan
-        description: Indicates whether the store is on a 'frozen', 'fraudulent', 'paused', 'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means they are not.
+        description:
+          Indicates whether the store is on a 'frozen', 'fraudulent', 'paused',
+          'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means they
+          are not.
         meta:
           metabase.display_name: Is Zombie Shopify Plan?
         tests:
@@ -801,8 +804,6 @@ models:
           - not_null
       - name: billing_overage_last_count
         description: The number of times the Shop has been over their billing limit.
-        tests:
-          - not_null
       - name: overlimit_date_pt
         description: The date the Shop went over their billing limit.
       - name: has_attempted_a_test
@@ -840,65 +841,294 @@ models:
           (BOB)
         tests:
           - not_null
-      - name: last_touch_app_store_surface_type
+      - name: acq_last_touch_app_store_surface_type
         description: The type of surface for the last touch in the app store.
-      - name: first_touch_app_store_surface_intra_position
+      - name: acq_first_touch_app_store_surface_intra_position
         description: The intra position of the first touch on the app store surface.
-      - name: last_touch_source_medium
+      - name: acq_last_touch_source_medium
         description: The source medium of the last touch.
-      - name: first_touch_app_store_surface_type
+      - name: acq_first_touch_app_store_surface_type
         description: The type of surface for the first touch in the app store.
-      - name: last_touch_content
+      - name: acq_last_touch_content
         description: The content of the last touch.
-      - name: first_touch_app_store_search_term
-        description: The search term of the first touch in the app store.
-      - name: days_to_install
-        description: The number of days it took to install.
-      - name: first_touch_path
+      - name: acq_first_touch_path
         description: The path of the first touch.
-      - name: install_event_source
-        description: The source of the install event.
-      - name: last_touch_url
+      - name: acq_mesa_install_event_mesa_source
+        description: The source of the m3_mesa_install event.
+      - name: acq_last_touch_url
         description: The URL of the last touch.
-      - name: last_touch_campaign
+      - name: acq_last_touch_campaign
         description: The campaign of the last touch.
-      - name: first_touch_at_pt
+      - name: acq_first_touch_at_pt
         description: The timestamp of the first touch.
-      - name: last_touch_app_store_surface_intra_position
+      - name: acq_last_touch_app_store_surface_intra_position
         description: The intra position of the last touch on the app store surface.
-      - name: last_touch_host
+      - name: acq_last_touch_host
         description: The host of the last touch.
-      - name: last_touch_app_store_search_term
-        description: The search term of the last touch in the app store.
-      - name: last_touch_referrer_host
+      - name: acq_last_touch_app_store_surface_detail
+        description: The surface_detail term of the last touch in the app store.
+      - name: acq_last_touch_referrer_host
         description: The referrer host of the last touch.
-      - name: last_touch_path
+      - name: acq_last_touch_path
         description: The path of the last touch.
-      - name: is_app_store_search_ad_referral
+      - name: acq_is_app_store_search_ad_referral
         description: Whether the referral is from an app store search ad.
-      - name: first_touch_host
+        tests:
+          - not_null
+      - name: acq_first_touch_host
         description: The host of the first touch.
-      - name: acq_info_source
+      - name: acq_install_event_info_source
         description: The source of acquisition information.
-      - name: last_touch_medium
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.95
+              config:
+                where: NOT is_custom_app AND latest_installed_at_pt > '2022-01-01'
+      - name: acq_last_touch_medium
         description: The medium of the last touch.
-      - name: last_touch_referrer
+      - name: acq_last_touch_referrer
         description: The referrer of the last touch.
-      - name: first_touch_app_store_locale
+      - name: acq_first_touch_app_store_locale
         description: The locale of the first touch in the app store.
-      - name: sessions_til_install
-        description: The number of sessions until installation.
-      - name: last_touch_at_pt
+      - name: acq_last_touch_at_pt
         description: The timestamp of the last touch.
-      - name: last_touch_app_store_surface_inter_position
+      - name: acq_last_touch_app_store_surface_inter_position
         description: The inter position of the last touch on the app store surface.
-      - name: is_app_store_referral
+      - name: acq_is_app_store_referral
         description: Whether the referral is from the app store.
-      - name: first_touch_url
+        tests:
+          - not_null
+      - name: acq_first_touch_url
         description: The URL of the first touch.
-      - name: first_touch_app_store_surface_inter_position
+      - name: acq_first_touch_app_store_surface_inter_position
         description: The inter position of the first touch on the app store surface.
-      - name: last_touch_app_store_locale
+      - name: acq_last_touch_app_store_locale
         description: The locale of the last touch in the app store.
-      - name: last_touch_source
+      - name: acq_last_touch_source
         description: The source of the last touch.
+      - name: acq_app_store_ad_click_utm_medium
+        description: The utm_medium of the app store ad click.
+      - name: acq_app_store_ad_click_event_timestamp_pt
+        description:
+          The timestamp indicating when the user clicked on an advertisement
+          in the app store, in the Pacific Time zone.
+      - name: acq_app_store_organic_click_referrer_host
+        description: The host URL from which the organic click in the app store originated.
+      - name: acq_mesa_install_event_referer
+        description:
+          The referring URL or source that led to the installation event of
+          the Mesa application.
+      - name: acq_has_app_store_organic_click
+        description:
+          Indicates whether there was an organic click in the app store related
+          to the shop or app.
+      - name: acq_mesa_install_event_utm_source
+        description:
+          The UTM source parameter capturing the marketing medium that led
+          to the Mesa installation event.
+      - name: acq_app_store_organic_click_app_store_surface_inter_position
+        description:
+          The position or location within the app store where the organic click
+          occurred, for intermediary app store surfaces.
+      - name: acq_app_store_did_click_ad
+        description: Indicates whether an ad in the app store was clicked.
+      - name: acq_app_store_install_event_timestamp_pt
+        description:
+          Timestamp marking when the app was installed from the app store,
+          in Pacific Time.
+      - name: acq_app_store_install_app_store_surface_detail
+        description:
+          Details about the app store surface (section or category) where the
+          app was installed from.
+      - name: acq_app_store_ad_click_page_location
+        description:
+          The specific page location or section in the app store where the
+          ad click occurred.
+      - name: acq_app_store_ad_click_utm_source
+        description:
+          The UTM source parameter for tracking the origin of traffic that
+          led to an ad click in the app store.
+      - name: acq_app_store_install_utm_term
+        description:
+          The UTM term parameter used for identifying specific search terms
+          leading to an app installation.
+      - name: acq_app_store_organic_click_app_store_surface_detail
+        description:
+          Detailed information about the specific app store surface where an
+          organic click occurred.
+      - name: acq_app_store_organic_click_app_store_locale
+        description:
+          The locale or regional setting of the app store during an organic
+          click event.
+      - name: acq_app_store_ad_click_app_store_locale
+        description:
+          The locale or regional setting of the app store during an ad click
+          event.
+      - name: acq_mesa_install_event_plan_selected
+        description:
+          Details the specific plan or package selected during the Mesa installation
+          event.
+      - name: acq_app_store_organic_click_utm_medium
+        description:
+          The UTM medium parameter for tracking the type of link or medium
+          through which the organic click occurred.
+      - name: acq_app_store_organic_click_utm_campaign
+        description:
+          The UTM campaign parameter used for identifying the specific marketing
+          campaign linked to an organic click.
+      - name: acq_mesa_install_event_utm_medium
+        description:
+          The UTM medium parameter associated with the Mesa installation event
+          for tracking the marketing channel.
+      - name: acq_mesa_install_event_utm_campaign
+        description:
+          The UTM campaign parameter related to the specific marketing campaign
+          during the Mesa installation event.
+      - name: acq_app_store_organic_click_page_location
+        description:
+          The specific page location or area in the app store where an organic
+          click took place.
+      - name: shop_value_per_month
+        description: The estimated monetary value of the shop on a monthly basis.
+      - name: acq_mesa_install_event_plan
+        description:
+          Identifies the specific Mesa plan or tier chosen during the installation
+          process.
+      - name: acq_app_store_ad_click_referrer_host
+        description:
+          The host URL or domain that referred the user to the app store ad
+          click.
+      - name: acq_app_store_has_ad_click
+        description:
+          Indicates whether there was a click on an advertisement within the
+          app store.
+      - name: acq_app_store_install_referrer_medium
+        description:
+          The medium through which the user was referred to the app store for
+          installation.
+      - name: acq_app_store_install_app_store_locale
+        description:
+          The locale or regional setting of the app store at the time of the
+          app installation.
+      - name: acq_app_store_organic_click_app_store_surface_intra_position
+        description:
+          The intra-position or specific subsection within an app store surface
+          where an organic click occurred.
+      - name: acq_mesa_install_event_timestamp_pt
+        description: The Pacific Time timestamp of the Mesa installation event.
+      - name: acq_app_store_organic_click_app_store_surface_type
+        description:
+          The type or category of the app store surface where an organic click
+          took place.
+      - name: acq_app_store_install_app_store_surface_type
+        description:
+          The type or category of the app store surface from which the app
+          was installed.
+      - name: acq_first_touch_app_surface_detail
+        description:
+          Details about the first interaction or 'touch' with the app in the
+          app store,
+      - name: acq_app_store_ad_click_app_store_surface_inter_position
+        description:
+          The inter-position or specific section within an app store surface
+          where an ad click occurred.
+      - name: acq_app_store_ad_click_utm_content
+        description:
+          The UTM content parameter for tracking the specific content or ad
+          that was clicked in the app store.
+      - name: acq_sessions_til_install
+        description: The number of sessions that occurred before the app was installed.
+      - name: acq_app_store_install_utm_content
+        description:
+          The UTM content parameter for tracking the specific content or ad
+          that led to an app installation.
+      - name: acq_app_store_install_utm_source
+        description:
+          The UTM source parameter for tracking the origin of traffic that
+          led to an app installation.
+      - name: acq_app_store_install_referrer_host
+        description:
+          The host URL or domain that referred the user to the app store for
+          installation.
+      - name: acq_days_to_install
+        description: The number of days that passed before the app was installed.
+      - name: acq_app_store_click_type
+        description:
+          The type of click that occurred in the app store, either organic
+          or ad.
+      - name: acq_app_store_ad_click_referrer_source
+        description: The source of the referrer that led to an ad click in the app store.
+      - name: acq_app_store_ad_click_app_store_surface_detail
+        description:
+          Detailed information about the specific app store surface where an
+          ad click occurred.
+      - name: acq_mesa_install_event_start_selected
+        description:
+          Indicates whether the user selected the 'Start Free Trial' option
+          during the Mesa installation event.
+      - name: acq_shopify_id
+        description: The Shopify ID of the shop.
+      - name: acq_app_store_organic_click_referrer_term
+        description:
+          The referrer term or search term that led to an organic click in
+          the app store.
+      - name: acq_app_store_organic_click_event_timestamp_pt
+        description:
+          The timestamp indicating when the user clicked on an organic link
+          in the app store, in the Pacific Time zone.
+      - name: acq_mesa_install_event_install_completed
+        description:
+          Indicates whether the user completed the installation process during
+          the Mesa installation event.
+      - name: acq_app_store_install_referrer
+        description: The referrer URL or source that led to the app store for installation.
+      - name: acq_app_store_ad_click_app_store_surface_type
+        description: The type or category of the app store surface where an ad click occurred.
+      - name: acq_app_store_install_referrer_source
+        description:
+          The source of the referrer that led to an app installation in the
+          app store.
+      - name: acq_app_store_install_page_location
+        description:
+          The specific page location or section in the app store where the
+          app was installed from.
+      - name: acq_app_store_organic_click_utm_content
+        description:
+          The UTM content parameter for tracking the specific content or ad
+          that was clicked in the app store.
+      - name: acq_app_store_organic_click_utm_source
+        description:
+          The UTM source parameter for tracking the origin of traffic that
+          led to an organic click.
+      - name: acq_app_store_ad_click_app_store_surface_intra_position
+        description:
+          The intra-position or specific subsection within an app store surface
+          where an ad click occurred.
+      - name: acq_app_store_ad_click_referrer_medium
+        description:
+          The medium through which the user was referred to the app store for
+          an ad click.
+      - name: acq_mesa_install_event_session
+        description: The session ID associated with the Mesa installation event.
+      - name: shopify_last_updated_at_pt
+        description: The timestamp of the last update to the shop in Pacific Time.
+      - name: acq_app_store_ad_click_utm_campaign
+        description:
+          The UTM campaign parameter used for identifying the specific marketing
+          campaign linked to an ad click.
+      - name: acq_app_store_has_ad_click
+        description:
+          Indicates whether there was a click on an advertisement within the
+          app store.
+      - name: acq_app_store_did_click_ad_before_install
+        description:
+          Flags if the user clicked on an app store ad prior to installing
+          the app.
+      - name: acq_app_store_install_source_medium
+        description:
+          The source-medium through which the user was referred to the app
+          store for installation.
+      - name: acq_app_store_ad_click_source_medium
+        description:
+          The source-medium through which the user was referred to the app
+          store for an ad click.

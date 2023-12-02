@@ -152,7 +152,19 @@ with
         left join yesterdays using (shop_subdomain)
     ),
 
-    install_sources as (select * from {{ ref("int_shop_install_sources") }}),
+    install_sources as (
+        {% set table_name = ref("int_shop_install_sources") %}
+        {% set column_names = dbt_utils.get_filtered_columns_in_relation(
+            from=table_name, except=["shop_subdomain"]
+        ) %}
+        select
+            shop_subdomain,
+            {% for column_name in column_names %}
+                {{ column_name }} as acq_{{ column_name }}
+                {%- if not loop.last %},{% endif %}
+            {% endfor %}
+        from {{ table_name }}
+    ),
 
     max_funnel_steps as (
         select
@@ -216,7 +228,7 @@ with
         select
             shop_subdomain,
             coalesce(avg(daily_usage_revenue), 0) as average_daily_usage_revenue,
-            coalesce(avg(inc_amount), 0) as average_daily_revenue,
+            coalesce(avg(inc_amount::float), 0) as average_daily_revenue,
             average_daily_revenue * 30 as projected_mrr,
             coalesce(sum(inc_amount), 0) as total_thirty_day_revenue
         from shops
@@ -404,6 +416,15 @@ with
         group by 1
     ),
 
+    last_plan_prices as (
+        select
+            shop_subdomain,
+            round(max_by(daily_plan_revenue, dt) * 30) as last_plan_price
+        from {{ ref("int_shop_calendar") }}
+        where daily_plan_revenue > 0
+        group by 1
+    ),
+
     first_newsletter_deliveries as (
         select * from {{ ref("int_first_newsletter_deliveries") }}
     ),
@@ -443,7 +464,8 @@ with
                 has_had_launch_session,
                 avg_current_gmv_usd,
                 avg_initial_gmv_usd,
-                churned_on_pt
+                churned_on_pt,
+                last_plan_price
             ),
             not activation_date_pt
             is null as is_activated,
@@ -614,7 +636,10 @@ with
             ) as churned_customer_duration_in_weeks,
             floor(
                 datediff('days', first_plan_upgrade_date, churned_on_pt) / 30
-            ) as churned_customer_duration_in_months
+            ) as churned_customer_duration_in_months,
+            coalesce(
+                iff(projected_mrr > 0, projected_mrr, last_plan_price), 0
+            ) as shop_value_per_month
 
         from shops
         left join billing_accounts using (shop_subdomain)
@@ -644,6 +669,7 @@ with
         left join first_journey_deliveries using (shop_subdomain)
         left join churn_dates using (shop_subdomain)
         left join workflow_source_destination_pairs using (shop_subdomain)
+        left join last_plan_prices using (shop_subdomain)
     )
 
 select *

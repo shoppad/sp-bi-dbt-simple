@@ -1,9 +1,29 @@
 with
     shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
 
+    {% set not_empty_string_fields = [
+        "first_page_url",
+        "first_page_url_host",
+        "first_page_url_path",
+        "utm_content",
+        "utm_campaign",
+        "utm_medium",
+        "utm_source",
+        "referrer",
+        "referrer_host",
+        "referrer_medium",
+        "referrer_source",
+    ] %}
     segment_sessions as (
         select
-            * exclude session_start_tstamp rename(blended_user_id as shop_subdomain),
+            * exclude session_start_tstamp replace (
+                {% for field in not_empty_string_fields %}
+                    nullif({{ field }}, '') as {{ field }}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            )
+            rename blended_user_id as shop_subdomain,
+
             {{ pacific_timestamp("session_start_tstamp") }} as session_start_tstamp_pt
         from {{ ref("segment_web_sessions") }}
     ),

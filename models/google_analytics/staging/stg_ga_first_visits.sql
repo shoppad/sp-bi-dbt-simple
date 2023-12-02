@@ -7,8 +7,8 @@ with
 
     first_visits as (
         select *
-        from {{ source("mesa_ga4", "events") }}
-        where event_name = 'first_visit' and not page_location ilike '%.pages.dev%'
+        from {{ ref("ga4_events") }}
+        where (event_name = 'first_visit') and not (page_location ilike '%.pages.dev%')
     ),
 
     shop_first_visits as (
@@ -16,37 +16,21 @@ with
         select
             user_pseudo_id::string as user_pseudo_id,
             page_location::string as page_location,
-            {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}::timestamp
-            as event_timestamp_pt,
-            parse_url(page_location::string) as page_params,
-            page_params:parameters:utm_content::string as utm_content,
-            page_params:parameters:utm_campaign::string as utm_campaign,
-            page_params:parameters:utm_medium::string as utm_medium,
-            page_params:parameters:utm_source::string as utm_source,
-            nullif(
-                lower(
-                    {{ target.schema }}.url_decode(
-                        page_params:parameters:surface_detail::string
-                    )
-                ),
-                'undefined'
-            ) as app_store_search_term,
-            page_params:parameters:surface_type::string as app_store_surface_type,
-            page_params:parameters:surface_intra_position::string
-            as app_store_surface_intra_position,
-            page_params:parameters:surface_inter_position::string
-            as app_store_surface_inter_position,
-            page_params:parameters:locale::string as app_store_locale,
+            event_timestamp_pt,
+
+            {# Attribution #}
+            param_content as utm_content,
+            param_term as utm_term,
+            coalesce(traffic_source_name, param_campaign) as utm_campaign,
+            coalesce(traffic_source_medium, param_medium) as utm_medium,
+            coalesce(traffic_source_source, param_source) as utm_source,
             page_referrer as first_touch_referrer,
-            parse_url(first_touch_referrer):host::string as first_touch_referrer_host
-        from shops
-        left join first_visits
-        qualify
-            row_number() over (
-                partition by user_pseudo_id, event_name, event_timestamp
-                order by param_source, name, __hevo__loaded_at
-            )
-            = 1
+            parse_url(first_touch_referrer):host::string as first_touch_referrer_host,
+
+            {# App Store #}
+            * ilike 'app_store%'
+
+        from first_visits
     ),
 
     formatted_first_visits as (
@@ -61,7 +45,7 @@ with
             utm_campaign as first_touch_campaign,
             utm_medium as first_touch_medium,
             utm_source as first_touch_source,
-            app_store_search_term as first_touch_app_store_search_term,
+            app_store_surface_detail as first_touch_app_surface_detail,
             app_store_surface_type as first_touch_app_store_surface_type,
             app_store_surface_intra_position
             as first_touch_app_store_surface_intra_position,

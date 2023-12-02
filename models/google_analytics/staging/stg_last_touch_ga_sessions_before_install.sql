@@ -45,7 +45,7 @@ with
             utm_campaign as last_touch_campaign,
             utm_medium as last_touch_medium,
             utm_source as last_touch_source,
-            app_store_surface_detail as last_touch_app_store_search_term,
+            app_store_surface_detail as last_touch_app_store_surface_detail,
             app_store_surface_type as last_touch_app_store_surface_type,
             app_store_surface_intra_position
             as last_touch_app_store_surface_intra_position,
