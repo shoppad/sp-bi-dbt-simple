@@ -72,7 +72,8 @@ with
             ) as first_touch_app_store_surface_inter_position,
             to_varchar(page_params:parameters:locale) as first_touch_app_store_locale,
             referrer as first_touch_referrer,
-            referrer_host as first_touch_referrer_host
+            referrer_host as first_touch_referrer_host,
+            device_category as first_touch_device_category
         from first_segment_visits
     )
 

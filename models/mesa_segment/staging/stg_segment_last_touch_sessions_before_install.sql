@@ -82,7 +82,8 @@ with
                 page_params:parameters:locale as string
             ) as last_touch_app_store_locale,
             referrer as last_touch_referrer,
-            referrer_host as last_touch_referrer_host
+            referrer_host as last_touch_referrer_host,
+            device_category as last_touch_device_category
         from last_touch_sessions
     )
 
