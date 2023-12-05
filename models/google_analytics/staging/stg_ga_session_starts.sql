@@ -1,37 +1,34 @@
-with
-    stg_shops as (
-        select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}
-    ),
+WITH
+    user_matching AS (SELECT * FROM {{ ref("stg_anonymous_to_known_user_matching") }}),
 
-    user_matching as (select * from {{ ref("stg_anonymous_to_known_user_matching") }}),
-
-    session_starts as (
-        select
+    session_starts AS (
+        SELECT
             user_pseudo_id,
             page_location,
             event_timestamp_pt,
 
-            {# URL parts #}
-            split_part(page_location, '//', 2) as page_url,
-            split_part(page_url, '/', 1) as page_host,
-            split_part(page_url, '?', 1) as page_path,
+            -- URL parts
+            SPLIT_PART(page_location, '//', 2) AS page_url,
+            SPLIT_PART(page_url, '/', 1) AS page_host,
+            SPLIT_PART(page_url, '?', 1) AS page_path,
 
-            {# Attribution #}
-            coalesce(traffic_source_name, param_campaign) as utm_campaign,
-            coalesce(traffic_source_medium, param_medium) as utm_medium,
-            coalesce(traffic_source_source, param_source) as utm_source,
-            param_content as utm_content,
-            param_term as utm_term,
+            -- Attribution
+            COALESCE(traffic_source_name, param_campaign) AS utm_campaign,
+            COALESCE(traffic_source_medium, param_medium) AS utm_medium,
+            COALESCE(traffic_source_source, param_source) AS utm_source,
+            device_category,
+            param_content AS utm_content,
+            param_term AS utm_term,
             page_referrer,
-            * ilike 'referrer%',
+            * ILIKE 'referrer%',
 
-            {# App Store #}
-            * ilike 'app_store%'
+            -- App Store
+            * ILIKE 'app_store%'
 
-        from {{ ref("ga4_events") }}
-        where event_name = 'session_start'
+        FROM {{ ref("ga4_events") }}
+        WHERE event_name = 'session_start'
     )
 
-select *
-from session_starts
-inner join user_matching using (user_pseudo_id)
+SELECT *
+FROM session_starts
+INNER JOIN user_matching USING (user_pseudo_id)

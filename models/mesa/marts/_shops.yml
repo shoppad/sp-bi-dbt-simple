@@ -1066,8 +1066,6 @@ models:
         description:
           Indicates whether the user selected the 'Start Free Trial' option
           during the Mesa installation event.
-      - name: acq_shopify_id
-        description: The Shopify ID of the shop.
       - name: acq_app_store_organic_click_referrer_term
         description:
           The referrer term or search term that led to an organic click in
@@ -1132,3 +1130,9 @@ models:
         description:
           The source-medium through which the user was referred to the app
           store for an ad click.
+      - name: acq_app_store_ad_click_device_category
+        description: The device category from which the app store ad click occurred.
+      - name: acq_app_store_install_device_category
+        description: The device category from which the app store install occurred.
+      - name: acq_app_store_organic_click_device_category
+        description: The device category from which the app store organic click occurred.

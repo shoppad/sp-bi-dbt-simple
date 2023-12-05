@@ -1,65 +1,66 @@
-with
-    shop_anonymous_keys as (
-        select * from {{ ref("stg_anonymous_to_known_user_matching") }}
+WITH
+    shop_anonymous_keys AS (
+        SELECT * FROM {{ ref("stg_anonymous_to_known_user_matching") }}
     ),
 
-    shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
-
-    first_visits as (
-        select *
-        from {{ ref("ga4_events") }}
-        where (event_name = 'first_visit') and not (page_location ilike '%.pages.dev%')
+    first_visits AS (
+        SELECT *
+        FROM {{ ref("ga4_events") }}
+        WHERE (event_name = 'first_visit') AND NOT (page_location ILIKE '%.pages.dev%')
     ),
 
-    shop_first_visits as (
+    shop_first_visits AS (
 
-        select
-            user_pseudo_id::string as user_pseudo_id,
-            page_location::string as page_location,
+        SELECT
+            {# App Store #}
+            * ILIKE 'app_store%',
+
+            {# Identifiers #}
+            user_pseudo_id::STRING AS user_pseudo_id,
+            page_location::STRING AS page_location,
             event_timestamp_pt,
 
             {# Attribution #}
-            param_content as utm_content,
-            param_term as utm_term,
-            coalesce(traffic_source_name, param_campaign) as utm_campaign,
-            coalesce(traffic_source_medium, param_medium) as utm_medium,
-            coalesce(traffic_source_source, param_source) as utm_source,
-            page_referrer as first_touch_referrer,
-            parse_url(first_touch_referrer):host::string as first_touch_referrer_host,
+            param_content AS utm_content,
+            param_term AS utm_term,
+            COALESCE(traffic_source_name, param_campaign) AS utm_campaign,
+            COALESCE(traffic_source_medium, param_medium) AS utm_medium,
+            COALESCE(traffic_source_source, param_source) AS utm_source,
+            device_category,
+            page_referrer AS first_touch_referrer,
+            parse_url(first_touch_referrer):host::STRING AS first_touch_referrer_host
 
-            {# App Store #}
-            * ilike 'app_store%'
-
-        from first_visits
+        FROM first_visits
     ),
 
-    formatted_first_visits as (
-        select
+    formatted_first_visits AS (
+        SELECT
             user_pseudo_id,
-            event_timestamp_pt as first_touch_at_pt,
-            page_location as acquisition_first_page_path,
-            split_part(page_location, '//', 2) as first_touch_url,
-            split_part(first_touch_url, '/', 1) as first_touch_host,
-            '/' || split_part(
-                split_part(first_touch_url, '/', 2), '?', 1
-            ) as first_touch_path,
-            utm_content as first_touch_content,
-            utm_campaign as first_touch_campaign,
-            utm_medium as first_touch_medium,
-            utm_source as first_touch_source,
-            app_store_surface_detail as first_touch_app_surface_detail,
-            app_store_surface_type as first_touch_app_store_surface_type,
+            event_timestamp_pt AS first_touch_at_pt,
+            page_location AS acquisition_first_page_path,
+            utm_content AS first_touch_content,
+            utm_campaign AS first_touch_campaign,
+            utm_medium AS first_touch_medium,
+            utm_source AS first_touch_source,
+            app_store_surface_detail AS first_touch_app_surface_detail,
+            app_store_surface_type AS first_touch_app_store_surface_type,
             app_store_surface_intra_position
-            as first_touch_app_store_surface_intra_position,
+                AS first_touch_app_store_surface_intra_position,
             app_store_surface_inter_position
-            as first_touch_app_store_surface_inter_position,
-            app_store_locale as first_touch_app_store_locale,
+                AS first_touch_app_store_surface_inter_position,
+            app_store_locale AS first_touch_app_store_locale,
             first_touch_referrer,
-            first_touch_referrer_host
-        from shop_first_visits
+            first_touch_referrer_host,
+            device_category AS first_touch_device_category,
+            SPLIT_PART(page_location, '//', 2) AS first_touch_url,
+            SPLIT_PART(first_touch_url, '/', 1) AS first_touch_host,
+            '/' || SPLIT_PART(
+                SPLIT_PART(first_touch_url, '/', 2), '?', 1
+            ) AS first_touch_path
+        FROM shop_first_visits
     )
 
-select *
-from formatted_first_visits
-inner join shop_anonymous_keys using (user_pseudo_id)
-qualify row_number() over (partition by shop_subdomain order by first_touch_at_pt) = 1
+SELECT *
+FROM formatted_first_visits
+INNER JOIN shop_anonymous_keys USING (user_pseudo_id)
+QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY first_touch_at_pt) = 1

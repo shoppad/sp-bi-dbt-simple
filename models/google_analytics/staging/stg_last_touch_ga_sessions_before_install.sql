@@ -1,63 +1,64 @@
-with
-    first_install_events as (
-        select
-            * rename(
-                getmesa_install_convert_event_timestamp_pt as first_install_timestamp_pt
+WITH
+    first_install_events AS (
+        SELECT
+            * RENAME (
+                getmesa_install_convert_event_timestamp_pt AS first_install_timestamp_pt
             )
-        from {{ ref("stg_ga_install_events") }}
-        qualify
-            row_number() over (
-                partition by shop_subdomain
-                order by getmesa_install_convert_event_timestamp_pt
+        FROM {{ ref("stg_ga_install_events") }}
+        QUALIFY
+            ROW_NUMBER() OVER (
+                PARTITION BY shop_subdomain
+                ORDER BY getmesa_install_convert_event_timestamp_pt
             )
             = 1
     ),
 
-    session_starts as (select * from {{ ref("stg_ga_session_starts") }}),
+    session_starts AS (SELECT * FROM {{ ref("stg_ga_session_starts") }}),
 
-    last_touch_sessions as (
-        select * exclude (rn)
-        from
+    last_touch_sessions AS (
+        SELECT * EXCLUDE (rn)
+        FROM
             (
-                select
+                SELECT
                     session_starts.*,
-                    row_number() over (
-                        partition by first_install_events.shop_subdomain
-                        order by session_starts.event_timestamp_pt desc
-                    ) as rn
-                from session_starts
-                inner join first_install_events using (shop_subdomain)
-                where
+                    ROW_NUMBER() OVER (
+                        PARTITION BY first_install_events.shop_subdomain
+                        ORDER BY session_starts.event_timestamp_pt DESC
+                    ) AS rn
+                FROM session_starts
+                INNER JOIN first_install_events USING (shop_subdomain)
+                WHERE
                     session_starts.event_timestamp_pt
                     <= first_install_events.first_install_timestamp_pt
-                qualify rn = 1
-            ) as t
+                QUALIFY rn = 1
+            ) AS t
     ),
 
-    formatted_last_touch_session_starts as (
-        select
+    formatted_last_touch_session_starts AS (
+        SELECT
             shop_subdomain,
-            event_timestamp_pt as last_touch_at_pt,
-            split_part(page_location, '//', 2) as last_touch_url,
-            split_part(last_touch_url, '/', 1) as last_touch_host,
-            '/' || split_part(
-                split_part(last_touch_url, '/', 2), '?', 1
-            ) as last_touch_path,
-            utm_content as last_touch_content,
-            utm_campaign as last_touch_campaign,
-            utm_medium as last_touch_medium,
-            utm_source as last_touch_source,
-            app_store_surface_detail as last_touch_app_store_surface_detail,
-            app_store_surface_type as last_touch_app_store_surface_type,
+            event_timestamp_pt AS last_touch_at_pt,
+            utm_content AS last_touch_content,
+            utm_campaign AS last_touch_campaign,
+            utm_medium AS last_touch_medium,
+            utm_source AS last_touch_source,
+            app_store_surface_detail AS last_touch_app_store_surface_detail,
+            app_store_surface_type AS last_touch_app_store_surface_type,
             app_store_surface_intra_position
-            as last_touch_app_store_surface_intra_position,
-            app_store_locale as last_touch_app_store_locale,
+                AS last_touch_app_store_surface_intra_position,
+            app_store_locale AS last_touch_app_store_locale,
             app_store_surface_inter_position
-            as last_touch_app_store_surface_inter_position,
-            page_referrer as last_touch_referrer,
-            parse_url(last_touch_referrer):host::string as last_touch_referrer_host
-        from last_touch_sessions
+                AS last_touch_app_store_surface_inter_position,
+            page_referrer AS last_touch_referrer,
+            PARSE_URL(last_touch_referrer):host::STRING AS last_touch_referrer_host,
+            device_category AS last_touch_device_category,
+            SPLIT_PART(page_location, '//', 2) AS last_touch_url,
+            SPLIT_PART(last_touch_url, '/', 1) AS last_touch_host,
+            '/' || SPLIT_PART(
+                SPLIT_PART(last_touch_url, '/', 2), '?', 1
+            ) AS last_touch_path
+        FROM last_touch_sessions
     )
 
-select *
-from formatted_last_touch_session_starts
+SELECT *
+FROM formatted_last_touch_session_starts

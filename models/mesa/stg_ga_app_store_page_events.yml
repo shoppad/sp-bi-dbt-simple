@@ -3,11 +3,16 @@ models:
   - name: stg_ga_app_store_page_events
     columns:
       - name: user_pseudo_id
+        description: the anonymouse google analytics user id
       - name: shopify_id
         description: The official shopify identifier for the shop.
       - name: utm_source
       - name: app_store_locale
       - name: app_store_search_term
       - name: event_name
+        tests:
+          - dbt_expectations.expect_column_distinct_count_to_be_greater_than:
+              value: 0
+              row_condition: event_name = 'shopify_app_install'
       - name: utm_campaign
       - name: app_store_surface_type

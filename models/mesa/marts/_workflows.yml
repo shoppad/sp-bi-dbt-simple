@@ -1,11 +1,15 @@
-version: 2
+uversion: 2
 models:
   - name: workflows
-    description: |
-      This model contains information about individual Workflows.
+    description: "This model contains information about individual Workflows.
+
+      "
     meta:
-      metabase.caveats: |
-        Some records are for Deleted Workflows, so be sure to filter on is_deleted.
+      metabase.caveats:
+        "Some records are for Deleted Workflows, so be sure to filter
+        on is_deleted.
+
+        "
     columns:
       - name: workflow_id
         description: The unique identifier for the workflow.
@@ -13,7 +17,7 @@ models:
           - unique
           - not_null
       - name: shop_subdomain
-        description: The foreign key for the Shop.
+        description: The foreign key of the Shop.
         tests:
           - not_null
           - relationships:
@@ -21,7 +25,6 @@ models:
               to: ref('shops')
       - name: template_name
         description: The name of the template the workflow originated from.
-
       - name: title
         description: The title of the workflow.
         tests:
@@ -77,7 +80,9 @@ models:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: first_successful_test_at_pt
-        description: The timestamp of the first successful test attempt of the workflow in PT.
+        description:
+          The timestamp of the first successful test attempt of the workflow
+          in PT.
         tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
@@ -92,15 +97,21 @@ models:
       - name: test_success_percent
         description: The percent of test attempts that have completed successfully.
       - name: has_edited_or_saved_workflow
-        description: Whether the workflow has been edited or saved. Determined by presence of `workflow_save` and `dashboard_workflow_edit` events.
+        description:
+          Whether the workflow has been edited or saved. Determined by presence
+          of `workflow_save` and `dashboard_workflow_edit` events.
         tests:
           - not_null
       - name: has_viewed_workflow
-        description: Whether the workflow has been viewed. Determined by presence of Pageview of the workflow's URL.
+        description:
+          Whether the workflow has been viewed. Determined by presence of Pageview
+          of the workflow's URL.
         tests:
           - not_null
       - name: has_enabled_workflow
-        description: Whether the workflow has been enabled. Determined by presence of `workflow_enable` event featuring the workflow_id.
+        description:
+          Whether the workflow has been enabled. Determined by presence of
+          `workflow_enable` event featuring the workflow_id.
         tests:
           - not_null
       - name: created_at_pt
@@ -138,27 +149,43 @@ models:
       - name: setup
         description: The stage of a template-wizard workflow setup process.
       - name: thirty_day_run_was_filter_stopped_percent
-        description: The percent of workflow run attempts that were stopped by a filter in the last 30 days.
+        description:
+          The percent of workflow run attempts that were stopped by a filter
+          in the last 30 days.
       - name: thirty_day_run_was_filter_stopped_count
-        description: The number of times the workflow was stopped by a filter in the last 30 days.
+        description:
+          The number of times the workflow was stopped by a filter in the last
+          30 days.
       - name: thirty_day_run_success_percent
-        description: The percent of workflow run attempts that successfully ran in the last 30 days.
+        description:
+          The percent of workflow run attempts that successfully ran in the
+          last 30 days.
       - name: run_did_move_data_count
         description: The number of workflow runs that successfully moved data.
       - name: run_moved_data_percent
         description: The percent of workflow runs that successfully moved data.
       - name: thirty_day_run_moved_data_percent
-        description: The percent of workflow runs that successfully moved data in the last 30 days.
+        description:
+          The percent of workflow runs that successfully moved data in the
+          last 30 days.
       - name: thirty_day_trigger_count
-        description: The number of times the workflow has started to run in the last 30 days.
+        description:
+          The number of times the workflow has started to run in the last 30
+          days.
       - name: thirty_day_step_count
-        description: The total number of steps that have been executed for this Workflow in the last 30 days.
+        description:
+          The total number of steps that have been executed for this Workflow
+          in the last 30 days.
       - name: run_was_filter_stopped_count
         description: The number of times the workflow was stopped by a filter.
       - name: thirty_day_run_success_count
-        description: The number of times the workflow has been run successfully in the last 30 days.
+        description:
+          The number of times the workflow has been run successfully in the
+          last 30 days.
       - name: thirty_day_run_did_move_data_count
-        description: The number of workflow runs that successfully moved data in the last 30 days.
+        description:
+          The number of workflow runs that successfully moved data in the last
+          30 days.
       - name: run_was_filter_stopped_percent
         description: The percent of workflow run attempts that were stopped by a filter.
       - name: has_pro_app

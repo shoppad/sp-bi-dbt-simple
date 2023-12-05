@@ -9,7 +9,7 @@ with
                 surface_detail,
                 surface_type
             )
-            rename(
+            rename (
                 name as traffic_source_name,
                 medium as traffic_source_medium,
                 source as traffic_source_source,
@@ -49,7 +49,7 @@ with
             as app_store_surface_inter_position,
             page_params:parameters:locale::string as app_store_locale
         from {{ source("mesa_ga4", "events") }}
-        where ga_session_id is not null and not page_location ilike '%.pages.dev%'
+        where ga_session_id is not NULL and (page_location is NULL OR not page_location ilike '%.pages.dev%')
     )
 
     {% set not_empty_string_fields = [

@@ -7,4 +7,4 @@ packages:
     version: 1.1.1
   - package: Fleetio/dbt_segment
     version: 0.3.0
-sha1_hash: da1c9695fe2ca7d573dadcaeb05a1c3d9a29017f
+sha1_hash: 79057121caaf40aa8df90326f52997f57c2735bd

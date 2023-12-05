@@ -1,8 +1,8 @@
 with
-    user_matching as (select * from {{ ref("stg_anonymous_to_known_user_matching") }}),
+    user_matching AS (SELECT * FROM {{ ref("stg_anonymous_to_known_user_matching") }}),
 
-    source as (
-        select
+    source AS (
+        SELECT
             user_pseudo_id,
             shop_subdomain,
             event_name,
@@ -11,54 +11,55 @@ with
             page_location,
 
             {# Attribution #}
-            coalesce(traffic_source_name, param_campaign) as utm_campaign,
-            coalesce(traffic_source_medium, param_medium) as utm_medium,
-            coalesce(traffic_source_source, param_source) as utm_source,
-            param_content as utm_content,
-            param_term as utm_term,
+            COALESCE(traffic_source_name, param_campaign) AS utm_campaign,
+            COALESCE(traffic_source_medium, param_medium) AS utm_medium,
+            COALESCE(traffic_source_source, param_source) AS utm_source,
+            device_category,
+            param_content AS utm_content,
+            param_term AS utm_term,
             * ilike 'referrer%',
 
             {# App Store #}
             * ilike 'app_store%'
-        from {{ ref("ga4_events") }}
-        where
+        FROM {{ ref("ga4_events") }}
+        WHERE
             page_location ilike '%apps.shopify.com%'
-            or event_name ilike 'shopify%'
-            or page_location ilike '%surface_%'
+            OR event_name ilike 'shopify%'
+            OR page_location ilike '%surface_%'
 
     ),
 
-    final as (
+    final AS (
 
-        select
+        SELECT
             source.* exclude (utm_source, utm_campaign, shop_subdomain),
             user_matching.shop_subdomain,
-            case
-                when app_store_surface_type is not null
-                then 'Shopify App Store'
-                else utm_source
-            end as utm_source,
+            CASE
+                WHEN app_store_surface_type IS NOT NULL
+                THEN 'Shopify App Store'
+                ELSE utm_source
+            END AS utm_source,
 
-            case
-                when app_store_surface_intra_position is not null
-                then
-                    concat(
+            CASE
+                WHEN app_store_surface_intra_position IS NOT NULL
+                THEN
+                    CONCAT(
                         'Intra pos:',
                         app_store_surface_intra_position,
                         ' / Inter pos:',
                         app_store_surface_inter_position
                     )
-                else utm_campaign
-            end as utm_campaign
-        from source
-        inner join
+                ELSE utm_campaign
+            END AS utm_campaign
+        FROM source
+        INNER JOIN
             user_matching
-            on (
+            ON (
                 source.user_pseudo_id = user_matching.user_pseudo_id
-                or source.shopify_id = user_matching.shopify_id
-                or source.shop_subdomain = user_matching.shop_subdomain
+                OR source.shopify_id = user_matching.shopify_id
+                OR source.shop_subdomain = user_matching.shop_subdomain
             )
     )
 
-select *
-from final
+SELECT *
+FROM final
