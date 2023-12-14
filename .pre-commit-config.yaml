@@ -52,5 +52,5 @@ repos:
       #  additional_dependencies: ["dbt-snowflake", "sqlfluff-templater-dbt"]
       - id: sqlfluff-fix
         args: ["--dialect", "snowflake"]
-        log_file: "true"
+        #log_file: true
         additional_dependencies: ["dbt-snowflake", "sqlfluff-templater-dbt"]
