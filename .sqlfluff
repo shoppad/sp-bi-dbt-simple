@@ -7,10 +7,6 @@ max_line_length = 160
 large_file_skip_byte_limit = 40000
 runaway_limit = 10
 
-[sqlfluff:templater:dbt]
-project_dir = /Users/jon/Projects/mesa_dbt
-profiles_dir = ~/.dbt/
-
 [sqlfluff:rules]
 allow_scalar = True
 single_table_references = consistent

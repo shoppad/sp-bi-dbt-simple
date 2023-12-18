@@ -3,7 +3,7 @@ with
     shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
 
     first_install_events as (
-        select * rename(event_timestamp_pt as first_install_timestamp_pt)
+        select * rename event_timestamp_pt as first_install_timestamp_pt
         from {{ ref("stg_segment_install_events") }}
         qualify
             row_number() over (partition by shop_subdomain order by event_timestamp_pt)
@@ -15,10 +15,9 @@ with
             * replace (
                 {{ pacific_timestamp("session_start_tstamp") }} as session_start_tstamp
             )
-            rename(
+            rename
                 blended_user_id as shop_subdomain,
                 session_start_tstamp as session_start_tstamp_pt
-            )
         from {{ ref("segment_web_sessions") }}
     ),
 
@@ -62,11 +61,11 @@ with
             coalesce(utm_medium, referrer_medium) as last_touch_medium,
             coalesce(utm_source, referrer_source) as last_touch_source,
             nullif(
-                lower(
+                TRIM(lower(
                     {{ target.schema }}.url_decode(
                         cast(page_params:parameters:surface_detail as string)
                     )
-                ),
+                )),
                 'undefined'
             ) as last_touch_app_store_search_term,
             cast(

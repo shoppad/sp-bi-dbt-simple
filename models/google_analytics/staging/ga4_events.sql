@@ -23,33 +23,35 @@ with
 
             {# Attribution #}
             parse_url(page_location) as page_params,
-            page_params:parameters:utm_content::string as param_content,
-            page_params:parameters:utm_term::string as param_term,
-            page_params:parameters:page_referrer::string as referrer,
-            page_params:host::string as referrer_host,
-            page_params:parameters:referrer_source::string as referrer_source,
-            page_params:parameters:referrer_medium::string as referrer_medium,
-            page_params:parameters:referrer_term::string as referrer_term,
+            page_params:parameters:utm_content::STRING as param_content,
+            page_params:parameters:utm_term::STRING as param_term,
+            page_params:parameters:page_referrer::STRING as referrer,
+            page_params:host::STRING as referrer_host,
+            page_params:parameters:referrer_source::STRING as referrer_source,
+            page_params:parameters:referrer_medium::STRING as referrer_medium,
+            page_params:parameters:referrer_term::STRING as referrer_term,
 
             {# App Store #}
-            lower(
-                {{ target.schema }}.url_decode(
-                    coalesce(
-                        nullif(surface_detail, 'undefined'),
-                        page_params:parameters:surface_detail::string
+            TRIM(
+                LOWER(
+                    {{ target.schema }}.URL_DECODE(
+                        COALESCE(
+                            NULLIF(surface_detail, 'undefined'),
+                            page_params:parameters:surface_detail::STRING
+                        )
                     )
                 )
-            ) as app_store_surface_detail,
+            ) AS app_store_surface_detail,
             coalesce(
-                nullif(surface_type, ''), page_params:parameters:surface_type::string
+                nullif(surface_type, ''), page_params:parameters:surface_type::STRING
             ) as app_store_surface_type,
-            page_params:parameters:surface_intra_position::string
+            page_params:parameters:surface_intra_position::STRING
             as app_store_surface_intra_position,
-            page_params:parameters:surface_inter_position::string
+            page_params:parameters:surface_inter_position::STRING
             as app_store_surface_inter_position,
-            page_params:parameters:locale::string as app_store_locale
-        from {{ source("mesa_ga4", "events") }}
-        where ga_session_id is not NULL and (page_location is NULL OR not page_location ilike '%.pages.dev%')
+            page_params:parameters:locale::STRING as app_store_locale
+        FROM {{ source("mesa_ga4", "events") }}
+        WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
     )
 
     {% set not_empty_string_fields = [

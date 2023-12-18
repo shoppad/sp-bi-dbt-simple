@@ -54,11 +54,11 @@ with
             coalesce(utm_medium, referrer_medium) as first_touch_medium,
             coalesce(utm_source, referrer_source) as first_touch_source,
             nullif(
-                lower(
+                TRIM(lower(
                     {{ target.schema }}.url_decode(
                         to_varchar(page_params:parameters:surface_detail)
                     )
-                ),
+                )),
                 'undefined'
             ) as first_touch_app_store_surface_detail,
             to_varchar(
