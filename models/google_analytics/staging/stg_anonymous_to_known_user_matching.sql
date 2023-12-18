@@ -1,8 +1,8 @@
 with
     user_id_matches as (
         select user_pseudo_id, shop_subdomain, shopify_id
-        from {{ ref("ga4_events") }}
-        where shop_subdomain is not null or shopify_id is not null
+        from {{ ref("stg_ga4_events") }}
+        where shop_subdomain is not NULL or shopify_id is not NULL
         qualify
             row_number() over (
                 partition by user_pseudo_id, shop_subdomain, shopify_id

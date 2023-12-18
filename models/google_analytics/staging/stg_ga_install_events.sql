@@ -3,7 +3,7 @@ with
 
     installation_events as (
         select user_pseudo_id, shop_subdomain, shopify_id, event_timestamp_pt
-        from {{ ref("ga4_events") }}
+        from {{ ref("stg_ga4_events") }}
         where event_name = 'getmesa_install_convert'
     )
 

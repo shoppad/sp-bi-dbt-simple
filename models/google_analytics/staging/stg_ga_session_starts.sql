@@ -25,7 +25,7 @@ WITH
             -- App Store
             * ILIKE 'app_store%'
 
-        FROM {{ ref("ga4_events") }}
+        FROM {{ ref("stg_ga4_events") }}
         WHERE event_name = 'session_start'
     )
 

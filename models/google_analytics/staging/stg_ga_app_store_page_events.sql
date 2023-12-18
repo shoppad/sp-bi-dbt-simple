@@ -21,7 +21,7 @@ with
 
             {# App Store #}
             * ilike 'app_store%'
-        FROM {{ ref("ga4_events") }}
+        FROM {{ ref("stg_ga4_events") }}
         WHERE
             page_location ilike '%apps.shopify.com%'
             OR event_name ilike 'shopify%'

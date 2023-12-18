@@ -5,7 +5,7 @@ WITH
 
     first_visits AS (
         SELECT *
-        FROM {{ ref("ga4_events") }}
+        FROM {{ ref("stg_ga4_events") }}
         WHERE (event_name = 'first_visit') AND NOT (page_location ILIKE '%.pages.dev%')
     ),
 
