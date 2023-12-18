@@ -33,15 +33,22 @@ with
 
             {# App Store #}
             TRIM(
-                LOWER(
-                    {{ target.schema }}.URL_DECODE(
-                        COALESCE(
-                            NULLIF(surface_detail, 'undefined'),
-                            page_params:parameters:surface_detail::STRING
-                        )
+                {{ target.schema }}.URL_DECODE(
+                    NULLIF(
+                        LOWER(
+                            COALESCE(
+                                surface_detail,
+                                page_params:parameters:surface_detail::STRING
+                            )
+                        ),
+                        'undefined'
                     )
                 )
             ) AS app_store_surface_detail,
+            {{ target.schema }}.URL_DECODE(COALESCE(
+                                surface_detail,
+                                page_params:parameters:surface_detail::STRING
+                            )) AS surface_detail2,
             coalesce(
                 nullif(surface_type, ''), page_params:parameters:surface_type::STRING
             ) as app_store_surface_type,

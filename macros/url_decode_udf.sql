@@ -5,7 +5,11 @@
     language javascript
     as '
     var decoded = decodeURIComponent(INPUT);
-    return decoded.replace(/\\+/g, " ");
+    if (decoded === "undefined") {
+        return null;
+    } else {
+        return decoded.replace(/\\+/g, " ");
+    }
 '
     ;
 {% endmacro %}
