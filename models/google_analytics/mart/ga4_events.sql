@@ -14,14 +14,14 @@ final AS (
         shop_anonymous_keys.shopify_id,
 
                 -- URL parts
-        SPLIT_PART(page_location, '//', 2) AS page_url,
-        SPLIT_PART(page_url, '/', 1) AS page_host,
-        SPLIT_PART(page_url, '?', 1) AS page_path
-
-
+        PARSE_URL(page_location) AS parsed_url,
+        parsed_url:host || '/' || parsed_url:path AS page_url,
+        parsed_url:host::STRING AS page_host,
+        '/' || parsed_url:path::STRING AS page_path,
+        '?' || parsed_url:query::STRING AS page_query
     FROM ga4_events
     LEFT JOIN shop_anonymous_keys USING (user_pseudo_id)
 )
 
-SELECT *
+SELECT * EXCLUDE (parsed_url)
 FROM final
