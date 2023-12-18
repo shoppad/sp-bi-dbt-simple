@@ -67,7 +67,7 @@ with
                     )
                 )),
                 'undefined'
-            ) as last_touch_app_store_search_term,
+            ) as last_touch_app_store_surface_detail,
             cast(
                 page_params:parameters:surface_type as string
             ) as last_touch_app_store_surface_type,

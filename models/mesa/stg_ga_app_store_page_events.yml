@@ -8,7 +8,7 @@ models:
         description: The official shopify identifier for the shop.
       - name: utm_source
       - name: app_store_locale
-      - name: app_store_search_term
+      - name: app_store_detail
       - name: event_name
         tests:
           - dbt_expectations.expect_column_distinct_count_to_be_greater_than:

@@ -20,7 +20,7 @@ models:
         description: The medium of the last touch.
       - name: last_touch_source
         description: The source of the last touch.
-      - name: last_touch_app_store_search_term
+      - name: last_touch_app_store_surface_detail
         description: The search term of the last touch in the app store.
       - name: last_touch_app_store_surface_type
         description: The type of surface for the last touch in the app store.
