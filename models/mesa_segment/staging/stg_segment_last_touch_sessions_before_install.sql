@@ -60,13 +60,16 @@ with
             utm_campaign as last_touch_campaign,
             coalesce(utm_medium, referrer_medium) as last_touch_medium,
             coalesce(utm_source, referrer_source) as last_touch_source,
-            nullif(
-                TRIM(lower(
-                    {{ target.schema }}.url_decode(
-                        cast(page_params:parameters:surface_detail as string)
+            TRIM(
+                nullif(
+                    lower(
+                        {{ target.schema }}.url_decode(
+                            cast(page_params:parameters:surface_detail as string)
+                        )
                     )
-                )),
+                ,
                 'undefined'
+                )
             ) as last_touch_app_store_surface_detail,
             cast(
                 page_params:parameters:surface_type as string
