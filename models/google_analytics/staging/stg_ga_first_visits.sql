@@ -52,15 +52,16 @@ WITH
             first_touch_referrer,
             first_touch_referrer_host,
             device_category AS first_touch_device_category,
-            SPLIT_PART(page_location, '//', 2) AS first_touch_url,
-            SPLIT_PART(first_touch_url, '/', 1) AS first_touch_host,
-            '/' || SPLIT_PART(
-                SPLIT_PART(first_touch_url, '/', 2), '?', 1
-            ) AS first_touch_path
+
+            parse_url(page_location) AS parsed_url,
+            parsed_url:host || '/' || parsed_url:path AS first_touch_url,
+            parsed_url:host::STRING AS first_touch_host,
+            '/' || parsed_url:path::STRING AS first_touch_path,
+            '?' || parsed_url:query::STRING AS first_touch_query
         FROM shop_first_visits
     )
 
-SELECT *
+SELECT * EXCLUDE (parsed_url)
 FROM formatted_first_visits
 INNER JOIN shop_anonymous_keys USING (user_pseudo_id)
 QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY first_touch_at_pt) = 1

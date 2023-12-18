@@ -8,9 +8,10 @@ WITH
             event_timestamp_pt,
 
             -- URL parts
-            SPLIT_PART(page_location, '//', 2) AS page_url,
-            SPLIT_PART(page_url, '/', 1) AS page_host,
-            SPLIT_PART(page_url, '?', 1) AS page_path,
+             parsed_url:host || '/' || parsed_url:path AS page_url,
+            parsed_url:host::STRING AS page_host,
+            '/' || parsed_url:path::STRING AS page_path,
+            '?' || parsed_url:query::STRING AS page_query,
 
             -- Attribution
             COALESCE(traffic_source_name, param_campaign) AS utm_campaign,

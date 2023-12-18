@@ -52,11 +52,13 @@ WITH
             page_referrer AS last_touch_referrer,
             PARSE_URL(last_touch_referrer):host::STRING AS last_touch_referrer_host,
             device_category AS last_touch_device_category,
-            SPLIT_PART(page_location, '//', 2) AS last_touch_url,
-            SPLIT_PART(last_touch_url, '/', 1) AS last_touch_host,
-            '/' || SPLIT_PART(
-                SPLIT_PART(last_touch_url, '/', 2), '?', 1
-            ) AS last_touch_path
+
+            PARSE_URL(page_location) AS parsed_url,
+            parsed_url:host || '/' || parsed_url:path AS last_touch_url,
+            parsed_url:host::STRING AS last_touch_host,
+            '/' || parsed_url:path::STRING AS last_touch_path,
+            '?' || parsed_url:query::STRING AS last_touch_query
+
         FROM last_touch_sessions
     )
 
