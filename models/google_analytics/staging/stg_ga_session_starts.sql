@@ -8,6 +8,10 @@ WITH
             event_timestamp_pt,
 
             -- URL parts
+            CASE WHEN page_location ILIKE 'http%'
+                THEN PARSE_URL(page_location)
+                ELSE NULL 
+                END AS parsed_url,
              parsed_url:host || '/' || parsed_url:path AS page_url,
             parsed_url:host::STRING AS page_host,
             '/' || parsed_url:path::STRING AS page_path,
@@ -30,6 +34,6 @@ WITH
         WHERE event_name = 'session_start'
     )
 
-SELECT *
+SELECT * EXCLUDE (parsed_url)
 FROM session_starts
 INNER JOIN user_matching USING (user_pseudo_id)
