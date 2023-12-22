@@ -860,7 +860,7 @@
     "WizardForDbtCore(TM).trace.server": "verbose",
     "dbt.queryScale": "0.87",
     "editor.selectionHighlight": true,
-    "turntable.dbtVersion": "1.6",
+    "turntable.dbtVersion": "1.7",
     "turntable.warehouse": "snowflake",
     "editor.defaultFormatter": "henriblancke.vscode-dbt-formatter",
     "sqlfluff.executablePath": "",
