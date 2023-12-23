@@ -31,5 +31,5 @@ with
         left join session_counts using (shop_subdomain)
     )
 
-select *
+select * EXCLUDE (parsed_url)
 from final
