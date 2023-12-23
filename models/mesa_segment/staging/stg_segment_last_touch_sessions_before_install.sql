@@ -56,6 +56,7 @@ with
             split_part(first_page_url, '//', 2) as last_touch_url,
             first_page_url_host as last_touch_host,
             first_page_url_path as last_touch_path,
+            first_page_url_query AS last_touch_query,
             utm_content as last_touch_content,
             utm_campaign as last_touch_campaign,
             coalesce(utm_medium, referrer_medium) as last_touch_medium,

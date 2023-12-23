@@ -49,6 +49,7 @@ with
             split_part(first_page_url, '//', 2) as first_touch_url,
             first_page_url_host as first_touch_host,
             first_page_url_path as first_touch_path,
+            first_page_url_query AS first_touch_query,
             utm_content as first_touch_content,
             utm_campaign as first_touch_campaign,
             coalesce(utm_medium, referrer_medium) as first_touch_medium,
