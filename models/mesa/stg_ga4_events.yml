@@ -7,17 +7,19 @@ models:
       - name: traffic_source_name
       - name: event_name
       - name: user_pseudo_id
+        description: the anonymouse google analytics user id
       - name: traffic_source_medium
       - name: traffic_source_source
       - name: device_category
       - name: event_id
       - name: shop_subdomain
-        description: The subdomain of the shop.
+        description: The foreign key for the Shop.
       - name: param_campaign
       - name: param_source
       - name: param_medium
       - name: page_referrer
       - name: shopify_id
+        description: The official shopify identifier for the shop.
       - name: ga_session_id
       - name: ga_session_number
       - name: continent

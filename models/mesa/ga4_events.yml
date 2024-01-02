@@ -3,7 +3,7 @@ models:
   - name: ga4_events
     columns:
       - name: shop_subdomain
-        description: The subdomain of the shop.
+        description: The foreign key for the Shop.
       - name: page_title
       - name: traffic_source_name
       - name: event_name

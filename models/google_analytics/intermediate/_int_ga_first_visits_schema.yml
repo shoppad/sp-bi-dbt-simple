@@ -28,11 +28,13 @@ models:
       - name: ga_first_touch_referrer_host
         description: The referrer host that referrered the shop's first visit.
       - name: ga_first_touch_app_store_surface_detail
-        description: ""
+        description: The detail of the app store surface during the first touch event.
       - name: ga_first_touch_app_store_surface_type
         description: The type of surface for the first touch in the app store.
       - name: ga_first_touch_app_store_surface_intra_position
-        description: The intra position of the first touch on the app store surface.
+        description:
+          The intra position of the app store surface during the first touch
+          event.
       - name: ga_first_touch_app_store_surface_inter_position
         description: The inter position of the first touch on the app store surface.
       - name: ga_first_touch_app_store_locale

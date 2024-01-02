@@ -10,7 +10,7 @@ WITH
             -- URL parts
             CASE WHEN page_location ILIKE 'http%'
                 THEN PARSE_URL(page_location)
-                ELSE NULL
+                ELSE NULL 
                 END AS parsed_url,
              parsed_url:host || '/' || parsed_url:path AS page_url,
             parsed_url:host::STRING AS page_host,
@@ -24,6 +24,7 @@ WITH
             device_category,
             param_content AS utm_content,
             param_term AS utm_term,
+            page_referrer,
             * ILIKE 'referrer%',
 
             -- App Store

@@ -3,7 +3,7 @@ models:
   - name: shop_attribution
     columns:
       - name: shop_subdomain
-        description: The subdomain of the shop.
+        description: The foreign key for the Shop.
         tests:
           - not_null
       - name: unified_traffic_source
@@ -31,7 +31,7 @@ models:
       - name: unified_referrer_host
         description: The host that referred the user to the shop.
       - name: is_blog_referral
-        description: Indicates whether the referral to the shop came from a blog.
+        description: Whether the Shop was referred/entered the marketing site by a blog post.
       - name: days_to_install
         description:
           The number of days it took for the user to install the app after
@@ -56,15 +56,14 @@ models:
         name: ga_first_touch_app_store_surface_type
       - description: The source of the m3_mesa_install event.
         name: mesa_install_record_mesa_source
-      - description: The locale of the app store during the first touch event.
+      - description: The locale of the first touch in the app store.
         name: ga_first_touch_app_store_locale
       - description: The timestamp of the last touch.
         name: ga_last_touch_at_pt
       - description: The inter position of the last touch on the app store surface.
         name: ga_last_touch_app_store_surface_inter_position
       - description:
-          The inter position of the app store surface during the first touch
-          event.
+          The inter position of the first touch on the app store surface.
         name: ga_first_touch_app_store_surface_inter_position
       - description: The locale of the app store during the last touch event.
         name: ga_last_touch_app_store_locale
@@ -128,7 +127,7 @@ models:
           The specific page location or area in the app store where an organic
           click took place.
         name: app_store_organic_click_page_location
-      - description: The name of the traffic source during the first touch event.
+      - description: The campaign that the shop was acquired through.
         name: ga_first_touch_traffic_source_name
       - description: The first page path that the shop was acquired through.
         name: segment_acquisition_first_page_path
@@ -186,8 +185,6 @@ models:
         name: app_store_install_location_continent
       - description: The continent of the location during the app store installation.
         name: ga_last_touch_manual_campaign_name
-      - description: The source of the traffic source during the first touch event.
-        name: ga_first_touch_traffic_source_source
       - description:
           The host of the page location during the organic click in the app
           store.
@@ -742,11 +739,15 @@ models:
         name: mesa_install_record_utm_source
       - description: The inter position of the app store surface during the ad click event.
         name: app_store_ad_click_app_store_surface_inter_position
-      - description: The content of the traffic source during the last touch event in Segment.
+      - description:
+          The content of the traffic source during the last touch event in
+          Segment.
         name: segment_last_touch_traffic_source_content
       - description: The source of the traffic during the organic click in the app store.
         name: app_store_organic_click_traffic_source_source
-      - description: The name of the traffic source during the last touch event in Google Analytics.
+      - description:
+          The name of the traffic source during the last touch event in Google
+          Analytics.
         name: ga_last_touch_traffic_source_name
       - description: The host of the referrer during the last touch event in Segment.
         name: segment_last_touch_referrer_host
@@ -756,7 +757,9 @@ models:
         name: app_store_install_location_city
       - description: The path during the first touch event in Segment.
         name: segment_first_touch_path
-      - description: The path of the page location during the last touch event in Google Analytics.
+      - description:
+          The path of the page location during the last touch event in Google
+          Analytics.
         name: ga_last_touch_page_location_path
       - description: The path of the page location during the ad click in the app store.
         name: app_store_ad_click_page_location_path
@@ -768,15 +771,21 @@ models:
         name: app_store_ad_click_referrer_url
       - description: The manual content during the first touch event in Google Analytics.
         name: ga_first_touch_manual_content
-      - description: The Google Analytics session number during the organic click in the app store.
+      - description:
+          The Google Analytics session number during the organic click in the
+          app store.
         name: app_store_organic_click_ga_session_number
       - description: The event ID during the app store installation.
         name: app_store_install_event_id
-      - description: The Google Analytics session ID during the organic click in the app store.
+      - description:
+          The Google Analytics session ID during the organic click in the app
+          store.
         name: app_store_organic_click_ga_session_id
       - description: The host during the last touch event in Segment.
         name: segment_last_touch_host
-      - description: The metro area of the location during the organic click in the app store.
+      - description:
+          The metro area of the location during the organic click in the app
+          store.
         name: app_store_organic_click_location_metro
       - description: The manual content during the organic click in the app store.
         name: app_store_organic_click_manual_content
@@ -784,9 +793,15 @@ models:
         name: app_store_organic_click_param_term
       - description: The manual content during the last touch event in Google Analytics.
         name: ga_last_touch_manual_content
-      - description: The inter position of the app store surface during the app store installation.
+      - description:
+          The inter position of the app store surface during the app store
+          installation.
         name: app_store_install_app_store_surface_inter_position
-      - description: The timestamp indicating when the first touch event occurred in Google Analytics, in the Pacific Time zone.
+      - description:
+          The timestamp indicating when the first touch event occurred in Google
+          Analytics, in the Pacific Time zone.
         name: ga_first_touch_at_pt
-      - description: The content of the traffic source during the first touch event in Segment.
-        name: segment_first_touch_traffic_source_content```
+      - description:
+          The content of the traffic source during the first touch event in
+          Segment.
+        name: segment_first_touch_traffic_source_content
