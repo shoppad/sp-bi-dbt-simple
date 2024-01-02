@@ -13,23 +13,49 @@ with
                 0
             ) as ga4_sessions_til_install
         from shops
-        left join {{ ref("stg_ga_session_starts") }} using (shop_subdomain)
+        left join {{ ref("int_ga_session_starts") }} using (shop_subdomain)
         group by 1
     ),
 
-    first_touches_ga4 as (select * from {{ ref("stg_ga_first_visits") }}),
+    first_touches_ga4 as (select * from {{ ref("int_ga_first_visits") }}),
 
     last_touches_ga4 as (
-        select * from {{ ref("stg_last_touch_ga_sessions_before_install") }}
+        select * from {{ ref("int_last_touch_ga_sessions_before_install") }}
     ),
 
-    final as (
+    combined as (
 
-        select * exclude (user_pseudo_id)
-        from first_touches_ga4
+        select *
+        FROM first_touches_ga4
         left join last_touches_ga4 using (shop_subdomain)
         left join session_counts using (shop_subdomain)
+    ),
+
+final AS (
+   SELECT *
+    REPLACE (
+        {%- set reformatted_fields = [] -%}
+            {%- for prefix in ['first_touch', 'last_touch'] -%}
+                {%- for midfix in ['traffic_source', 'manual', 'param'] -%}
+                    {%- for endfix in ['source', 'medium', 'campaign_name', 'term', 'content' ] -%}
+                        {%- if (endfix=='campaign_name') -%}
+                            {% if midfix=='traffic_source' %}
+                                {% set endfix = 'name' %}
+                            {%- elif midfix=='param' %}
+                                {% set endfix = 'campaign' %}
+                            {%- endif %}
+                        {%- elif (midfix=='traffic_source' and (endfix=='term' or endfix=='content')) -%}
+                            {%- continue -%}
+                        {%- endif -%}
+                        {%- set column_name = [prefix, midfix, endfix] | join('_') -%}
+                        {%- do reformatted_fields.append("initcap(replace(" ~ column_name ~ ", '_', ' ')) as " ~ column_name) -%}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        {{ reformatted_fields | join(',\n       ') }}
     )
+    FROM combined
+)
 
 select * EXCLUDE (parsed_url)
 from final

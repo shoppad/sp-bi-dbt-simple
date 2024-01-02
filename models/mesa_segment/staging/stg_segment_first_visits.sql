@@ -50,10 +50,10 @@ with
             first_page_url_host as first_touch_host,
             first_page_url_path as first_touch_path,
             first_page_url_query AS first_touch_query,
-            utm_content as first_touch_content,
-            utm_campaign as first_touch_campaign,
-            coalesce(utm_medium, referrer_medium) as first_touch_medium,
-            coalesce(utm_source, referrer_source) as first_touch_source,
+            utm_content as first_touch_traffic_source_content,
+            utm_campaign as first_touch_traffic_source_name,
+            coalesce(utm_medium, referrer_medium) as first_touch_traffic_source_medium,
+            coalesce(utm_source, referrer_source) as first_touch_traffic_source_source,
             nullif(
                 TRIM(lower(
                     {{ target.schema }}.url_decode(

@@ -57,33 +57,10 @@ with
             first_page_url_host as last_touch_host,
             first_page_url_path as last_touch_path,
             first_page_url_query AS last_touch_query,
-            utm_content as last_touch_content,
-            utm_campaign as last_touch_campaign,
-            coalesce(utm_medium, referrer_medium) as last_touch_medium,
-            coalesce(utm_source, referrer_source) as last_touch_source,
-            TRIM(
-                nullif(
-                    lower(
-                        {{ target.schema }}.url_decode(
-                            cast(page_params:parameters:surface_detail as string)
-                        )
-                    )
-                ,
-                'undefined'
-                )
-            ) as last_touch_app_store_surface_detail,
-            cast(
-                page_params:parameters:surface_type as string
-            ) as last_touch_app_store_surface_type,
-            cast(
-                page_params:parameters:surface_intra_position as string
-            ) as last_touch_app_store_surface_intra_position,
-            cast(
-                page_params:parameters:surface_inter_position as string
-            ) as last_touch_app_store_surface_inter_position,
-            cast(
-                page_params:parameters:locale as string
-            ) as last_touch_app_store_locale,
+            utm_content as last_touch_traffic_source_content,
+            utm_campaign as last_touch_traffic_source_name,
+            coalesce(utm_medium, referrer_medium) as last_touch_traffic_source_medium,
+            coalesce(utm_source, referrer_source) as last_touch_traffic_source_source,
             referrer as last_touch_referrer,
             referrer_host as last_touch_referrer_host,
             device_category as last_touch_device_category

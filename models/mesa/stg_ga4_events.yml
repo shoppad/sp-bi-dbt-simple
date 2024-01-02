@@ -1,26 +1,30 @@
 version: 2
 models:
-  - name: ga4_events
+  - name: stg_ga4_events
     columns:
-      - name: shop_subdomain
-        description: The subdomain of the shop.
+      - name: page_location
       - name: page_title
       - name: traffic_source_name
       - name: event_name
+      - name: user_pseudo_id
       - name: traffic_source_medium
       - name: traffic_source_source
       - name: device_category
       - name: event_id
+      - name: shop_subdomain
+        description: The subdomain of the shop.
       - name: param_campaign
       - name: param_source
       - name: param_medium
+      - name: page_referrer
+      - name: shopify_id
       - name: ga_session_id
       - name: ga_session_number
-      - name: location_continent
-      - name: location_country
-      - name: location_city
-      - name: location_metro
-      - name: device_language
+      - name: continent
+      - name: country
+      - name: city
+      - name: metro
+      - name: language
       - name: manual_campaign_name
       - name: gclid
       - name: manual_medium
@@ -28,18 +32,15 @@ models:
       - name: manual_term
       - name: manual_content
       - name: event_timestamp_pt
-      - name: page_location_host
-      - name: page_location_path
-      - name: page_location_query
-      - name: page_location_url
-      - name: page_location
       - name: param_content
       - name: param_term
+      - name: referrer
       - name: referrer_host
-      - name: referrer_path
-      - name: referrer_query
-      - name: referrer_url
-      - name: referrer_full
+      - name: referrer_source
+        description: The source of the referrer that led the user to the shop.
+      - name: referrer_medium
+        description: The medium of the referrer that led the user to the shop.
+      - name: referrer_term
       - name: app_store_surface_detail
       - name: app_store_surface_type
       - name: app_store_surface_intra_position

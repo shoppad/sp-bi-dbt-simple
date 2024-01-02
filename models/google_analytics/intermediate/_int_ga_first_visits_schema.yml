@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_ga_first_visits
+  - name: int_ga_first_visits
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 100
@@ -9,36 +9,36 @@ models:
       - name: user_pseudo_id
         decription: the anonymous google analytics id
         description: the anonymouse google analytics user id
-      - name: first_touch_at_pt
+      - name: ga_first_touch_at_pt
         description: The timestamp of the first touch.
-      - name: first_touch_url
+      - name: ga_first_touch_url
         description: The URL of the first touch.
-      - name: first_touch_host
+      - name: ga_first_touch_host
         description: The host of the first touch.
-      - name: first_touch_path
+      - name: ga_first_touch_path
         description: The path of the first touch.
-      - name: first_touch_content
+      - name: ga_first_touch_content
         description: The content that the shop was acquired through.
-      - name: first_touch_campaign
+      - name: ga_first_touch_traffic_source_name
         description: The campaign that the shop was acquired through.
-      - name: first_touch_medium
+      - name: ga_first_touch_traffic_source_medium
         description: The medium that the shop was acquired through.
-      - name: first_touch_source
+      - name: ga_first_touch_traffic_source_source
         description: The source that the shop was acquired through.
-      - name: first_touch_referrer_host
+      - name: ga_first_touch_referrer_host
         description: The referrer host that referrered the shop's first visit.
-      - name: first_touch_app_store_surface_detail
+      - name: ga_first_touch_app_store_surface_detail
         description: ""
-      - name: first_touch_app_store_surface_type
+      - name: ga_first_touch_app_store_surface_type
         description: The type of surface for the first touch in the app store.
-      - name: first_touch_app_store_surface_intra_position
+      - name: ga_first_touch_app_store_surface_intra_position
         description: The intra position of the first touch on the app store surface.
-      - name: first_touch_app_store_surface_inter_position
+      - name: ga_first_touch_app_store_surface_inter_position
         description: The inter position of the first touch on the app store surface.
-      - name: first_touch_app_store_locale
+      - name: ga_first_touch_app_store_locale
         description: The locale of the first touch in the app store.
       - name: shop_subdomain
-        description: The foreign key of the Shop.
+        description: The foreign key for the Shop.
         tests:
           - not_null
           - unique

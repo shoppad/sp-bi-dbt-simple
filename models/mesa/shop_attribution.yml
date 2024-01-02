@@ -1,0 +1,792 @@
+version: 2
+models:
+  - name: shop_attribution
+    columns:
+      - name: shop_subdomain
+        description: The subdomain of the shop.
+        tests:
+          - not_null
+      - name: unified_traffic_source
+        description: The source of the traffic that led to the shop.
+      - name: unified_traffic_medium
+        description: The medium of the traffic that led to the shop.
+      - name: unified_traffic_campaign
+        description: The campaign of the traffic that led to the shop.
+      - name: unified_traffic_url
+        description: The URL of the traffic that led to the shop.
+      - name: unified_traffic_path
+        description: The path of the traffic that led to the shop.
+      - name: unified_traffic_page_host
+        description: The page host of the traffic that led to the shop.
+      - name: unified_first_touch_at_pt
+        description: The timestamp of the first touch at the shop in Pacific Time.
+      - name: unified_app_store_surface_type
+        description:
+          The type of the app store surface where the user first interacted
+          with the shop.
+      - name: unified_app_store_surface_detail
+        description:
+          The detail of the app store surface where the user first interacted
+          with the shop.
+      - name: unified_referrer_host
+        description: The host that referred the user to the shop.
+      - name: is_blog_referral
+        description: Indicates whether the referral to the shop came from a blog.
+      - name: days_to_install
+        description:
+          The number of days it took for the user to install the app after
+          first interaction.
+      - name: is_app_store_search_ad_referral
+        description:
+          Indicates whether the referral to the shop came from an app store
+          search ad.
+        tests:
+          - not_null
+      - name: referrer_medium
+        description: The medium of the referrer that led the user to the shop.
+      - name: referrer_source
+        description: The source of the referrer that led the user to the shop.
+      - description: The type of the app store surface during the last touch event.
+        name: ga_last_touch_app_store_surface_type
+      - description:
+          The intra position of the app store surface during the first touch
+          event.
+        name: ga_first_touch_app_store_surface_intra_position
+      - description: The type of surface for the first touch in the app store.
+        name: ga_first_touch_app_store_surface_type
+      - description: The source of the m3_mesa_install event.
+        name: mesa_install_record_mesa_source
+      - description: The locale of the app store during the first touch event.
+        name: ga_first_touch_app_store_locale
+      - description: The timestamp of the last touch.
+        name: ga_last_touch_at_pt
+      - description: The inter position of the last touch on the app store surface.
+        name: ga_last_touch_app_store_surface_inter_position
+      - description:
+          The inter position of the app store surface during the first touch
+          event.
+        name: ga_first_touch_app_store_surface_inter_position
+      - description: The locale of the app store during the last touch event.
+        name: ga_last_touch_app_store_locale
+      - description:
+          The timestamp indicating when the user clicked on an advertisement
+          in the app store, in the Pacific Time zone.
+        name: app_store_ad_click_at_pt
+      - description: The host URL from which the organic click in the app store originated.
+        name: app_store_organic_click_referrer_host
+      - description:
+          The referring URL or source that led to the installation event of
+          the Mesa application.
+        name: mesa_install_record_referer
+      - description:
+          Indicates whether there was an organic click in the app store related
+          to the shop or app.
+        name: has_app_store_organic_click
+      - description:
+          The position or location within the app store where the organic click
+          occurred, for intermediary app store surfaces.
+        name: app_store_organic_click_app_store_surface_inter_position
+      - description: Indicates whether an ad in the app store was clicked.
+        name: app_store_did_click_ad
+      - description:
+          Details about the app store surface (section or category) where the
+          app was installed from.
+        name: app_store_install_app_store_surface_detail
+      - description:
+          The specific page location or section in the app store where the
+          ad click occurred.
+        name: app_store_ad_click_page_location
+      - description:
+          Detailed information about the specific app store surface where an
+          organic click occurred.
+        name: app_store_organic_click_app_store_surface_detail
+      - description:
+          The locale or regional setting of the app store during an organic
+          click event.
+        name: app_store_organic_click_app_store_locale
+      - description:
+          The locale or regional setting of the app store during an ad click
+          event.
+        name: app_store_ad_click_app_store_locale
+      - description:
+          Details the specific plan or package selected during the Mesa installation
+          event.
+        name: mesa_install_record_plan_selected
+      - description:
+          The UTM medium parameter associated with the Mesa installation event
+          for tracking the marketing channel.
+        name: mesa_install_record_utm_medium
+      - description:
+          Identifies the specific Mesa plan or tier chosen during the installation
+          process.
+        name: mesa_install_record_plan
+      - description:
+          The UTM campaign parameter related to the specific marketing campaign
+          during the Mesa installation event.
+        name: mesa_install_record_utm_campaign
+      - description:
+          The specific page location or area in the app store where an organic
+          click took place.
+        name: app_store_organic_click_page_location
+      - description: The name of the traffic source during the first touch event.
+        name: ga_first_touch_traffic_source_name
+      - description: The first page path that the shop was acquired through.
+        name: segment_acquisition_first_page_path
+      - description: The host of the referrer during the first touch event.
+        name: ga_first_touch_referrer_host
+      - description: The medium that the shop was acquired through.
+        name: ga_first_touch_traffic_source_medium
+      - description: The source of the traffic source during the first touch event.
+        name: ga_first_touch_traffic_source_source
+      - description:
+          The intra position of the app store surface during the app store
+          installation.
+        name: app_store_install_app_store_surface_intra_position
+      - description: The device language during the last touch event.
+        name: ga_last_touch_device_language
+      - description: The manual medium used during the app store installation.
+        name: app_store_install_manual_medium
+      - description:
+          The query of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_query
+      - description: The medium parameter during the first touch event.
+        name: ga_first_touch_param_medium
+      - description:
+          The URL of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_url
+      - description: The path during the last touch event in the segment.
+        name: segment_last_touch_path
+      - description: The device language during the organic click in the app store.
+        name: app_store_organic_click_device_language
+      - description: The manual source used during the app store installation.
+        name: app_store_install_manual_source
+      - description: The source parameter during the organic click in the app store.
+        name: app_store_organic_click_param_source
+      - description: The manual term used during the organic click in the app store.
+        name: app_store_organic_click_manual_term
+      - description: The GA session ID during the first touch event.
+        name: ga_first_touch_ga_session_id
+      - description: The city of the location during the last touch event.
+        name: ga_last_touch_location_city
+      - description: The referrer URL during the organic click in the app store.
+        name: app_store_organic_click_referrer_url
+      - description: The metro of the location during the ad click in the app store.
+        name: app_store_ad_click_location_metro
+      - description: The URL during the first touch event in the segment.
+        name: segment_first_touch_url
+      - description: The URL of the page location during the last touch event.
+        name: ga_last_touch_page_location_url
+      - description: The host of the referrer during the first touch event.
+        name: ga_first_touch_referrer_host
+      - description: The manual source used during the last touch event.
+        name: ga_last_touch_manual_source
+      - description: The continent of the location during the app store installation.
+        name: app_store_install_location_continent
+      - description: The continent of the location during the app store installation.
+        name: ga_last_touch_manual_campaign_name
+      - description: The source of the traffic source during the first touch event.
+        name: ga_first_touch_traffic_source_source
+      - description:
+          The host of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_host
+      - description:
+          The host of the page location during the organic click in the app
+          store.
+        name: app_store_install_manual_campaign_name
+      - description: The event ID during the last touch event.
+        name: ga_last_touch_event_id
+      - description: The term parameter during the last touch event.
+        name: ga_last_touch_param_term
+      - description: The page title during the app store installation.
+        name: app_store_install_page_title
+      - description: The manual source used during the organic click in the app store.
+        name: app_store_organic_click_manual_source
+      - description: The source parameter during the first touch event.
+        name: ga_first_touch_param_source
+      - description: The source parameter during the first touch event.
+        name: ga_last_touch_page_title
+      - description: The title of the page during the last touch event.
+        name: ga_first_touch_manual_campaign_name
+      - description: The device language during the first touch event.
+        name: ga_first_touch_device_language
+      - description: The country of the location during the organic click in the app store.
+        name: app_store_organic_click_location_country
+      - description: The manual source used during the first touch event.
+        name: ga_first_touch_manual_source
+      - description: The manual source used during the first touch event.
+        name: ga_ga4_sessions_til_install
+      - description:
+          The intra position of the app store surface during the app store
+          installation.
+        name: app_store_install_app_store_surface_intra_position
+      - description: The device language during the last touch event.
+        name: ga_last_touch_device_language
+      - description: The manual medium used during the app store installation.
+        name: app_store_install_manual_medium
+      - description: The medium parameter during the first touch event.
+        name: ga_first_touch_param_medium
+      - description: The path during the last touch event in the segment.
+        name: segment_last_touch_path
+      - description: The device language during the organic click in the app store.
+        name: app_store_organic_click_device_language
+      - description: The manual source used during the app store installation.
+        name: app_store_install_manual_source
+      - description: The continent of the location during the ad click in the app store.
+        name: app_store_ad_click_location_continent
+      - description: The GA session number during the ad click in the app store.
+        name: app_store_ad_click_ga_session_number
+      - description: The query of the referrer during the first touch event.
+        name: ga_first_touch_referrer_query
+      - description: The host of the referrer during the first touch event in the segment.
+        name: segment_first_touch_referrer_host
+      - description: The GA session ID during the last touch event.
+        name: ga_last_touch_ga_session_id
+      - description: The campaign parameter during the first touch event.
+        name: ga_first_touch_param_campaign
+      - description: The path of the referrer during the app store installation.
+        name: app_store_install_referrer_path
+      - description: The path of the referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_path
+      - description: The detail of the app store surface during the first touch event.
+        name: ga_first_touch_app_store_surface_detail
+      - description: The source parameter during the last touch event.
+        name: ga_last_touch_param_source
+      - description: The referrer during the first touch event in the segment.
+        name: segment_first_touch_referrer
+      - description: The full referrer during the ad click in the app store.
+        name: app_store_ad_click_referrer_full
+      - description: The continent of the location during the first touch event.
+        name: ga_first_touch_location_continent
+      - description: The term parameter during the app store installation.
+        name: app_store_install_param_term
+      - description: The campaign parameter during the ad click in the app store.
+        name: app_store_ad_click_param_campaign
+      - description: The timestamp of the first touch event in Pacific Time in the segment.
+        name: segment_first_touch_at_pt
+      - description:
+          The intra position of the app store surface during the first touch
+          event in the segment.
+        name: segment_first_touch_app_store_surface_intra_position
+      - description: The device category during the last touch event.
+        name: ga_last_touch_device_category
+      - description: The host of the page location during the last touch event.
+        name: ga_last_touch_page_location_host
+      - description: The content parameter during the app store installation.
+        name: app_store_install_param_content
+      - description:
+          The medium of the traffic source during the first touch event in
+          the segment.
+        name: segment_first_touch_traffic_source_medium
+      - description: The path of the page location during the first touch event.
+        name: ga_first_touch_page_location_path
+      - description: The medium of the traffic source during the last touch event.
+        name: ga_last_touch_traffic_source_medium
+      - description: The manual medium used during the organic click in the app store.
+        name: app_store_organic_click_manual_medium
+      - description: The referrer URL during the last touch event.
+        name: ga_last_touch_referrer_url
+      - description: The manual source used during the ad click in the app store.
+        name: app_store_ad_click_manual_source
+      - description: The manual term used during the last touch event.
+        name: ga_last_touch_manual_term
+      - description: The event ID during the ad click in the app store.
+        name: app_store_ad_click_event_id
+      - description: The device language during the ad click in the app store.
+        name: app_store_ad_click_device_language
+      - description: The metro of the location during the last touch event.
+        name: ga_last_touch_location_metro
+      - description: The full referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_full
+      - description: The locale of the app store during the first touch event in the segment.
+        name: segment_first_touch_app_store_locale
+      - description: The event ID during the first touch event.
+        name: ga_first_touch_event_id
+      - description:
+          The source of the traffic source during the last touch event in the
+          segment.
+        name: segment_last_touch_traffic_source_source
+      - description: The GA session ID during the app store installation.
+        name: app_store_install_ga_session_id
+      - description: The source of the traffic source during the app store installation.
+        name: app_store_install_traffic_source_source
+      - description: The city of the location during the organic click in the app store.
+        name: app_store_organic_click_location_city
+      - description: The GA session ID during the ad click in the app store.
+        name: app_store_ad_click_ga_session_id
+      - description: The campaign parameter during the app store installation.
+        name: app_store_install_param_campaign
+      - description: The URL of the page location during the app store installation.
+        name: app_store_install_page_location_url
+      - description: The source of the traffic source during the ad click in the app store.
+        name: app_store_ad_click_traffic_source_source
+      - description: The content parameter during the last touch event.
+        name: ga_last_touch_param_content
+      - description: The host of the referrer during the last touch event.
+        name: ga_last_touch_referrer_host
+      - description: The medium of the traffic source during the app store installation.
+        name: app_store_install_traffic_source_medium
+      - description:
+          The inter position of the app store surface during the first touch
+          event in the segment.
+        name: segment_first_touch_app_store_surface_inter_position
+      - description:
+          The source of the traffic source during the first touch event in
+          the segment.
+        name: segment_first_touch_traffic_source_source
+      - description: The title of the page during the ad click in the app store.
+        name: app_store_ad_click_page_title
+      - description: The location of the page during the last touch event.
+        name: ga_last_touch_page_location
+      - description: The manual term used during the app store installation.
+        name: app_store_install_manual_term
+      - description: The full referrer during the first touch event.
+        name: ga_first_touch_referrer_full
+      - description: The query of the referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_query
+      - description:
+          The type of the app store surface during the first touch event in
+          the segment.
+        name: segment_first_touch_app_store_surface_type
+      - description: The campaign parameter during the organic click in the app store.
+        name: app_store_organic_click_param_campaign
+      - description: The content parameter during the ad click in the app store.
+        name: app_store_ad_click_param_content
+      - description: The query of the page location during the app store installation.
+        name: app_store_install_page_location_query
+      - description: The device language during the app store installation.
+        name: app_store_install_device_language
+      - description: The term parameter during the first touch event.
+        name: ga_first_touch_param_term
+      - description:
+          The intra position of the app store surface during the app store
+          installation.
+        name: app_store_install_app_store_surface_intra_position
+      - description: The device language during the last touch event.
+        name: ga_last_touch_device_language
+      - description:
+          The query of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_query
+      - description:
+          The URL of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_url
+      - description: The path during the last touch event in the segment.
+        name: segment_last_touch_path
+      - description: The device language during the organic click in the app store.
+        name: app_store_organic_click_device_language
+      - description: The manual medium used during the ad click in the app store.
+        name: app_store_ad_click_manual_medium
+      - description: The device category during the first touch event.
+        name: ga_first_touch_device_category
+      - description: The GA session ID during the first touch event.
+        name: ga_first_touch_ga_session_id
+      - description: The city of the location during the last touch event.
+        name: ga_last_touch_location_city
+      - description: The GCLID during the last touch event.
+        name: ga_last_touch_gclid
+      - description: The term parameter during the ad click in the app store.
+        name: app_store_ad_click_param_term
+      - description: The event ID during the organic click in the app store.
+        name: app_store_organic_click_event_id
+      - description: The continent of the location during the ad click in the app store.
+        name: app_store_ad_click_location_continent
+      - description: The GA session number during the ad click in the app store.
+        name: app_store_ad_click_ga_session_number
+      - description: The query of the referrer during the first touch event.
+        name: ga_first_touch_referrer_query
+      - description: The host of the referrer during the first touch event in the segment.
+        name: segment_first_touch_referrer_host
+      - description: The GA session ID during the last touch event.
+        name: ga_last_touch_ga_session_id
+      - description: The campaign parameter during the first touch event.
+        name: ga_first_touch_param_campaign
+      - description: The path of the referrer during the app store installation.
+        name: app_store_install_referrer_path
+      - description: The path of the referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_path
+      - description: The detail of the app store surface during the first touch event.
+        name: ga_first_touch_app_store_surface_detail
+      - description: The source parameter during the last touch event.
+        name: ga_last_touch_param_source
+      - description: The referrer during the first touch event in the segment.
+        name: segment_first_touch_referrer
+      - description: The full referrer during the ad click in the app store.
+        name: app_store_ad_click_referrer_full
+      - description:
+          The intra position of the app store surface during the first touch
+          event.
+        name: ga_first_touch_app_store_surface_intra_position
+      - description: The country of the location during the last touch event.
+        name: ga_last_touch_location_country
+      - description: The locale of the app store during the last touch event.
+        name: ga_last_touch_app_store_locale
+      - description: The GCLID during the app store installation.
+        name: app_store_install_gclid
+      - description: The page title during the organic click in the app store.
+        name: app_store_organic_click_page_title
+      - description:
+          The continent of the location during the organic click in the app
+          store.
+        name: app_store_organic_click_location_continent
+      - description: The continent of the location during the first touch event.
+        name: ga_first_touch_location_continent
+      - description: The term parameter during the app store installation.
+        name: app_store_install_param_term
+      - description: The campaign parameter during the ad click in the app store.
+        name: app_store_ad_click_param_campaign
+      - description:
+          The intra position of the app store surface during the first touch
+          event in the segment.
+        name: segment_first_touch_app_store_surface_intra_position
+      - description: The device category during the last touch event.
+        name: ga_last_touch_device_category
+      - description: The host of the page location during the last touch event.
+        name: ga_last_touch_page_location_host
+      - description: The content parameter during the app store installation.
+        name: app_store_install_param_content
+      - description:
+          The medium of the traffic source during the first touch event in
+          the segment.
+        name: segment_first_touch_traffic_source_medium
+      - description: The path of the page location during the first touch event.
+        name: ga_first_touch_page_location_path
+      - description: The timestamp of the last touch event in the segment in Pacific Time.
+        name: segment_last_touch_at_pt
+      - description: The manual medium used during the organic click in the app store.
+        name: app_store_organic_click_manual_medium
+      - description: The manual source used during the ad click in the app store.
+        name: app_store_ad_click_manual_source
+      - description: The device language during the ad click in the app store.
+        name: app_store_ad_click_device_language
+      - description: The metro of the location during the last touch event.
+        name: ga_last_touch_location_metro
+      - description: The full referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_full
+      - description: The locale of the app store during the first touch event in the segment.
+        name: segment_first_touch_app_store_locale
+      - description: The event ID during the first touch event.
+        name: ga_first_touch_event_id
+      - description:
+          The source of the traffic source during the last touch event in the
+          segment.
+        name: segment_last_touch_traffic_source_source
+      - description: The GA session ID during the app store installation.
+        name: app_store_install_ga_session_id
+      - description: The source of the traffic source during the app store installation.
+        name: app_store_install_traffic_source_source
+      - description: The city of the location during the organic click in the app store.
+        name: app_store_organic_click_location_city
+      - description: The GA session ID during the ad click in the app store.
+        name: app_store_ad_click_ga_session_id
+      - description: The campaign parameter during the app store installation.
+        name: app_store_install_param_campaign
+      - description: The URL of the page location during the app store installation.
+        name: app_store_install_page_location_url
+      - description: The source of the traffic source during the ad click in the app store.
+        name: app_store_ad_click_traffic_source_source
+      - description: The GCLID during the organic click in the app store.
+        name: app_store_organic_click_gclid
+      - description: The city of the location during the first touch event.
+        name: ga_first_touch_location_city
+      - description: The content parameter during the last touch event.
+        name: ga_last_touch_param_content
+      - description: The host of the referrer during the last touch event.
+        name: ga_last_touch_referrer_host
+      - description: The medium of the traffic source during the app store installation.
+        name: app_store_install_traffic_source_medium
+      - description: The source of the traffic source during the last touch event.
+        name: ga_last_touch_traffic_source_source
+      - description: The timestamp of the app store installation in Pacific Time.
+        name: app_store_install_at_pt
+      - description:
+          The inter position of the app store surface during the first touch
+          event in the segment.
+        name: segment_first_touch_app_store_surface_inter_position
+      - description: The location of the page during the last touch event.
+        name: ga_last_touch_page_location
+      - description: The manual term used during the app store installation.
+        name: app_store_install_manual_term
+      - description: The full referrer during the first touch event.
+        name: ga_first_touch_referrer_full
+      - description: The query of the referrer during the organic click in the app store.
+        name: app_store_organic_click_referrer_query
+      - description:
+          The type of the app store surface during the first touch event in
+          the segment.
+        name: segment_first_touch_app_store_surface_type
+      - description: The campaign parameter during the organic click in the app store.
+        name: app_store_organic_click_param_campaign
+      - description: The content parameter during the ad click in the app store.
+        name: app_store_ad_click_param_content
+      - description: The query of the page location during the app store installation.
+        name: app_store_install_page_location_query
+      - description: The device language during the app store installation.
+        name: app_store_install_device_language
+      - description: The term parameter during the first touch event.
+        name: ga_first_touch_param_term
+      - name: ga_first_touch_manual_term
+        description: The manual term used during the first touch event.
+      - description: The manual term used during the first touch event.
+        name: ga_first_touch_manual_term
+      - description:
+          The name of the traffic source during the last touch event in the
+          segment.
+        name: segment_last_touch_traffic_source_name
+      - description:
+          The name of the manual campaign during the organic click in the app
+          store.
+        name: app_store_organic_click_manual_campaign_name
+      - description: The manual term used during the ad click in the app store.
+        name: app_store_ad_click_manual_term
+      - description: The name of the traffic source during the ad click in the app store.
+        name: app_store_ad_click_traffic_source_name
+      - description: The continent of the location during the last touch event.
+        name: ga_last_touch_location_continent
+      - description: The source parameter during the app store installation.
+        name: app_store_install_param_source
+      - description: The path of the referrer during the ad click in the app store.
+        name: app_store_ad_click_referrer_path
+      - description: The name of the manual campaign during the ad click in the app store.
+        name: app_store_ad_click_manual_campaign_name
+      - description: The timestamp of the organic click in the app store in Pacific Time.
+        name: app_store_organic_click_at_pt
+      - description: The country of the location during the app store installation.
+        name: app_store_install_location_country
+      - description: The referrer URL during the app store installation.
+        name: app_store_install_referrer_url
+      - description: The medium parameter during the ad click in the app store.
+        name: app_store_ad_click_param_medium
+      - description: The device category during the first touch event in the segment.
+        name: segment_first_touch_device_category
+      - description: The query of the page location during the last touch event.
+        name: ga_last_touch_page_location_query
+      - description: The medium parameter during the last touch event.
+        name: ga_last_touch_param_medium
+      - description: The URL during the last touch event in the segment.
+        name: segment_last_touch_url
+      - description: The content parameter during the first touch event.
+        name: ga_first_touch_param_content
+      - description: The URL of the page location during the ad click in the app store.
+        name: app_store_ad_click_page_location_url
+      - description: The query of the page location during the ad click in the app store.
+        name: app_store_ad_click_page_location_query
+      - description: The GA session number during the first touch event.
+        name: ga_first_touch_ga_session_number
+      - description: The manual content used during the ad click in the app store.
+        name: app_store_ad_click_manual_content
+      - description: The name of the traffic source during the app store installation.
+        name: app_store_install_traffic_source_name
+      - description: The medium parameter during the organic click in the app store.
+        name: app_store_organic_click_param_medium
+      - description: The title of the page during the first touch event.
+        name: ga_first_touch_page_title
+      - description: The referrer during the last touch event in the segment.
+        name: segment_last_touch_referrer
+      - description: The medium of the traffic source during the ad click in the app store.
+        name: app_store_ad_click_traffic_source_medium
+      - description: The query of the page location during the first touch event.
+        name: ga_first_touch_page_location_query
+      - description: The metro of the location during the first touch event.
+        name: ga_first_touch_location_metro
+      - description:
+          The detail of the app store surface during the first touch event
+          in the segment.
+        name: segment_first_touch_app_store_surface_detail
+      - description: The country of the location during the first touch event.
+        name: ga_first_touch_location_country
+      - description: The path of the page location during the app store installation.
+        name: app_store_install_page_location_path
+      - description: The city of the location during the ad click in the app store.
+        name: app_store_ad_click_location_city
+      - description: The campaign parameter during the last touch event.
+        name: ga_last_touch_param_campaign
+      - description: The host of the page location during the ad click in the app store.
+        name: app_store_ad_click_page_location_host
+      - description: The GA session number during the app store installation.
+        name: app_store_install_ga_session_number
+      - description: The query of the referrer during the last touch event.
+        name: ga_last_touch_referrer_query
+      - description:
+          The name of the traffic source during the organic click in the app
+          store.
+        name: app_store_organic_click_traffic_source_name
+      - description: The path of the referrer during the last touch event.
+        name: ga_last_touch_referrer_path
+      - description: The GA session number during the last touch event.
+        name: ga_last_touch_ga_session_number
+      - description: The number of segment sessions until installation.
+        name: segment_segment_sessions_til_install
+      - description: The GCLID during the ad click in the app store.
+        name: app_store_ad_click_gclid
+      - description:
+          The medium of the traffic source during the last touch event in the
+          segment.
+        name: segment_last_touch_traffic_source_medium
+      - description: The acquisition template.
+        name: acquisition_template
+      - description: The manual medium used during the last touch event.
+        name: ga_last_touch_manual_medium
+      - description: The URL of the page location during the first touch event.
+        name: ga_first_touch_page_location_url
+      - description:
+          The name of the traffic source during the first touch event in the
+          segment.
+        name: segment_first_touch_traffic_source_name
+      - description: The source parameter during the app store installation.
+        name: app_store_install_param_medium
+      - description: The query of the referrer during the app store installation.
+        name: app_store_install_referrer_query
+      - description: The path of the referrer during the first touch event.
+        name: ga_first_touch_referrer_path
+      - description: The content parameter during the organic click in the app store.
+        name: app_store_organic_click_param_content
+      - description: The metro of the location during the app store installation.
+        name: app_store_install_location_metro
+      - description: The location of the page during the first touch event.
+        name: ga_first_touch_page_location
+      - description: The Shopify ID in the segment.
+        name: segment_shopify_id
+      - description:
+          The medium of the traffic source during the organic click in the
+          app store.
+        name: app_store_organic_click_traffic_source_medium
+      - description: The host of the page location during the app store installation.
+        name: app_store_install_page_location_host
+      - description: The manual content used during the app store installation.
+        name: app_store_install_manual_content
+      - description: The GCLID during the first touch event.
+        name: ga_first_touch_gclid
+      - description:
+          The path of the page location during the organic click in the app
+          store.
+        name: app_store_organic_click_page_location_path
+      - description: The detail of the app store surface during the last touch event.
+        name: ga_last_touch_app_store_surface_detail
+      - description:
+          The intra position of the app store surface during the last touch
+          event.
+        name: ga_last_touch_app_store_surface_intra_position
+      - description: The full referrer during the app store installation.
+        name: app_store_install_referrer_full
+      - description: The manual medium used during the first touch event.
+        name: ga_first_touch_manual_medium
+      - description: The host of the page location during the first touch event.
+        name: ga_first_touch_page_location_host
+      - description: The full referrer during the last touch event.
+        name: ga_last_touch_referrer_full
+      - description: The query of the referrer during the ad click in the app store.
+        name: app_store_ad_click_referrer_query
+      - description: The country of the location during the ad click in the app store.
+        name: app_store_ad_click_location_country
+      - description:
+          Detailed information about the specific app store surface where an
+          ad click occurred.
+        name: app_store_ad_click_app_store_surface_detail
+      - description: The URL of the referrer during the first touch event.
+        name: ga_first_touch_referrer_url
+      - description:
+          The locale or regional setting of the app store during an installation
+          event.
+        name: app_store_install_app_store_locale
+      - description: The host URL from which the installation in the app store originated.
+        name: app_store_install_referrer_host
+      - description: The type of surface where the ad click occurred in the app store.
+        name: app_store_ad_click_app_store_surface_type
+      - description: The category of the device used during the app store installation.
+        name: app_store_install_device_category
+      - description: The type of surface where the installation occurred in the app store.
+        name: app_store_install_app_store_surface_type
+      - description: Whether there was an ad click before the app store installation.
+        name: app_store_has_ad_click
+      - description: Whether the Mesa installation was completed.
+        name: mesa_install_record_install_completed
+      - description:
+          The timestamp indicating when the Mesa installation occurred, in
+          the Pacific Time zone.
+        name: mesa_install_record_at_pt
+      - description:
+          The category of the device used during the organic click in the app
+          store.
+        name: app_store_organic_click_device_category
+      - description: The host URL from which the ad click in the app store originated.
+        name: app_store_ad_click_referrer_host
+      - description: Whether there was an ad click before the app store installation.
+        name: app_store_did_click_ad_before_install
+      - description:
+          The intra position of the app store surface during the organic click
+          event.
+        name: app_store_organic_click_app_store_surface_intra_position
+      - description: The category of the device used during the ad click in the app store.
+        name: app_store_ad_click_device_category
+      - description:
+          The specific page location or section in the app store where the
+          installation occurred.
+        name: app_store_install_page_location
+      - description: The type of click (ad or organic) in the app store.
+        name: app_store_click_type
+      - description: The intra position of the app store surface during the ad click event.
+        name: app_store_ad_click_app_store_surface_intra_position
+      - description: The type of surface where the organic click occurred in the app store.
+        name: app_store_organic_click_app_store_surface_type
+      - description:
+          Details the specific plan or package selected during the Mesa installation
+          event.
+        name: mesa_install_record_start_selected
+      - description:
+          The UTM source parameter associated with the Mesa installation event
+          for tracking the marketing channel.
+        name: mesa_install_record_utm_source
+      - description: The inter position of the app store surface during the ad click event.
+        name: app_store_ad_click_app_store_surface_inter_position
+      - description: The content of the traffic source during the last touch event in Segment.
+        name: segment_last_touch_traffic_source_content
+      - description: The source of the traffic during the organic click in the app store.
+        name: app_store_organic_click_traffic_source_source
+      - description: The name of the traffic source during the last touch event in Google Analytics.
+        name: ga_last_touch_traffic_source_name
+      - description: The host of the referrer during the last touch event in Segment.
+        name: segment_last_touch_referrer_host
+      - description: The category of the device used during the last touch event in Segment.
+        name: segment_last_touch_device_category
+      - description: The city of the location during the app store installation.
+        name: app_store_install_location_city
+      - description: The path during the first touch event in Segment.
+        name: segment_first_touch_path
+      - description: The path of the page location during the last touch event in Google Analytics.
+        name: ga_last_touch_page_location_path
+      - description: The path of the page location during the ad click in the app store.
+        name: app_store_ad_click_page_location_path
+      - description: The source parameter during the ad click in the app store.
+        name: app_store_ad_click_param_source
+      - description: The host during the first touch event in Segment.
+        name: segment_first_touch_host
+      - description: The URL of the referrer during the ad click in the app store.
+        name: app_store_ad_click_referrer_url
+      - description: The manual content during the first touch event in Google Analytics.
+        name: ga_first_touch_manual_content
+      - description: The Google Analytics session number during the organic click in the app store.
+        name: app_store_organic_click_ga_session_number
+      - description: The event ID during the app store installation.
+        name: app_store_install_event_id
+      - description: The Google Analytics session ID during the organic click in the app store.
+        name: app_store_organic_click_ga_session_id
+      - description: The host during the last touch event in Segment.
+        name: segment_last_touch_host
+      - description: The metro area of the location during the organic click in the app store.
+        name: app_store_organic_click_location_metro
+      - description: The manual content during the organic click in the app store.
+        name: app_store_organic_click_manual_content
+      - description: The term parameter during the organic click in the app store.
+        name: app_store_organic_click_param_term
+      - description: The manual content during the last touch event in Google Analytics.
+        name: ga_last_touch_manual_content
+      - description: The inter position of the app store surface during the app store installation.
+        name: app_store_install_app_store_surface_inter_position
+      - description: The timestamp indicating when the first touch event occurred in Google Analytics, in the Pacific Time zone.
+        name: ga_first_touch_at_pt
+      - description: The content of the traffic source during the first touch event in Segment.
+        name: segment_first_touch_traffic_source_content```

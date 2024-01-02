@@ -199,9 +199,9 @@ models:
     google_analytics:
       staging:
         +schema: support
+        +materialized: view
       intermediate:
         +schema: support
-        +materialized: ephemeral
 
     customer_io:
       staging:

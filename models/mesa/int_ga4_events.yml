@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: ga4_events
+  - name: int_ga4_events
     columns:
       - name: shop_subdomain
         description: The subdomain of the shop.

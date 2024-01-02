@@ -1,12 +1,8 @@
 version: 2
 models:
-  - name: stg_ga_install_events
+  - name: int_ga_install_events
     description: ""
     columns:
-      - name: USER_PSEUDO_ID
-        description: The anonymouse Google Analytics user ID
-        tests:
-          - not_null
       - name: SHOP_SUBDOMAIN
         description: The foreign key of the Shop.
       - name: EVENT_TIMESTAMP

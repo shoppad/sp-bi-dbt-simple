@@ -1,29 +1,31 @@
-with
-    user_id_matches as (
-        select user_pseudo_id, shop_subdomain, shopify_id
-        from {{ ref("stg_ga4_events") }}
-        where shop_subdomain is not NULL or shopify_id is not NULL
-        qualify
-            row_number() over (
-                partition by user_pseudo_id, shop_subdomain, shopify_id
-                order by event_timestamp_pt
-            )
-            = 1
-    ),
+WITH
+ga4_events AS (
+    SELECT *
+    FROM {{ ref("stg_ga4_events") }}
+),
 
-    shops as (select shop_subdomain, shopify_id from {{ ref("stg_shops") }}),
+shops AS (SELECT shop_subdomain, shopify_id FROM {{ ref("stg_shops") }}),
 
-    final as (
+final AS (
 
-        select user_id_matches.user_pseudo_id, shops.shopify_id, shops.shop_subdomain
-        from user_id_matches
-        inner join
-            shops
-            on (
-                user_id_matches.shop_subdomain = shops.shop_subdomain
-                or user_id_matches.shopify_id = shops.shopify_id
-            )
-    )
+    SELECT
+        ga4_events.user_pseudo_id,
+        shops.shopify_id::STRING AS shopify_id,
+        shops.shop_subdomain
+    FROM shops
+    LEFT JOIN ga4_events
+        ON (
+            shops.shop_subdomain = ga4_events.shop_subdomain
+            OR
+            ga4_events.shopify_id::STRING = shops.shopify_id::STRING
+        )
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY shops.shop_subdomain, user_pseudo_id
+            ORDER BY true
+        )
+        = 1
+)
 
-select *
-from final
+SELECT *
+FROM final

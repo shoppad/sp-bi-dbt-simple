@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_last_touch_ga_sessions_before_install
+  - name: int_last_touch_ga_sessions_before_install
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.

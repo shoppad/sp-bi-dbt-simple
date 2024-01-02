@@ -1,8 +1,9 @@
 version: 2
 models:
-  - name: stg_ga_session_starts
+  - name: int_ga_session_starts
     columns:
       - name: user_pseudo_id
+        description: the anonymouse google analytics user id
       - name: page_location
       - name: event_timestamp_pt
       - name: page_url

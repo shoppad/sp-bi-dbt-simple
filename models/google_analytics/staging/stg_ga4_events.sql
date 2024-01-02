@@ -7,29 +7,53 @@ with
                 __hevo__ingested_at,
                 __hevo__loaded_at,
                 surface_detail,
-                surface_type
+                surface_type,
+                page_referrer,
+                user_id,
+                page_location,
+                shop_id
             )
             rename (
+                __hevo_id as event_id,
                 name as traffic_source_name,
                 medium as traffic_source_medium,
                 source as traffic_source_source,
                 category as device_category,
-                __hevo_id as event_id,
-                user_id as shop_subdomain,
-                shop_id as shopify_id
+                language as device_language,
+                country AS location_country,
+                city AS location_city,
+                continent AS location_continent,
+                metro AS location_metro
             ),
+            shop_id::STRING as shopify_id,
             {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }}
-            as event_timestamp_pt,
+                as event_timestamp_pt,
+
+            {# Conditionally set shop_subdomain #}
+            coalesce(user_id, COALESCE(
+                        NULLIF(REGEXP_SUBSTR(page_location, 'shop=(.*?)\.myshopify\.com', 1, 1, 'ie'), ''),
+                        NULLIF(REGEXP_SUBSTR(page_referrer, 'shop=(.*?)\.myshopify\.com', 1, 1, 'ie'), '')
+                    )) AS shop_subdomain,
+
+            {# Page components #}
+            parse_url(page_location) as parsed_url,
+            parsed_url:host::STRING as page_location_host,
+            '/' || parsed_url:path as page_location_path,
+            '?' || parsed_url:query as page_location_query,
+            page_location_host || page_location_path AS page_location_url,
+            page_location_host || page_location_path || COALESCE(page_location_query, '') AS page_location,
 
             {# Attribution #}
-            parse_url(page_location) as page_params,
-            page_params:parameters:utm_content::STRING as param_content,
-            page_params:parameters:utm_term::STRING as param_term,
-            page_params:parameters:page_referrer::STRING as referrer,
-            page_params:host::STRING as referrer_host,
-            page_params:parameters:referrer_source::STRING as referrer_source,
-            page_params:parameters:referrer_medium::STRING as referrer_medium,
-            page_params:parameters:referrer_term::STRING as referrer_term,
+            parsed_url:parameters:utm_content::STRING as param_content,
+            parsed_url:parameters:utm_term::STRING as param_term,
+
+            {# Referrer #}
+            parse_url(page_referrer) as parsed_referrer,
+            parsed_referrer:host::STRING as referrer_host,
+            '/' || parsed_referrer:path as referrer_path,
+            '?' || parsed_referrer:query as referrer_query,
+            referrer_host || referrer_path AS referrer_url,
+            referrer_host || referrer_path || COALESCE(referrer_query, '') AS referrer_full,
 
             {# App Store #}
             TRIM(
@@ -38,7 +62,7 @@ with
                         LOWER(
                             COALESCE(
                                 surface_detail,
-                                page_params:parameters:surface_detail::STRING
+                                parsed_url:parameters:surface_detail::STRING
                             )
                         ),
                         'undefined'
@@ -46,13 +70,13 @@ with
                 )
             ) AS app_store_surface_detail,
             coalesce(
-                nullif(surface_type, ''), page_params:parameters:surface_type::STRING
+                nullif(surface_type, ''), parsed_url:parameters:surface_type::STRING
             ) as app_store_surface_type,
-            page_params:parameters:surface_intra_position::STRING
+            parsed_url:parameters:surface_intra_position::STRING
             as app_store_surface_intra_position,
-            page_params:parameters:surface_inter_position::STRING
+            parsed_url:parameters:surface_inter_position::STRING
             as app_store_surface_inter_position,
-            page_params:parameters:locale::STRING as app_store_locale
+            parsed_url:parameters:locale::STRING as app_store_locale
         FROM {{ source("mesa_ga4", "events") }}
         WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
     )
@@ -66,15 +90,17 @@ with
         "traffic_source_name",
         "traffic_source_source",
         "traffic_source_medium",
-        "referrer",
         "referrer_host",
-        "referrer_source",
-        "referrer_medium",
-        "shop_subdomain",
+        "referrer_full",
+        "referrer_url",
+        "referrer_query",
+        "referrer_path",
+        "shop_subdomain"
     ] %}
 select
     *
-    exclude page_params replace (
+    exclude (parsed_url, parsed_referrer)
+    replace (
         {% for field in not_empty_string_fields %}
             nullif({{ field }}, '') as {{ field }}{% if not loop.last %},{% endif %}
         {% endfor %}

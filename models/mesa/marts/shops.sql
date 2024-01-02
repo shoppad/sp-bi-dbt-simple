@@ -152,18 +152,10 @@ with
         LEFT JOIN yesterdays USING (shop_subdomain)
     ),
 
-    install_sources AS (
-        {% set table_name = ref("int_shop_install_sources") %}
-        {% set column_names = dbt_utils.get_filtered_columns_in_relation(
-            from=table_name, except=["shop_subdomain", "shopify_id"]
-        ) %}
+    simple_shop_attribution AS (
         SELECT
-            shop_subdomain,
-            {% for column_name in column_names %}
-                {{ column_name }} AS acq_{{ column_name }}
-                {%- if not loop.last %},{% endif %}
-            {% endfor %}
-        FROM {{ table_name }}
+            *
+        FROM {{ ref('int_simplified_shop_attribution') }}
     ),
 
     max_funnel_steps AS (
@@ -658,7 +650,7 @@ with
         LEFT JOIN successful_workflow_run_counts USING (shop_subdomain)
         LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
         LEFT JOIN current_rolling_counts USING (shop_subdomain)
-        LEFT JOIN install_sources USING (shop_subdomain)
+        LEFT JOIN simple_shop_attribution USING (shop_subdomain)
         LEFT JOIN max_funnel_steps USING (shop_subdomain)
         LEFT JOIN total_ltv_revenue USING (shop_subdomain)
         LEFT JOIN shop_infos USING (shop_subdomain)

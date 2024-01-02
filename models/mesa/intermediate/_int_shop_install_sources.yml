@@ -10,29 +10,30 @@ models:
       - name: shop_subdomain
         tests:
           - not_null
+          - unique
         description: The foreign key for the Shop.
-      - name: first_touch_campaign
+      - name: ga_first_touch_traffic_source_name
         description: The campaign that the shop was acquired through.
-      - name: first_touch_content
+      - name: ga_first_touch_content
         description: The content that the shop was acquired through.
-      - name: first_touch_referrer
+      - name: ga_first_touch_referrer
         description: The referrer URL that referred the Shop's first visit.
-      - name: first_touch_referrer_host
+      - name: ga_first_touch_referrer_host
         description: The referrer host that referrered the shop's first visit.
-      - name: first_touch_first_page_path
+      - name: ga_first_touch_first_page_path
         description: The first page path that the shop was acquired through.
-      - name: first_touch_source
+      - name: ga_first_touch_traffic_source_source
         description: The source that the shop was acquired through.
-      - name: first_touch_medium
+      - name: ga_first_touch_traffic_source_medium
         tests:
           - not_null:
               config:
-                where: shop_subdomain IN ('hotrocksjewelry', 'hydromony')
+                where: shop_subdomain IN ('locker-toys', 'drink-renude')
           - dbt_expectations.expect_column_values_to_not_be_in_set:
               value_set:
                 - ""
         description: The medium that the shop was acquired through.
-      - name: first_touch_source_medium
+      - name: ga_first_touch_traffic_source_source_medium
         description: The source & medium that drove the Shop's first visit.
       - name: is_blog_referral
         tests:
@@ -40,7 +41,7 @@ models:
         description:
           Whether the Shop was referred/entered the marketing site by a blog
           post.
-      - name: first_touch_template
+      - name: ga_first_touch_template
         description:
           The template the Shop intended to use when they first installed the
           app.

@@ -79,7 +79,7 @@ sources:
           - name: created_at
             tests:
               - not_null
-      - name: mesa_install_events
+      - name: mesa_install_records
         identifier: m3_mesa_installs
       - name: blog_studio_shops
         identifier: m3_blogstudio

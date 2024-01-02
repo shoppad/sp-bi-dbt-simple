@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_ga_app_store_page_events
+  - name: int_ga_app_store_page_events
     columns:
       - name: user_pseudo_id
         description: the anonymouse google analytics user id

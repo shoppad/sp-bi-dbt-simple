@@ -1,0 +1,23 @@
+version: 2
+models:
+  - name: int_simplified_shop_attribution
+    columns:
+      - name: shop_subdomain
+        description: The subdomain of the shop.
+      - name: acq_acquisition_template
+      - name: acq_has_app_store_organic_click
+      - name: acq_unified_traffic_source
+      - name: acq_unified_traffic_medium
+      - name: acq_unified_traffic_campaign
+      - name: acq_unified_traffic_url
+      - name: acq_unified_traffic_path
+      - name: acq_unified_traffic_page_host
+      - name: acq_unified_first_touch_at_pt
+      - name: acq_unified_app_store_surface_type
+      - name: acq_unified_app_store_surface_detail
+      - name: acq_unified_referrer_host
+      - name: acq_is_blog_referral
+      - name: acq_days_to_install
+      - name: acq_is_app_store_search_ad_referral
+      - name: acq_referrer_medium
+      - name: acq_referrer_source
