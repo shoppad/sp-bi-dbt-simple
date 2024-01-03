@@ -57,5 +57,5 @@ final AS (
     FROM combined
 )
 
-select * EXCLUDE (parsed_url)
+select *
 from final
