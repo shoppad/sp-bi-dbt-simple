@@ -705,7 +705,7 @@ models:
         description: Whether the acquisition is a referral from an app store search ad.
       - name: acq_days_to_install
         description: The number of days it took to install after acquisition.
-      - name: acq_has_app_store_organic_click
+      - name: acq_app_store_has_organic_click
         description: Whether there was an organic click in the app store during acquisition.
       - name: acq_unified_traffic_medium
         description: The medium of the traffic during acquisition.
@@ -731,3 +731,9 @@ models:
         description: The host of the traffic page during acquisition.
       - name: acq_unified_app_store_surface_detail
         description: The detail of the surface in the app store during acquisition.
+      - name: acq_app_store_click_type
+        description: The type of click in the app store during acquisition.
+      - name: acq_app_store_has_organic_click
+        description: Whether there was an organic click in the app store during acquisition.
+      - name: acq_app_store_has_ad_click
+        description: Whether there was an ad click in the app store during acquisition.

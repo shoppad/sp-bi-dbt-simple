@@ -62,8 +62,7 @@ models:
         name: ga_last_touch_at_pt
       - description: The inter position of the last touch on the app store surface.
         name: ga_last_touch_app_store_surface_inter_position
-      - description:
-          The inter position of the first touch on the app store surface.
+      - description: The inter position of the first touch on the app store surface.
         name: ga_first_touch_app_store_surface_inter_position
       - description: The locale of the app store during the last touch event.
         name: ga_last_touch_app_store_locale
@@ -80,7 +79,7 @@ models:
       - description:
           Indicates whether there was an organic click in the app store related
           to the shop or app.
-        name: has_app_store_organic_click
+        name: app_store_has_organic_click
       - description:
           The position or location within the app store where the organic click
           occurred, for intermediary app store surfaces.

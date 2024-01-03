@@ -100,15 +100,15 @@ final AS (
             ) as app_store_has_ad_click,
             coalesce(
                 app_store_organic_click_app_store_surface_type is not NULL, FALSE
-            ) as has_app_store_organic_click,
+            ) as app_store_has_organic_click,
 
             case
                 when
-                    app_store_has_ad_click = TRUE and has_app_store_organic_click = TRUE
+                    app_store_has_ad_click = TRUE and app_store_has_organic_click = TRUE
                 then 'app_store_ad_click_and_organic_click'
                 when app_store_has_ad_click = TRUE
                 then 'app_store_ad_click'
-                when has_app_store_organic_click = TRUE
+                when app_store_has_organic_click = TRUE
                 then 'app_store_organic_click'
                 else '(direct or predates tracking)'
             end as app_store_click_type

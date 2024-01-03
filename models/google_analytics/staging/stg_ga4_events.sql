@@ -1,4 +1,9 @@
 with
+    raw_ga4_events AS (
+        SELECT *
+        FROM {{ source("mesa_ga4", "events") }}
+        WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
+    ),
 
     ga4_events as (
         select
@@ -77,8 +82,7 @@ with
             parsed_url:parameters:surface_inter_position::STRING
             as app_store_surface_inter_position,
             parsed_url:parameters:locale::STRING as app_store_locale
-        FROM {{ source("mesa_ga4", "events") }}
-        WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
+        FROM raw_ga4_events
     )
 
     {% set not_empty_string_fields = [

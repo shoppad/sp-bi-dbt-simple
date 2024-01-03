@@ -42,7 +42,6 @@ models:
         description: The source of the referrer that led the user to the shop.
       - name: referrer_medium
         description: The medium of the referrer that led the user to the shop.
-      - name: referrer_term
       - name: app_store_surface_detail
       - name: app_store_surface_type
       - name: app_store_surface_intra_position

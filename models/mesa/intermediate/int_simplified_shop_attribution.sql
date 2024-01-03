@@ -13,7 +13,10 @@ with unified_columns AS (
                 {{ column_name }} AS acq_{{ column_name }}
                 {%- if not loop.last %},{% endif %}
             {% endif %}
-        {% endfor %}
+        {% endfor %},
+        app_store_has_ad_click AS acq_app_store_has_ad_click,
+        app_store_has_organic_click AS acq_app_store_has_organic_click,
+        app_store_click_type AS acq_app_store_click_type
     FROM {{ table_name }}
 )
 

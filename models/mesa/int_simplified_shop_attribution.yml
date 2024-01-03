@@ -8,7 +8,7 @@ models:
         description:
           The template the Shop intended to use when they first installed the
           app.
-      - name: acq_has_app_store_organic_click
+      - name: acq_app_store_has_organic_click
         description: Whether there was an organic click in the app store during acquisition.
       - name: acq_unified_traffic_source
         description: The source of the traffic during acquisition.
