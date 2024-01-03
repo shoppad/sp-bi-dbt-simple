@@ -204,7 +204,7 @@ final as (
 
             {# Referral Type #}
         coalesce(
-            unified_traffic_url ilike 'getmesa.com/blog%', FALSE
+            unified_traffic_url ilike '%getmesa.com/blog%', FALSE
         ) as is_blog_referral,
         timediff(
             'days', unified_first_touch_at_pt, first_installed_at_pt
