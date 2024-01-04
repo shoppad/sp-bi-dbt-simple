@@ -11,21 +11,21 @@
 [x] re-add acquisition template.
 [ ] Look for any and all pre-install search_ad surface_type events.
 #}
-with
-shops as (select shop_subdomain, first_installed_at_pt from {{ ref("stg_shops") }}),
+WITH
+shops AS (SELECT shop_subdomain, first_installed_at_pt FROM {{ ref("stg_shops") }}),
 
 ga_attribution as (
     select
         shop_subdomain,
         {{ get_prefixed_columns(ref('int_ga_attribution'), 'ga') }}
-    from {{ ref("int_ga_attribution") }}
+    FROM {{ ref("int_ga_attribution") }}
 ),
 
 segment_attribution as (
     select
         shop_subdomain,
         {{ get_prefixed_columns(ref('int_segment_attribution'), 'segment') }}
-    from {{ ref("int_segment_attribution") }}
+    FROM {{ ref("int_segment_attribution") }}
 ),
 
 app_store_attribution AS (
@@ -38,21 +38,21 @@ mesa_install_records as (
 ),
 
 formatted_install_records as (
-    select mesa_install_records.*
-    from mesa_install_records
-    left join shops using (shop_subdomain)
-    having
+    SELECT mesa_install_records.*
+    FROM mesa_install_records
+    LEFT JOIN shops USING (shop_subdomain)
+    HAVING
         mesa_install_record_at_pt
         <= first_installed_at_pt + interval '60seconds'
-    qualify
-        row_number() over (
-            partition by shop_subdomain order by mesa_install_record_at_pt asc
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY shop_subdomain ORDER BY mesa_install_record_at_pt ASC
         )
         = 1
 ),
 
-combined_attribution as (
-    select
+combined_attribution AS (
+    SELECT
         *,
         REPLACE(COALESCE(
             ga_first_touch_traffic_source_source,
@@ -163,17 +163,17 @@ combined_attribution as (
             app_store_ad_click_referrer_host,
             app_store_organic_click_referrer_host
         ), 'www.', '') AS unified_referrer_host
-    from shops
-    left join formatted_install_records using (shop_subdomain)
-    left join ga_attribution using (shop_subdomain)
+    FROM shops
+    LEFT JOIN formatted_install_records USING (shop_subdomain)
+    LEFT JOIN ga_attribution USING (shop_subdomain)
     LEFT JOIN app_store_attribution USING (shop_subdomain)
-    left join segment_attribution using (shop_subdomain)
+    LEFT JOIN segment_attribution USING (shop_subdomain)
 ),
 
-referrer_mapping as (select * from {{ ref("referrer_mapping") }}),
+referrer_mapping as (select * FROM {{ ref("referrer_mapping") }}),
 
-final as (
-    select
+final AS (
+    SELECT
         combined_attribution.* EXCLUDE (unified_traffic_source, unified_traffic_medium),
 
             {# Referrer Mapping #}
@@ -189,20 +189,20 @@ final as (
                 )
             )
         ) AS unified_traffic_source,
-        lower(
+        LOWER(
             COALESCE(
                 referrer_mapping.medium,
                 unified_traffic_medium
             )
         ) AS unified_traffic_medium,
 
-        referrer_mapping.medium as referrer_medium,
-        referrer_mapping.source as referrer_source
-    from shops
-    left join combined_attribution using (shop_subdomain)
-    left join
+        referrer_mapping.medium AS referrer_medium,
+        referrer_mapping.source AS referrer_source
+    FROM shops
+    LEFT JOIN combined_attribution USING (shop_subdomain)
+    LEFT JOIN
         referrer_mapping
-            on
+            ON
                 LOWER(REPLACE(combined_attribution.unified_traffic_source, 'www.', ''))
                     = lower(referrer_mapping.host)
                 OR
@@ -210,14 +210,14 @@ final as (
                     = lower(referrer_mapping.host)
 )
 
-select
+SELECT
     * EXCLUDE (first_installed_at_pt),
         COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND unified_traffic_medium = 'search'), FALSE) as is_blog_referral,
-        timediff(
+        TIMEDIFF(
             'days', unified_first_touch_at_pt, first_installed_at_pt
-        ) as days_to_install,
-        coalesce(
+        ) AS days_to_install,
+        COALESCE(
             unified_app_store_surface_type ilike '%search_ad%',
             FALSE
-        ) as is_app_store_search_ad_referral
-from final
+        ) AS is_app_store_search_ad_referral
+FROM final
