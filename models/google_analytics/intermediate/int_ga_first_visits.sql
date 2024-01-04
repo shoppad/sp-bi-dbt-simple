@@ -2,7 +2,7 @@ WITH
     first_visits AS (
         SELECT *
         FROM {{ ref("int_ga4_events") }}
-        WHERE (event_name = 'first_visit')
+        WHERE (event_name IN ('first_visit', 'session_start')) {# Sometimes there is no first_visit. #}
     ),
 
     formatted_first_visits AS (

@@ -3,6 +3,8 @@ with
         SELECT *
         FROM {{ source("mesa_ga4", "events") }}
         WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
+        {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
+        {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
     ),
 
     ga4_events as (
@@ -39,6 +41,7 @@ with
                         NULLIF(REGEXP_SUBSTR(page_location, 'shop=(.*?)\.myshopify\.com', 1, 1, 'ie'), ''),
                         NULLIF(REGEXP_SUBSTR(page_referrer, 'shop=(.*?)\.myshopify\.com', 1, 1, 'ie'), '')
                     )) AS shop_subdomain,
+            {# TODO: Coalesce the surface_type and surface_detail from past pageloads. #}
 
             {# Page components #}
             parse_url(page_location) as parsed_url,
@@ -67,21 +70,25 @@ with
                         LOWER(
                             COALESCE(
                                 surface_detail,
-                                parsed_url:parameters:surface_detail::STRING
-                            )
+                                parsed_url:parameters:surface_detail,
+                                parsed_referrer:parameters:surface_detail
+                            )::STRING
                         ),
                         'undefined'
                     )
                 )
             ) AS app_store_surface_detail,
             coalesce(
-                nullif(surface_type, ''), parsed_url:parameters:surface_type::STRING
-            ) as app_store_surface_type,
-            parsed_url:parameters:surface_intra_position::STRING
-            as app_store_surface_intra_position,
-            parsed_url:parameters:surface_inter_position::STRING
-            as app_store_surface_inter_position,
-            parsed_url:parameters:locale::STRING as app_store_locale
+                nullif(surface_type, ''), parsed_url:parameters:surface_type, parsed_referrer:parameters:surface_type
+            )::STRING as app_store_surface_type,
+            COALESCE(
+                parsed_url:parameters:surface_intra_position,
+                parsed_referrer:parameters:surface_intra_position
+            )::STRING as app_store_surface_intra_position,
+            COALESCE(parsed_url:parameters:surface_inter_position, parsed_referrer:parameters:surface_inter_position)::STRING
+                as app_store_surface_inter_position,
+            COALESCE(parsed_url:parameters:locale, parsed_referrer:parameters:locale)::STRING
+                as app_store_locale
         FROM raw_ga4_events
     )
 

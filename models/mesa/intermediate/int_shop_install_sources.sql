@@ -53,7 +53,7 @@ formatted_install_records as (
 
 combined_attribution as (
     select
-        * EXCLUDE (first_installed_at_pt),
+        *,
         REPLACE(COALESCE(
             ga_first_touch_traffic_source_source,
             ga_first_touch_param_source,
@@ -192,27 +192,10 @@ final as (
         lower(
             COALESCE(
                 referrer_mapping.medium,
-                IFF(
-                    (unified_traffic_medium IS NULL AND unified_referrer_host ILIKE '%shopify%')
-                        OR
-                        unified_traffic_medium ILIKE '%shopify%',
-                    'App Store',
-                    unified_traffic_medium
-                )
+                unified_traffic_medium
             )
         ) AS unified_traffic_medium,
 
-            {# Referral Type #}
-        coalesce(
-            unified_traffic_url ilike '%getmesa.com/blog%', FALSE
-        ) as is_blog_referral,
-        timediff(
-            'days', unified_first_touch_at_pt, first_installed_at_pt
-        ) as days_to_install,
-        coalesce(
-            unified_app_store_surface_type ilike '%search_ad%',
-            FALSE
-        ) as is_app_store_search_ad_referral,
         referrer_mapping.medium as referrer_medium,
         referrer_mapping.source as referrer_source
     from shops
@@ -227,4 +210,14 @@ final as (
                     = lower(referrer_mapping.host)
 )
 
-select * from final
+select
+    * EXCLUDE (first_installed_at_pt),
+        COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND unified_traffic_medium = 'search'), FALSE) as is_blog_referral,
+        timediff(
+            'days', unified_first_touch_at_pt, first_installed_at_pt
+        ) as days_to_install,
+        coalesce(
+            unified_app_store_surface_type ilike '%search_ad%',
+            FALSE
+        ) as is_app_store_search_ad_referral
+from final
