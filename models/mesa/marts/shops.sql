@@ -572,12 +572,18 @@ final AS (
             AND billing_accounts.plan_name not ilike '%free%'
             AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
 
-        has_ever_upgraded_to_paid_plan AND NOT is_currently_paying AS has_churned_paid,
+        CASE
+            WHEN install_status = 'uninstalled' OR has_ever_upgraded_to_paid_plan
+                THEN is_currently_paying
+        END AS has_churned_paid,
+
         has_ever_upgraded_to_paid_plan AND plan_change_chain ilike '%$0' AS did_pay_and_then_downgrade_to_free,
-        (install_status = 'uninstalled' or not is_in_trial)
-                    AND has_done_a_trial
-                    AND NOT has_ever_upgraded_to_paid_plan
-                AS has_churned_during_trial,
+
+        CASE has_done_a_trial
+            WHEN install_status = 'uninstalled' or not is_in_trial
+                THEN NOT has_ever_upgraded_to_paid_plan
+        END AS has_churned_during_trial,
+
         case
             when not has_done_a_trial
                 then '1-Has Not Done A Trial'
