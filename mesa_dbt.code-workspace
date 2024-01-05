@@ -33,7 +33,7 @@
     },
     "sqlfluff.format.enabled": false,
     "sqlfluff.suppressNotifications": false,
-    "dbt.queryLimit": 20,
+    "dbt.queryLimit": 200,
     "dbt.queryPreview.queryLimit": 250,
     "sqlfluff.osmosis.enabled": false,
     "files.trimTrailingWhitespace": true,

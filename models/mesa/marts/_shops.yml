@@ -615,7 +615,9 @@ models:
       - description: The date/time the Shop received their first journey email.
         name: first_journey_sent_at_pt
       - description: Whether the Shop has churned.
-        name: has_churned
+        name: has_churned_paid
+      - name: has_churned_during_trial
+        description: Whether the Shop has churned during trial.
       - description: The identifier of the Shop's first trial plan.
         name: first_trial_plan_identifier
       - description: The status of the Shop's plan upgrade funnel through trial, paying and churn.
@@ -646,6 +648,11 @@ models:
         name: churned_customer_duration_in_days
       - description: The date the Shop churned.
         name: churned_on_pt
+        tests:
+          - not_null:
+              config:
+                where: "NOT is_custom_app AND has_churned_paid"
+                error_if: ">100"
       - description: The number of weeks the Shop has been/was on a paid plan.
         name: churned_customer_duration_in_weeks
       - description: The number of months the Shop has been on a paid plan.
@@ -737,3 +744,5 @@ models:
         description: Whether there was an organic click in the app store during acquisition.
       - name: acq_app_store_has_ad_click
         description: Whether there was an ad click in the app store during acquisition.
+      - name: acq_unified_landing_surface_area
+        description: The type of page the user first landed on during acquisition.

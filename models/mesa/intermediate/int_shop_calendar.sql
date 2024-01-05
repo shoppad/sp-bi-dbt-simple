@@ -1,53 +1,53 @@
-with
-    shops as (select shop_subdomain, is_custom_app from {{ ref("stg_shops") }}),
+WITH
+    shops AS (SELECT shop_subdomain, is_custom_app FROM {{ ref("stg_shops") }}),
 
-    shop_plan_days as (select * from {{ ref("int_mesa_shop_plan_days") }}),
+    shop_plan_days AS (SELECT * FROM {{ ref("int_mesa_shop_plan_days") }}),
 
-    shop_lifespans as (select * from {{ ref("int_shop_lifespans") }}),
+    shop_lifespans AS (SELECT * FROM {{ ref("int_shop_lifespans") }}),
 
-    calendar_dates as (
-        select date_day as dt
-        from {{ ref("calendar_dates") }}
-        where
-            dt <= {{ pacific_timestamp("CURRENT_TIMESTAMP") }}::date - interval '1 DAY'
+    calendar_dates AS (
+        SELECT date_day AS dt
+        FROM {{ ref("calendar_dates") }}
+        WHERE
+            dt <= {{ pacific_timestamp("CURRENT_TIMESTAMP") }}::DATE - INTERVAL '1 DAY'
     ),
 
-    shop_trial_days as (
-        select shop_subdomain, dt, true as is_in_trial
-        from calendar_dates
-        inner join
+    shop_trial_days AS (
+        SELECT shop_subdomain, dt, TRUE AS is_in_trial
+        FROM calendar_dates
+        INNER JOIN
             {{ ref("stg_trial_periods") }}
-            on calendar_dates.dt between started_on_pt and coalesce(
-                ended_on_pt, {{ pacific_timestamp("CURRENT_DATE") }}::date
+            ON calendar_dates.dt BETWEEN started_on_pt AND COALESCE(
+                ended_on_pt, {{ pacific_timestamp("CURRENT_TIMESTAMP") }}::DATE - INTERVAL '1 DAY'
             )
     ),
 
-    shop_calendar as (
-        select
+    shop_calendar AS (
+        SELECT
             shop_subdomain,
             dt,
-            coalesce(
-                iff(
-                    is_shopify_zombie_plan or coalesce(is_in_trial, false),
+            COALESCE(
+                IFF(
+                    is_shopify_zombie_plan OR COALESCE(is_in_trial, FALSE),
                     0,
                     daily_plan_revenue
                 ),
                 0
-            ) as daily_plan_revenue,
+            ) AS daily_plan_revenue,
             mesa_plan,
             mesa_plan_identifier,
-            coalesce(shopify_plan, 'unavailable') as shopify_plan,
-            coalesce(shop_trial_days.is_in_trial, false) as is_in_trial,
-            coalesce(is_shopify_zombie_plan, false) as is_shopify_zombie_plan
+            COALESCE(shopify_plan, 'unavailable') AS shopify_plan,
+            COALESCE(shop_trial_days.is_in_trial, FALSE) AS is_in_trial,
+            COALESCE(is_shopify_zombie_plan, FALSE) AS is_shopify_zombie_plan
 
-        from shop_lifespans
-        inner join calendar_dates on dt between first_dt and last_dt
-        left join shop_plan_days using (shop_subdomain, dt)
-        left join shops using (shop_subdomain)
-        left join shop_trial_days using (shop_subdomain, dt)
-        order by dt
+        FROM shop_lifespans
+        INNER JOIN calendar_dates ON dt BETWEEN first_dt AND last_dt
+        LEFT JOIN shop_plan_days USING (shop_subdomain, dt)
+        LEFT JOIN shops USING (shop_subdomain)
+        LEFT JOIN shop_trial_days USING (shop_subdomain, dt)
+        ORDER BY dt
     )
 
-select *
-from shop_calendar
-order by shop_subdomain, dt
+SELECT *
+FROM shop_calendar
+ORDER BY shop_subdomain, dt

@@ -231,4 +231,3 @@ SELECT
             ELSE 'Other'
         END AS unified_landing_surface_area
 FROM final
-WHERE unified_traffic_source IS NOT NULL
