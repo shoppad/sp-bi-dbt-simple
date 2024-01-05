@@ -176,8 +176,8 @@ final AS (
     SELECT
         combined_attribution.* EXCLUDE (unified_traffic_source, unified_traffic_medium),
 
-            {# Referrer Mapping #}
-        lower(
+        {# Referrer Mapping #}
+        INITCAP(
             COALESCE(
                 referrer_mapping.source,
                 IFF(
@@ -189,10 +189,14 @@ final AS (
                 )
             )
         ) AS unified_traffic_source,
-        LOWER(
+        INITCAP(
             COALESCE(
                 referrer_mapping.medium,
-                unified_traffic_medium
+                IFF(
+                    (unified_traffic_medium IS NULL AND unified_referrer_host ILIKE '%apps.shopify.com%') OR unified_traffic_medium ILIKE '%apps.shopify.com%',
+                    'app store',
+                    unified_traffic_medium
+                )
             )
         ) AS unified_traffic_medium,
 
@@ -219,5 +223,12 @@ SELECT
         COALESCE(
             unified_app_store_surface_type ilike '%search_ad%',
             FALSE
-        ) AS is_app_store_search_ad_referral
+        ) AS is_app_store_search_ad_referral,
+        CASE
+            WHEN unified_traffic_url ILIKE '%getmesa.com/blog%' THEN 'Blog'
+            WHEN unified_traffic_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
+            WHEN unified_traffic_url ILIKE '%getmesa.com' THEN 'GetMesa Website'
+            ELSE 'Other'
+        END AS unified_landing_surface_area
 FROM final
+WHERE unified_traffic_source IS NOT NULL

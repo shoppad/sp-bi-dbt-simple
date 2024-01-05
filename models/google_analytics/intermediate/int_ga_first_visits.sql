@@ -15,6 +15,7 @@ WITH
         FROM first_visits
     )
 
-SELECT *
+SELECT
+    *
 FROM formatted_first_visits
 QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY first_touch_at_pt) = 1

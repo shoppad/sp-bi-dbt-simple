@@ -31,7 +31,7 @@
       "*.sql": "jinja-sql",
       "*.yml": "jinja-yaml"
     },
-    "sqlfluff.format.enabled": true,
+    "sqlfluff.format.enabled": false,
     "sqlfluff.suppressNotifications": false,
     "dbt.queryLimit": 20,
     "dbt.queryPreview.queryLimit": 250,
@@ -874,7 +874,9 @@
       "minified",
       "xaml",
       "sql"
-    ]
+    ],
+    "dbt-formatter.lowerWords": true,
+    "sql-formatter.uppercase": true
   },
   "extensions": {
       "recommendations": [

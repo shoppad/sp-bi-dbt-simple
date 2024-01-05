@@ -19,10 +19,10 @@ final AS (
         CASE
             {# If the traffic_source_medium is '(none)', then it's direct.
                 But first check if param_medium is set, and if so, use that instead. #}
-            WHEN traffic_source_medium = '(none)'
+            WHEN lower(traffic_source_medium) = '(none)'
                 THEN
                     CASE
-                        WHEN referrer_host = 'apps.shopify.com'
+                        WHEN lower(referrer_host) = 'apps.shopify.com'
                             THEN 'app store'
                         ELSE COALESCE(
                             param_medium,
@@ -36,18 +36,14 @@ final AS (
                             ) {# Do a bunch of stuff to override direct because of the way the
                                 App Store works. #}
                         )
-                END
-
+                    END
 
             {# Rename Shopify App Store to [medium:app store] #}
             WHEN
-                traffic_source_medium = 'referral' AND traffic_source_source ILIKE '%apps.shopify%'
+                lower(traffic_source_medium) = 'referral' AND traffic_source_source ILIKE '%apps.shopify%'
                     THEN 'app store'
 
-            {# Make "app" cuter as "PQL" #}
-            WHEN
-                traffic_source_medium = 'app'
-                    THEN 'PQL'
+            {# Fallback to original #}
             ELSE traffic_source_medium
             END AS traffic_source_medium,
 
@@ -85,5 +81,8 @@ final AS (
             )
 )
 
-SELECT *
+SELECT
+    * EXCLUDE (traffic_source_medium),
+    {# Make "app" cuter as "PQL" #}
+    IFF(lower(traffic_source_medium) = 'app', 'PQL', traffic_source_medium) AS traffic_source_medium
 FROM final
