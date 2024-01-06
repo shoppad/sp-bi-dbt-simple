@@ -227,7 +227,7 @@ SELECT
         CASE
             WHEN unified_traffic_url ILIKE '%getmesa.com/blog%' THEN 'Blog'
             WHEN unified_traffic_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
-            WHEN unified_traffic_url ILIKE '%getmesa.com' THEN 'GetMesa Website'
-            ELSE 'Other'
+            WHEN unified_traffic_url ILIKE '%getmesa.com' THEN SPLIT_PART(unified_traffic_path, '/', 2)
+            ELSE unified_traffic_url
         END AS unified_landing_surface_area
 FROM final
