@@ -82,7 +82,9 @@ final AS (
 )
 
 SELECT
-    * EXCLUDE (traffic_source_medium),
+    * EXCLUDE (traffic_source_medium, param_medium, manual_medium),
     {# Make "app" cuter as "PQL" #}
-    IFF(lower(traffic_source_medium) = 'app', 'PQL', traffic_source_medium) AS traffic_source_medium
+    IFF(lower(traffic_source_medium) = 'app', 'PQL', traffic_source_medium) AS traffic_source_medium,
+    IFF(lower(param_medium) = 'app', 'PQL', param_medium) AS param_medium,
+    IFF(lower(manual_medium) = 'app', 'PQL', manual_medium) AS manual_medium
 FROM final
