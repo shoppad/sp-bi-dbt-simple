@@ -573,8 +573,8 @@ final AS (
             AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
 
         CASE
-            WHEN install_status = 'uninstalled' OR has_ever_upgraded_to_paid_plan
-                THEN is_currently_paying
+            WHEN has_ever_upgraded_to_paid_plan
+                THEN install_status = 'uninstalled' OR NOT is_currently_paying
         END AS has_churned_paid,
 
         has_ever_upgraded_to_paid_plan AND plan_change_chain ilike '%$0' AS did_pay_and_then_downgrade_to_free,
