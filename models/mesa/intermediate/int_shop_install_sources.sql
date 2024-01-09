@@ -54,6 +54,8 @@ formatted_install_records as (
 combined_attribution AS (
     SELECT
         *,
+
+        {# Unified Columns #}
         REPLACE(COALESCE(
             ga_first_touch_traffic_source_source,
             ga_first_touch_param_source,
@@ -162,7 +164,132 @@ combined_attribution AS (
             app_store_install_referrer_host,
             app_store_ad_click_referrer_host,
             app_store_organic_click_referrer_host
-        ), 'www.', '') AS unified_referrer_host
+        ), 'www.', '') AS unified_referrer_host,
+
+        {# Chain Columns #}
+
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_traffic_source_source,
+                ga_first_touch_param_source,
+                ga_first_touch_manual_source,
+                segment_first_touch_traffic_source_source,
+                app_store_install_traffic_source_source,
+                app_store_install_param_source,
+                app_store_install_manual_source,
+                app_store_ad_click_traffic_source_source,
+                app_store_ad_click_param_source,
+                app_store_ad_click_manual_source,
+                app_store_organic_click_traffic_source_source,
+                app_store_organic_click_param_source,
+                app_store_organic_click_manual_source,
+                mesa_install_record_utm_source,
+                ga_last_touch_traffic_source_source,
+                ga_last_touch_param_source,
+                ga_last_touch_manual_source,
+                segment_last_touch_traffic_source_source
+            ), ' • '
+        ), 'www.', '') AS unified_source_chain,
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_traffic_source_medium,
+                ga_first_touch_param_medium,
+                ga_first_touch_manual_medium,
+                app_store_install_traffic_source_medium,
+                app_store_install_param_medium,
+                app_store_install_manual_medium,
+                segment_first_touch_traffic_source_medium,
+                app_store_ad_click_traffic_source_medium,
+                app_store_ad_click_param_medium,
+                app_store_ad_click_manual_medium,
+                app_store_organic_click_traffic_source_medium,
+                app_store_organic_click_param_medium,
+                app_store_organic_click_manual_medium,
+                mesa_install_record_utm_medium,
+                ga_last_touch_traffic_source_medium,
+                ga_last_touch_param_medium,
+                ga_last_touch_manual_medium,
+                segment_last_touch_traffic_source_medium
+            ), ' • '
+        ), 'www.', '') AS unified_medium_chain,
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_traffic_source_name,
+                ga_first_touch_param_campaign,
+                ga_first_touch_manual_campaign_name,
+                app_store_install_traffic_source_name,
+                app_store_install_param_campaign,
+                app_store_install_manual_campaign_name,
+                segment_first_touch_traffic_source_name,
+                app_store_ad_click_traffic_source_name,
+                app_store_ad_click_param_campaign,
+                app_store_ad_click_manual_campaign_name,
+                app_store_organic_click_traffic_source_name,
+                app_store_organic_click_param_campaign,
+                app_store_organic_click_manual_campaign_name,
+                mesa_install_record_utm_campaign,
+                ga_last_touch_traffic_source_name,
+                ga_last_touch_param_campaign,
+                ga_last_touch_manual_campaign_name,
+                segment_last_touch_traffic_source_name
+            ), ' • '
+        ), 'www.', '') AS unified_campaign_chain,
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+
+                ga_first_touch_page_location,
+                segment_first_touch_url,
+                ga_last_touch_page_location,
+                segment_last_touch_url
+            ), ' • '
+        ), 'www.', '') AS unified_url_chain,
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_page_location_path,
+                segment_first_touch_path,
+                ga_last_touch_page_location_path,
+                segment_last_touch_path
+            ), ' • '
+        ), 'www.', '') AS unified_path_chain,
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_page_location_host,
+                segment_first_touch_host,
+                ga_last_touch_page_location_host,
+                segment_last_touch_host
+            ), ' • '
+        ), 'www.', '') AS unified_page_host_chain,
+
+        ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_app_store_surface_type,
+                ga_last_touch_app_store_surface_type,
+                app_store_ad_click_app_store_surface_type,
+                app_store_organic_click_app_store_surface_type
+            ), ' • '
+        ) AS unified_app_store_surface_type_chain,
+
+        ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_app_store_surface_detail,
+                ga_last_touch_app_store_surface_detail,
+                app_store_ad_click_app_store_surface_detail,
+                app_store_organic_click_app_store_surface_detail
+            ), ' • '
+        ) AS unified_app_store_surface_detail_chain,
+
+        REPLACE(ARRAY_TO_STRING(
+            ARRAY_CONSTRUCT(
+                ga_first_touch_referrer_host,
+                ga_last_touch_referrer_host,
+                segment_first_touch_referrer_host,
+                segment_last_touch_referrer_host,
+                app_store_install_referrer_host,
+                app_store_ad_click_referrer_host,
+                app_store_organic_click_referrer_host
+            ), ' • '
+        ), 'www.', '') AS unified_referrer_host_chain
+
     FROM shops
     LEFT JOIN formatted_install_records USING (shop_subdomain)
     LEFT JOIN ga_attribution USING (shop_subdomain)
@@ -172,7 +299,7 @@ combined_attribution AS (
 
 referrer_mapping as (select * FROM {{ ref("referrer_mapping") }}),
 
-final AS (
+reformatted AS (
     SELECT
         combined_attribution.* EXCLUDE (unified_traffic_source, unified_traffic_medium),
 
@@ -212,23 +339,31 @@ final AS (
                 OR
                 lower(REPLACE(combined_attribution.unified_referrer_host, 'www.', ''))
                     = lower(referrer_mapping.host)
+),
+
+final AS (
+    SELECT
+        * EXCLUDE (first_installed_at_pt, unified_traffic_medium),
+        IFF(unified_traffic_medium ILIKE '%pql%', 'PQL Link', unified_traffic_medium) AS unified_traffic_medium,
+        COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND lower(unified_traffic_medium) = 'search'), FALSE) as is_blog_referral,
+        TIMEDIFF(
+            'days', unified_first_touch_at_pt, first_installed_at_pt
+        ) AS days_to_install,
+        COALESCE(
+            unified_app_store_surface_type ilike '%search_ad%',
+            FALSE
+        ) AS is_app_store_search_ad_referral,
+        NULLIF(CASE
+            WHEN unified_traffic_url ILIKE '%getmesa.com/blog%' OR unified_traffic_page_host = 'blog.getmesa.com' THEN 'Blog'
+            WHEN unified_traffic_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
+            WHEN unified_traffic_url ILIKE '%docs.getmesa%' THEN 'Support Site'
+            WHEN unified_traffic_url ILIKE '%getmesa.com/' THEN 'Homepage'
+            WHEN unified_traffic_url ILIKE '%app.getmesa%' THEN 'Inside App (Untrackable)'
+            WHEN unified_traffic_url ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(unified_traffic_path, '/', 2))
+            WHEN unified_traffic_url IS NULL THEN '(Untrackable)'
+            ELSE unified_traffic_url
+        END, '') AS unified_landing_surface_area
+    FROM reformatted
 )
 
-SELECT
-    * EXCLUDE (first_installed_at_pt, unified_traffic_medium),
-    IFF(unified_traffic_medium ILIKE '%pql%', 'PQL Link', unified_traffic_medium) AS unified_traffic_medium,
-    COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND lower(unified_traffic_medium) = 'search'), FALSE) as is_blog_referral,
-    TIMEDIFF(
-        'days', unified_first_touch_at_pt, first_installed_at_pt
-    ) AS days_to_install,
-    COALESCE(
-        unified_app_store_surface_type ilike '%search_ad%',
-        FALSE
-    ) AS is_app_store_search_ad_referral,
-    CASE
-        WHEN unified_traffic_url ILIKE '%getmesa.com/blog%' THEN 'Blog'
-        WHEN unified_traffic_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
-        WHEN unified_traffic_url ILIKE '%getmesa.com%' THEN SPLIT_PART(unified_traffic_path, '/', 2)
-        ELSE unified_traffic_url
-    END AS unified_landing_surface_area
-FROM final
+SELECT * FROM final

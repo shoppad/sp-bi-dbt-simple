@@ -4,7 +4,13 @@ with
         FROM {{ source("mesa_ga4", "events") }}
 
         {# You have to put page_location IS NULL or the next condition will nuke NULLs #}
-        WHERE page_location IS NULL OR page_location NOT ilike '%.pages.dev%'
+        WHERE page_location IS NULL OR (
+                page_location NOT ilike '%.pages.dev%'
+                AND
+                page_location NOT ilike '%2create.studio%'
+                AND
+                page_location NOT ILIKE '%wp-staging.net%'
+            )
         {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
         {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
     ),
