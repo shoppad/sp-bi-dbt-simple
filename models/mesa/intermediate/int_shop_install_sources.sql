@@ -216,8 +216,8 @@ final AS (
 
 SELECT
     * EXCLUDE (first_installed_at_pt, unified_traffic_medium),
-    IFF(unified_traffic_medium ILIKE '%pql%', 'PQL', unified_traffic_medium) AS unified_traffic_medium,
-    COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND unified_traffic_medium = 'search'), FALSE) as is_blog_referral,
+    IFF(unified_traffic_medium ILIKE '%pql%', 'PQL Link', unified_traffic_medium) AS unified_traffic_medium,
+    COALESCE((unified_traffic_url ILIKE '%getmesa.com/blog%' AND lower(unified_traffic_medium) = 'search'), FALSE) as is_blog_referral,
     TIMEDIFF(
         'days', unified_first_touch_at_pt, first_installed_at_pt
     ) AS days_to_install,
@@ -228,7 +228,7 @@ SELECT
     CASE
         WHEN unified_traffic_url ILIKE '%getmesa.com/blog%' THEN 'Blog'
         WHEN unified_traffic_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
-        WHEN unified_traffic_url ILIKE '%getmesa.com' THEN SPLIT_PART(unified_traffic_path, '/', 2)
+        WHEN unified_traffic_url ILIKE '%getmesa.com%' THEN SPLIT_PART(unified_traffic_path, '/', 2)
         ELSE unified_traffic_url
     END AS unified_landing_surface_area
 FROM final

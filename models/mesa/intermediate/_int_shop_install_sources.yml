@@ -38,6 +38,7 @@ models:
       - name: is_blog_referral
         tests:
           - not_null
+          - check_boolean_values
         description:
           Whether the Shop was referred/entered the marketing site by a blog
           post.

@@ -2,9 +2,29 @@ with
     raw_ga4_events AS (
         SELECT *
         FROM {{ source("mesa_ga4", "events") }}
-        WHERE ga_session_id is not NULL AND (page_location IS NULL OR NOT page_location ilike '%.pages.dev%')
+
+        {# You have to put page_location IS NULL or the next condition will nuke NULLs #}
+        WHERE page_location IS NULL OR page_location NOT ilike '%.pages.dev%'
         {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
         {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
+    ),
+
+    filtered_raw_ga4_events AS (
+        SELECT *
+        FROM raw_ga4_events
+        QUALIFY
+            ROW_NUMBER() OVER (
+                PARTITION BY
+                    user_pseudo_id,
+                    event_name,
+                    event_timestamp
+                ORDER BY
+                    NOT (ga_session_id IS NULL) DESC,
+                    NOT (category IS NULL) DESC,
+                    NOT (manual_medium IS NULL) DESC,
+                    NOT (param_medium IS NULL) DESC,
+                    NOT (name IS NULL) DESC
+            ) = 1
     ),
 
     ga4_events as (
@@ -89,7 +109,7 @@ with
                 as app_store_surface_inter_position,
             COALESCE(parsed_url:parameters:locale, parsed_referrer:parameters:locale)::STRING
                 as app_store_locale
-        FROM raw_ga4_events
+        FROM filtered_raw_ga4_events
     )
 
     {% set not_empty_string_fields = [
@@ -108,9 +128,9 @@ with
         "referrer_path",
         "shop_subdomain"
     ] %}
-select
-    *
-    exclude (parsed_url, parsed_referrer)
+
+SELECT
+    * exclude (parsed_url, parsed_referrer)
     replace (
         {% for field in not_empty_string_fields %}
             nullif({{ field }}, '') as {{ field }}{% if not loop.last %},{% endif %}

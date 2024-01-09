@@ -6,7 +6,7 @@ staged_ga4_events AS (
     FROM {{ ref("stg_ga4_events") }}
 ),
 
-final AS (
+reformatted AS (
 
     SELECT
         user_matching.shop_subdomain,
@@ -79,12 +79,18 @@ final AS (
                 OR
                 staged_ga4_events.shop_subdomain = user_matching.shop_subdomain
             )
+),
+
+final AS (
+
+    SELECT
+        * EXCLUDE (traffic_source_medium, param_medium, manual_medium),
+        {# Make "app" cuter as "PQL" #}
+        IFF(lower(traffic_source_medium) = 'app', 'PQL Link', traffic_source_medium) AS traffic_source_medium,
+        IFF(lower(param_medium) = 'app', 'PQL Link', param_medium) AS param_medium,
+        IFF(lower(manual_medium) = 'app', 'PQL Link', manual_medium) AS manual_medium
+    FROM reformatted
 )
 
-SELECT
-    * EXCLUDE (traffic_source_medium, param_medium, manual_medium),
-    {# Make "app" cuter as "PQL" #}
-    IFF(lower(traffic_source_medium) = 'app', 'PQL', traffic_source_medium) AS traffic_source_medium,
-    IFF(lower(param_medium) = 'app', 'PQL', param_medium) AS param_medium,
-    IFF(lower(manual_medium) = 'app', 'PQL', manual_medium) AS manual_medium
+SELECT *
 FROM final
