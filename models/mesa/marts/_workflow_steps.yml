@@ -7,27 +7,51 @@ models:
         Some records are for Deleted Workflows, so be sure to filter on is_deleted.
     columns:
       - name: workflow_step_id
+        description: Unique identifier for each workflow step.
         tests:
           - unique
           - not_null
       - name: shop_subdomain
+        description: Subdomain of the shop where the workflow step is executed.
         tests:
           - not_null
           - relationships:
               to: ref('shops')
               field: shop_subdomain
       - name: integration_app
+        description: The app integrated with the workflow step.
       - name: workflow_id
+        description: Identifier of the workflow that the step belongs to.
         tests:
           - not_null
           - relationships:
               to: ref('workflows')
               field: workflow_id
       - name: step_type
+        description: Type of the workflow step.
         tests:
           - not_null
       - name: step_weight
+        description: Weight of the workflow step.
       - name: position_in_workflow
+        description: Position of the step in the workflow.
       - name: is_deleted
+        description: Flag indicating if the workflow step is deleted.
         tests:
           - not_null
+      - name: created_at_pt
+        description: Timestamp when the workflow step was created.
+      - name: step_key
+        description: Key of the workflow step.
+      - name: step_name
+        description: Name of the workflow step.
+      - name: is_pro_app
+        description: Flag indicating if the workflow step is a pro app.
+      - name: run_count_success
+        description: Number of successful runs of the workflow step.
+      - name: run_count
+        description: Number of runs of the workflow step.
+      - name: run_success_rate
+        description: Success rate of the workflow step.
+      - name: run_count_failure
+        description: Number of failed runs of the workflow step.
