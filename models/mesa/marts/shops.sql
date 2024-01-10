@@ -652,7 +652,7 @@ final AS (
             datediff('days', first_plan_upgrade_date, churned_on_pt) / 30
         ) AS churned_customer_duration_in_months,
         COALESCE(
-            iff(projected_mrr > 0, projected_mrr, last_plan_price), 0
+            iff(projected_mrr > 0, projected_mrr, iff(last_plan_price > 0, last_plan_price, plan_price)), 0
         ) AS shop_value_per_month
 
     FROM shops

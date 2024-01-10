@@ -746,3 +746,21 @@ models:
         description: Whether there was an ad click in the app store during acquisition.
       - name: acq_unified_landing_surface_area
         description: The type of page the user first landed on during acquisition.
+      - name: acq_unified_campaign_chain
+        description: The campaign chain during acquisition.
+      - name: acq_unified_url_chain
+        description: The URL chain during acquisition.
+      - name: acq_unified_medium_chain
+        description: The medium chain during acquisition.
+      - name: acq_unified_source_chain
+        description: The source chain during acquisition.
+      - name: acq_unified_app_store_surface_type_chain
+        description: The chain of surface_types in the app store during acquisition.
+      - name: acq_unified_app_store_surface_detail_chain
+        description: The chain of surface_details in the app store during acquisition.
+      - name: acq_unified_path_chain
+        description: The URL path chain of important touch points during acquisition.
+      - name: acq_unified_page_host_chain
+        description: The host chain of important touch points during acquisition.
+      - name: acq_unified_referrer_host_chain
+        description: The referrer host chain of important touch points during acquisition.

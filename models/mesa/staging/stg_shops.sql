@@ -23,7 +23,7 @@ with
     custom_apps as (
         select
             shop_subdomain,
-            true as is_custom_app,
+            TRUE as is_custom_app,
             'custom app' as status,
             parse_json(
                 '{"plan_name": "none (custom app)", "currency": "usd"}'
@@ -68,25 +68,26 @@ with
             row_number() over (partition by shop_subdomain order by created_at desc) = 1
     ),
 
+    combined_uninstall_dates AS (
+        select
+            id as shop_subdomain, apps_mesa_uninstalledat as uninstalled_at_pt  -- note: this timestamp is already in pst
+        from {{ source("php_segment", "users") }}
+
+        union all
+        select shop_subdomain, uninstalled_at_pt  -- note: this timestamp is already in pst
+        from {{ ref("stg_mesa_uninstalls") }}
+
+        union all
+        select shop_subdomain, last_dt as uninstalled_at_pt
+        from custom_apps
+    ),
+
     uninstall_data_points as (
         select
             shop_subdomain,
-            iff(shops.status = 'active', null, uninstalled_at_pt) as uninstalled_at_pt
+            iff(shops.status = 'active', NULL, uninstalled_at_pt) as uninstalled_at_pt
         from shops
-        left join
-            (
-                select
-                    id as shop_subdomain, apps_mesa_uninstalledat as uninstalled_at_pt  -- note: this timestamp is already in pst
-                from {{ source("php_segment", "users") }}
-
-                union all
-                select shop_subdomain, uninstalled_at_pt  -- note: this timestamp is already in pst
-                from {{ ref("stg_mesa_uninstalls") }}
-
-                union all
-                select shop_subdomain, last_dt as uninstalled_at_pt
-                from custom_apps
-            ) using (shop_subdomain)
+        left join combined_uninstall_dates using (shop_subdomain)
     ),
 
     uninstall_dates as (
@@ -111,23 +112,24 @@ with
             shop_metas.aggregated_meta as meta,
             coalesce(shops.shopify, custom_apps.shopify) as shopify,
             shopify:id::variant as shopify_id,
+            shopify:name::string AS shop_name,
             coalesce(custom_apps.shopify:plan_name, shops.shopify:plan_name)::string
             as shopify_plan_name,
             coalesce(
                 shopify_plan_name
                 in ({{ "'" ~ var("zombie_store_shopify_plans") | join("', '") ~ "'" }}),
-                false
+                FALSE
             ) as is_shopify_zombie_plan,
             {{ pacific_timestamp("to_timestamp(shopify:updated_at)") }}
             as shopify_last_updated_at_pt,
             to_timestamp_ntz(billing:plan:trial_ends::varchar)::date
             as trial_end_dt_utc,
             iff(
-                uninstalled_at_pt is null,
-                null,
+                uninstalled_at_pt is NULL,
+                NULL,
                 {{ datediff("latest_installed_at_pt", "uninstalled_at_pt", "minute") }}
             ) as minutes_until_uninstall,
-            coalesce(is_custom_app, false) as is_custom_app
+            coalesce(is_custom_app, FALSE) as is_custom_app
         from shops
         full outer join custom_apps using (shop_subdomain)
         left join shop_metas using (shop_subdomain)
