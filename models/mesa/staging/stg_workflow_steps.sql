@@ -17,7 +17,7 @@ SELECT
     __hevo__marked_deleted AS is_deleted,
     IFF(is_deleted, 'DELETED - ' || workflow_steps.key, workflow_steps.key) AS step_key,
     workflow_steps.operation_id,
-    CONCAT(integration_app || ' - ' || operation_id) AS step_name,
+    CONCAT(integration_app::STRING || ' - ' || COALESCE(operation_id, integration_app::STRING)::STRING) AS step_name,
     REPLACE(REPLACE(IFF(is_deleted, 'DELETED - ' || trigger_name, trigger_name), 'In: ', ''), 'Out: ', '') AS step_custom_name,
     automation AS workflow_id,
     trigger_type AS step_type,
