@@ -23,6 +23,7 @@ with
             workflow_id as first_workflow_id,
             integration_app as first_workflow_trigger_app,
             step_key as first_workflow_trigger_key,
+            operation_id as first_workflow_trigger_operation_id,
             step_name as first_workflow_trigger_name,
             workflow_step_id as first_workflow_trigger_step_id,
             title as first_workflow_title,
@@ -45,6 +46,7 @@ with
             workflow_id as first_workflow_id,
             integration_app as first_workflow_destination_app,
             step_key as first_workflow_destination_key,
+            operation_id as first_workflow_destination_operation_id,
             step_name as first_workflow_destination_name
         from workflow_steps
         where
