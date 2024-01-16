@@ -4,6 +4,7 @@ WITH workflows AS (
     FROM {{ ref('stg_workflows') }}
 
 ),
+
 workflow_steps AS (
 
     SELECT *
@@ -31,7 +32,7 @@ app_chains AS (
     SELECT
         workflow_id,
         LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS app_chain,
-        LISTAGG(CONCAT(integration_app, ' → ' , step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
+        LISTAGG(step_name, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
     FROM workflow_steps
     GROUP BY 1
 ),
@@ -40,7 +41,7 @@ deleted_app_chains AS (
     SELECT
         workflow_id,
         LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS deleted_app_chain,
-        LISTAGG(CONCAT(integration_app, ' → ' , step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS deleted_step_chain
+        LISTAGG(CONCAT(integration_app, ' → ', step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS deleted_step_chain
     FROM deleted_workflow_steps
     GROUP BY 1
 ),
@@ -85,6 +86,14 @@ workflow_counts AS (
         1
 ),
 
+workflow_step_descriptions AS (
+    SELECT
+        workflow_id,
+        LISTAGG(description, ' • ') WITHIN GROUP (ORDER BY step_type, step_weight, position_in_workflow) AS step_descriptions
+    FROM workflow_steps
+    GROUP BY 1
+),
+
 final AS (
     SELECT * EXCLUDE (deleted_app_chain, deleted_step_chain),
         COALESCE(app_chains.app_chain, deleted_app_chains.deleted_app_chain) AS app_chain_with_deleted,
@@ -93,6 +102,7 @@ final AS (
     LEFT JOIN workflow_counts USING (workflow_id)
     LEFT JOIN app_chains USING (workflow_id)
     LEFT JOIN deleted_app_chains USING (workflow_id)
+    LEFT JOIN workflow_step_descriptions USING (workflow_id)
 )
 
 SELECT *

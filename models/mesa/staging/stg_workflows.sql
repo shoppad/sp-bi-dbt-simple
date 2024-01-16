@@ -6,7 +6,6 @@ source_workflows as (
 ),
 
 shops AS (
-
     SELECT shop_subdomain
     FROM {{ ref('stg_shops') }}
 
@@ -15,9 +14,8 @@ shops AS (
 workflows AS (
 
     SELECT
-        *,
-        uuid AS shop_subdomain,
-        __hevo__marked_deleted AS is_deleted
+        * RENAME uuid AS shop_subdomain, _id AS workflow_id, __hevo__marked_deleted AS is_deleted, name AS title, enabled AS is_enabled,
+        template AS template_name
     FROM source_workflows
 
 ),
@@ -25,22 +23,22 @@ workflows AS (
 final AS (
 
     SELECT
-        _id AS workflow_id,
+        workflow_id,
         {{ pacific_timestamp('created_at') }} AS created_at_pt,
         created_at_pt::DATE AS created_on_pt,
         created_by,
         COALESCE(CONTAINS(created_by, 'shoppad'), FALSE) AS is_created_by_shoppad,
         shop_subdomain,
-        name AS title,
+        title,
         COALESCE(is_premium, FALSE) AS is_premium,
         description,
         key,
         tags,
-        enabled AS is_enabled,
+        is_enabled,
         is_deleted,
         {# source AS first_step_app, #}
         {# destination AS last_step_app, TODO: Change to use Steps https://shoppad.slack.com/archives/D01UTNZKM6D/p1667343343556039 #}
-        template AS template_name,
+        template_name,
         {{ pacific_timestamp('updated_at') }} AS updated_at_pt,
         setup
     FROM workflows
