@@ -67,7 +67,20 @@ reformatted AS (
                 traffic_source_source ILIKE '%apps.shopify%'
                     THEN 'shopify'
             ELSE traffic_source_source
-            END AS traffic_source_source
+            END AS traffic_source_source,
+            NULLIF(
+                CASE
+                    WHEN page_location ILIKE '%getmesa.com/blog%' OR page_location_host = 'blog.getmesa.com' THEN 'Blog'
+                    WHEN page_location ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
+                    WHEN page_location ILIKE '%docs.getmesa%' THEN 'Support Site'
+                    WHEN page_location ILIKE '%getmesa.com/' THEN 'Homepage'
+                    WHEN page_location ILIKE '%app.getmesa%' THEN 'Inside App (Untrackable)'
+                    WHEN page_location ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(page_location_path, '/', 2))
+                    WHEN page_location IS NULL THEN '(Untrackable)'
+                    ELSE page_location
+                END,
+                ''
+                ) AS page_location_page_type
 
     FROM staged_ga4_events
     LEFT JOIN user_matching

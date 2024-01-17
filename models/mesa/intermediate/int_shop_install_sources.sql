@@ -134,6 +134,13 @@ combined_attribution AS (
             ga_last_touch_page_location_host,
             segment_last_touch_host
         ) AS unified_traffic_page_host,
+        COALESCE(
+            ga_first_touch_page_location_page_type,
+            segment_first_touch_page_type,
+            ga_last_touch_page_location_page_type,
+            segment_last_touch_page_type
+        ) AS unified_traffic_page_type,
+
         LEAST(
             ga_first_touch_at_pt,
             segment_first_touch_at_pt,
@@ -362,7 +369,7 @@ final AS (
             WHEN unified_traffic_url ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(unified_traffic_path, '/', 2))
             WHEN unified_traffic_url IS NULL THEN '(Untrackable)'
             ELSE unified_traffic_url
-        END, '') AS unified_landing_surface_area
+        END, '') AS unified_landing_page_type
     FROM reformatted
 )
 

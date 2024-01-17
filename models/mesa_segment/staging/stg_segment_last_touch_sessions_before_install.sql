@@ -63,7 +63,17 @@ with
             coalesce(utm_source, referrer_source) as last_touch_traffic_source_source,
             referrer as last_touch_referrer,
             referrer_host as last_touch_referrer_host,
-            device_category as last_touch_device_category
+            device_category as last_touch_device_category,
+            NULLIF(CASE
+                WHEN last_touch_url ILIKE '%getmesa.com/blog%' OR last_touch_host = 'blog.getmesa.com' THEN 'Blog'
+                WHEN last_touch_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
+                WHEN last_touch_url ILIKE '%docs.getmesa%' THEN 'Support Site'
+                WHEN last_touch_url ILIKE '%getmesa.com/' THEN 'Homepage'
+                WHEN last_touch_url ILIKE '%app.getmesa%' THEN 'Inside App (Untrackable)'
+                WHEN last_touch_url ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(last_touch_path, '/', 2))
+                WHEN last_touch_url IS NULL THEN '(Untrackable)'
+                ELSE last_touch_url
+                END, '') AS last_touch_page_type
         from last_touch_sessions
     )
 

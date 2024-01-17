@@ -50,6 +50,16 @@ with
             first_page_url_host as first_touch_host,
             first_page_url_path as first_touch_path,
             first_page_url_query as first_touch_query,
+            NULLIF(CASE
+                WHEN first_page_url ILIKE '%getmesa.com/blog%' OR first_touch_host = 'blog.getmesa.com' THEN 'Blog'
+                WHEN first_page_url ILIKE '%apps.shopify.com/mesa%' THEN 'Shopify App Store'
+                WHEN first_page_url ILIKE '%docs.getmesa%' THEN 'Support Site'
+                WHEN first_page_url ILIKE '%getmesa.com/' THEN 'Homepage'
+                WHEN first_page_url ILIKE '%app.getmesa%' THEN 'Inside App (Untrackable)'
+                WHEN first_page_url ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(first_touch_path, '/', 2))
+                WHEN first_page_url IS NULL THEN '(Untrackable)'
+                ELSE first_page_url
+                END, '') AS first_touch_page_type,
             utm_content as first_touch_traffic_source_content,
             utm_campaign as first_touch_traffic_source_name,
             coalesce(utm_medium, referrer_medium) as first_touch_traffic_source_medium,
