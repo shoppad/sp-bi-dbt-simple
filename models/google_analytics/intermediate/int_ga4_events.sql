@@ -48,6 +48,10 @@ reformatted AS (
             END AS traffic_source_medium,
 
         CASE
+            WHEN app_store_surface_type = 'search_ad'
+                THEN 'App Store - CPC'
+            WHEN app_store_surface_type = 'search'
+                THEN 'App Store - Organic Search'
             WHEN
                 traffic_source_source ILIKE '%direct%'
                     THEN COALESCE(
