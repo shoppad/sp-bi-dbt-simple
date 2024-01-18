@@ -17,13 +17,19 @@ reformatted AS (
         {# Manual reformatting based on experience. #}
 
         CASE
+            WHEN app_store_surface_type = 'search_ad'
+                THEN 'App Store - CPC'
+            WHEN app_store_surface_type = 'search'
+                THEN 'App Store - Organic Search'
+            WHEN app_store_surface_type IS NOT NULL
+                THEN 'App Store - ' || app_store_surface_type
             {# If the traffic_source_medium is '(none)', then it's direct.
                 But first check if param_medium is set, and if so, use that instead. #}
             WHEN lower(traffic_source_medium) = '(none)'
                 THEN
                     CASE
                         WHEN lower(referrer_host) = 'apps.shopify.com'
-                            THEN 'app store'
+                            THEN 'App Store - Direct/Other'
                         ELSE COALESCE(
                             param_medium,
                             IFF(
@@ -32,7 +38,7 @@ reformatted AS (
                                 NULL
                             ),
                             IFF(
-                                referrer_full ILIKE '%apps.shopify.com%', 'app store', 'direct'
+                                referrer_full ILIKE '%apps.shopify.com%', 'App Store - Direct/Other', 'direct'
                             ) {# Do a bunch of stuff to override direct because of the way the
                                 App Store works. #}
                         )
@@ -41,17 +47,13 @@ reformatted AS (
             {# Rename Shopify App Store to [medium:app store] #}
             WHEN
                 lower(traffic_source_medium) = 'referral' AND traffic_source_source ILIKE '%apps.shopify%'
-                    THEN 'app store'
+                    THEN 'App Store - Direct/Other'
 
             {# Fallback to original #}
             ELSE traffic_source_medium
             END AS traffic_source_medium,
 
         CASE
-            WHEN app_store_surface_type = 'search_ad'
-                THEN 'App Store - CPC'
-            WHEN app_store_surface_type = 'search'
-                THEN 'App Store - Organic Search'
             WHEN
                 traffic_source_source ILIKE '%direct%'
                     THEN COALESCE(
