@@ -23,6 +23,8 @@ sources:
       identifier: false
 
     tables:
+      - name: temp_shopify_partner_events
+        identifier: shopify_partner_app_events
       - name: workflows
         identifier: m3_mesa_automations
         description: individual workflow records with user-input name, description, starting time and more.

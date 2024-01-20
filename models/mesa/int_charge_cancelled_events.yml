@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: int_charge_cancelled_events
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: event_type
+      - name: occurred_at
+      - name: reason
+      - name: description
+      - name: is_cancelled_from_uninstall

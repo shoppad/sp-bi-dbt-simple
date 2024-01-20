@@ -439,6 +439,53 @@ inc_amount_days_and_day_befores AS (
     FROM {{ ref("mesa_shop_days") }}
 ),
 
+shop_freezes AS (
+    SELECT *
+    FROM {{ ref('int_frozen_store_events') }}
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
+    ) = 1
+),
+
+cancelled_charge_events AS (
+    SELECT *
+    FROM {{ ref('int_charge_cancelled_events') }}
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
+    ) = 1
+),
+
+shop_deactivated_events AS (
+    SELECT *
+    FROM {{ ref('int_shop_deactivated_events') }}
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
+    ) = 1
+),
+
+churn_types AS (
+    SELECT
+        shop_subdomain,
+        CASE
+            WHEN has_ever_upgraded_to_paid_plan
+                THEN
+                    CASE
+                        WHEN shop_deactivated_events.occurred_at IS NOT NULL
+                            THEN 'shop-deactivated'
+                        WHEN cancelled_charge_events.occurred_at IS NOT NULL
+                            THEN IFF(is_cancelled_from_uninstall, 'uninstalled', 'downgraded')
+                        WHEN shop_freezes.occurred_at IS NOT NULL
+                            THEN 'shop-frozen'
+                        WHEN install_status = 'uninstalled'
+                            THEN 'uninstalled'
+                    END
+        END AS churn_type
+    FROM shops
+    LEFT JOIN shop_freezes USING (shop_subdomain)
+    LEFT JOIN cancelled_charge_events USING (shop_subdomain)
+    LEFT JOIN shop_deactivated_events USING (shop_subdomain)
+),
+
 churn_dates AS (
     SELECT
         shop_subdomain,
@@ -463,7 +510,8 @@ final AS (
             avg_current_gmv_usd,
             avg_initial_gmv_usd,
             churned_on_pt,
-            last_plan_price
+            last_plan_price,
+            churn_type
         )
         REPLACE (
             (
@@ -576,7 +624,7 @@ final AS (
             WHEN has_ever_upgraded_to_paid_plan
                 THEN install_status = 'uninstalled' OR NOT is_currently_paying
         END AS has_churned_paid,
-
+        IFF(has_churned_paid, churn_type, NULL) AS churn_type, {# Don't provide a churn type if they haven't churned. #}
         has_ever_upgraded_to_paid_plan AND plan_change_chain ilike '%$0' AS did_pay_and_then_downgrade_to_free,
 
         CASE has_done_a_trial
@@ -682,6 +730,7 @@ final AS (
     LEFT JOIN first_newsletter_deliveries USING (shop_subdomain)
     LEFT JOIN first_journey_deliveries USING (shop_subdomain)
     LEFT JOIN churn_dates USING (shop_subdomain)
+    LEFT JOIN churn_types USING (shop_subdomain)
     LEFT JOIN workflow_source_destination_pairs USING (shop_subdomain)
     LEFT JOIN last_plan_prices USING (shop_subdomain)
 )

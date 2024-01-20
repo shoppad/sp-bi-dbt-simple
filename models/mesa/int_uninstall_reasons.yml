@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: int_uninstall_reasons
+    columns:
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: uninstall_reasons
+      - name: uninstall_reason_details

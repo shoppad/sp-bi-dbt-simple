@@ -153,7 +153,6 @@ models:
           +unique_key: workflow_id
 
         shops:
-          +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
 
       intermediate:

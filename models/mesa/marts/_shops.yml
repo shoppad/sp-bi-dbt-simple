@@ -744,7 +744,7 @@ models:
         description: Whether there was an organic click in the app store during acquisition.
       - name: acq_app_store_has_ad_click
         description: Whether there was an ad click in the app store during acquisition.
-      - name: acq_unified_landing_surface_area
+      - name: acq_unified_traffic_page_type
         description: The type of page the user first landed on during acquisition.
       - name: acq_unified_campaign_chain
         description: The campaign chain during acquisition.
@@ -764,3 +764,15 @@ models:
         description: The host chain of important touch points during acquisition.
       - name: acq_unified_referrer_host_chain
         description: The referrer host chain of important touch points during acquisition.
+      - name: first_workflow_destination_operation_id
+        description: The operation ID of the first workflow destination.
+      - name: acq_unified_traffic_page_type
+        description: The type of page the user first landed on during acquisition.
+      - name: first_workflow_trigger_operation_id
+        description: The operation ID of the first workflow trigger.
+      - name: shop_name
+        description: The name of the shop.
+      - name: churn_type
+        description: The type of churn event.
+      - name: acq_unified_landing_page_type
+        description: The type of landing page during acquisition.
