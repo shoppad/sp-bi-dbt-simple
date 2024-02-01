@@ -1,6 +1,7 @@
 {% set source_table = ref("stg_shops") %}
 with
-    decorated_shops as (
+
+decorated_shops as (
         {% set columns_to_skip = [
             "scopes",
             "billing",
@@ -41,7 +42,7 @@ with
             analytics:orders:gmv::numeric as shopify_shop_gmv_current_total,
             analytics:initial:shopify_plan_name::string as initial_shopify_plan_name,
             coalesce(
-                wizard:builder:step = 'complete', false
+                wizard:builder:step = 'complete', FALSE
             ) as is_builder_wizard_completed,
             {{ datediff("shopify_shop_created_at_pt", "first_installed_at_pt", "day") }}
             as age_of_store_at_install_in_days,
@@ -85,10 +86,10 @@ with
             iff(
                 meta_attribs.value:name = 'launchsessiondate',
                 meta_attribs.value:value::date,
-                null
+                NULL
             ) as launch_session_date,
             not launch_session_date
-            is null as has_had_launch_session
+            is NULL as has_had_launch_session
         from {{ ref("stg_shops") }}, lateral flatten(input => meta) as meta_attribs
     ),
 
@@ -139,7 +140,7 @@ with
             1.0
             * shopify_shop_gmv_current_total
             * in_usd as shopify_shop_gmv_current_total_usd,
-            coalesce(in_usd is null, false) as currency_not_supported,
+            coalesce(in_usd is NULL, FALSE) as currency_not_supported,
             first_trial_start_date - first_installed_on_pt as days_until_first_trial,
             first_plan_upgrade_date
             - first_installed_on_pt as days_until_first_plan_upgrade

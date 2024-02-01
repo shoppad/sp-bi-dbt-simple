@@ -3,7 +3,7 @@ models:
   - name: stg_mesa_billing_accounts
     tests:
       - dbt_utils.equal_rowcount:
-          compare_model: ref('int_shops')
+          compare_model: ref('shops')
     columns:
       - name: SHOP_subdomain
         tests:
