@@ -224,3 +224,5 @@ models:
           - not_null
       - name: created_by
         description: The user who created the workflow.
+      - name: step_descriptions
+        description: The descriptions of the steps in the workflow.

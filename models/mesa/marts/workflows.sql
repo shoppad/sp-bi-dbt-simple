@@ -116,7 +116,9 @@ workflow_enables AS (
 workflow_triggers AS (
     SELECT
         workflow_id,
-        integration_app AS trigger_app
+        integration_app AS trigger_app,
+        step_name AS trigger_step_name,
+        operation_id AS trigger_operation_id
     FROM workflow_steps
     WHERE step_type = 'input'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id) = 1
@@ -125,7 +127,9 @@ workflow_triggers AS (
 workflow_destinations AS (
     SELECT
         workflow_id,
-        integration_app AS destination_app
+        integration_app AS destination_app,
+        step_name AS destination_step_name,
+        operation_id AS destination_operation_id
     FROM workflow_steps
     WHERE step_type = 'output'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id DESC) = 1
@@ -136,7 +140,7 @@ final AS (
         *,
         trigger_app || ' - ' || destination_app AS source_destination_pair,
         COALESCE(template_name IS NOT NULL AND template_name != '', FALSE) AS is_from_template,
-        COALESCE(app_chain ILIKE ANY('%googlesheets%', '%recharge%', '%infiniteoptions%', '%tracktor%', '%openai%', '%slack%'), FALSE) AS is_puc
+        COALESCE(app_chain ILIKE ANY ('%googlesheets%', '%recharge%', '%infiniteoptions%', '%tracktor%', '%openai%', '%slack%'), FALSE) AS is_puc
     FROM workflows
     LEFT JOIN page_views USING (shop_subdomain, workflow_id)
     LEFT JOIN test_counts USING (workflow_id)
