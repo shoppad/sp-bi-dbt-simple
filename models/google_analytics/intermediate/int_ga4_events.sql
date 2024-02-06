@@ -81,6 +81,7 @@ reformatted AS (
                     WHEN page_location ILIKE '%docs.getmesa%' THEN 'Support Site'
                     WHEN page_location ILIKE '%getmesa.com/' THEN 'Homepage'
                     WHEN page_location ILIKE '%app.getmesa%' THEN 'Inside App (Untrackable)'
+                    WHEN REGEXP_LIKE(page_location_path, '^/apps/[^/]+/integrate/[^/]+/[^/]+$') THEN 'Template'
                     WHEN page_location ILIKE '%getmesa.com%' THEN initcap(SPLIT_PART(page_location_path, '/', 2))
                     WHEN page_location IS NULL THEN '(Untrackable)'
                     ELSE page_location

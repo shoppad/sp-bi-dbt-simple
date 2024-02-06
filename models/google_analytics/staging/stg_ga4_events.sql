@@ -72,7 +72,7 @@ with
             {# Page components #}
             parse_url(page_location) as parsed_url,
             parsed_url:host::STRING as page_location_host,
-            '/' || parsed_url:path as page_location_path,
+            '/' || RTRIM(parsed_url:path, '/') as page_location_path,
             '?' || parsed_url:query as page_location_query,
             page_location_host || page_location_path AS page_location_url,
             page_location_host || page_location_path || COALESCE(page_location_query, '') AS page_location,
