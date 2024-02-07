@@ -2,7 +2,7 @@ WITH
 user_matching AS (SELECT * FROM {{ ref("stg_anonymous_to_known_user_matching") }}),
 
 staged_ga4_events AS (
-    SELECT *
+    SELECT * REPLACE (REPLACE(user_pseudo_id, 'random', '') AS user_pseudo_id)
     FROM {{ ref("stg_ga4_events") }}
 ),
 
