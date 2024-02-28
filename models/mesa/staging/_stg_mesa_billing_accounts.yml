@@ -14,23 +14,43 @@ models:
           - not_null
           - accepted_values:
               values: ["shopify", "chargebee"]
-      - name: DAILY_PLAN_REVENUE
-      - name: BALANCE_USED
-      - name: SHOPIFY_ID
-      - name: PLAN_PRICE
-      - name: PLAN_USED
-      - name: STATUS
-      - name: PERCENT_COMPLETE
-      - name: BILLING_ON_PT
-      - name: PLAN_NAME
-      - name: PERCENT_USED
-      - name: OVERLIMIT_DATE_PT
-      - name: BALANCE_REMAINING
-      - name: TRIAL_ENDS_PT
-      - name: CHARGEBEE_ID
-      - name: PLAN_TYPE
-      - name: DAYS_COMPLETE
-      - name: PLAN_ID
-      - name: PLAN_INTERVAL
-      - name: TRIAL_DAYS
-      - name: BILLING_UPDATED_AT_PT
+      - name: daily_plan_revenue
+        description: The revenue generated from the plan on a daily basis.
+      - name: balance_used
+        description: The amount of the plan's balance that has been used.
+      - name: shopify_id
+        description: The unique identifier for the shop in Shopify.
+      - name: plan_price
+        description: The price of the plan.
+      - name: plan_used
+        description: The extent to which the plan's resources have been utilized.
+      - name: status
+        description: The current status of the billing account.
+      - name: percent_complete
+        description: The percentage of the plan period that has been completed.
+      - name: billing_on_pt
+        description: The billing date in Pacific Time.
+      - name: plan_name
+        description: The name of the plan.
+      - name: percent_used
+        description: The percentage of the plan's resources that have been used.
+      - name: overlimit_date_pt
+        description: The date on which the plan's limits were exceeded, in Pacific Time.
+      - name: balance_remaining
+        description: The remaining balance of the plan.
+      - name: trial_ends_pt
+        description: The end date of the trial period, in Pacific Time.
+      - name: chargebee_id
+        description: The unique identifier for the account in Chargebee.
+      - name: plan_type
+        description: The type of plan (e.g., monthly, yearly).
+      - name: days_complete
+        description: The number of days that have been completed in the current plan period.
+      - name: plan_id
+        description: The unique identifier for the plan.
+      - name: plan_interval
+        description: The interval at which the plan renews (e.g., monthly, annually).
+      - name: trial_days
+        description: The number of days in the trial period.
+      - name: billing_updated_at_pt
+        description: The last time the billing information was updated, in Pacific Time.

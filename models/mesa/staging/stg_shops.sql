@@ -10,7 +10,7 @@ with
     ),
 
     trimmed_shops as (
-        {% set exclude = ["_id", "_created_at", "timestamp", "method"] + var(
+        {% set exclude = ["_id", "_created_at", "timestamp", "method", "oauth_account"] + var(
             "etl_fields"
         ) -%}
 
