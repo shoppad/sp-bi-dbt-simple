@@ -37,6 +37,7 @@ WITH
             support_lastreplyat,
             {{ pacific_timestamp('apps_mesa_support_reviewrequestedat') }} AS app_store_review_requested_at_pt,
             {{ pacific_timestamp('apps_mesa_shopify_appstorereviewat') }} AS app_store_reviewed_at_pt,
+            app_store_reviewed_at_pt IS NOT NULL AS has_app_store_reviewed,
             COALESCE(support_lastreplyat IS NOT NULL, FALSE) AS has_contacted_support,
             COALESCE((1.0 * analytics_gmv * in_usd) > 3000, FALSE)
                 OR
