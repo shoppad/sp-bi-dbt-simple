@@ -10,24 +10,24 @@
     "kitkarts",
 ] -%}
 
-with
-    conversion_rates as (
-        select currency as analytics_currency, in_usd
-        from {{ ref("currency_conversion_rates") }}
+WITH
+    conversion_rates AS (
+        SELECT currency AS analytics_currency, in_usd
+        FROM {{ ref("currency_conversion_rates") }}
     ),
 
     constellation_users as (
-        select
-            coalesce(uuid, id) as shop_subdomain,
-            createdat as first_in_constellation_at_utc,
+        SELECT
+            COALESCE(uuid, id) AS shop_subdomain,
+            createdat AS first_in_constellation_at_utc,
             {{ pacific_timestamp("first_in_constellation_at_utc") }}
-            as first_in_constellation_at_pt,
-            first_in_constellation_at_pt::date as first_in_constellation_on_pt,
-            date_trunc(
+                AS first_in_constellation_at_pt,
+            first_in_constellation_at_pt::DATE AS first_in_constellation_on_pt,
+            DATE_TRUNC(
                 'week', first_in_constellation_on_pt
-            ) as constellation_cohort_week,
-            coalesce(updatedat, createdat, uuid_ts) as updated_at,
-            1.0 * analytics_gmv * in_usd as analytics_gmv,
+            ) AS constellation_cohort_week,
+            COALESCE(updatedat, createdat, uuid_ts) AS updated_at,
+            1.0 * analytics_gmv * in_usd AS analytics_gmv,
             analytics_orders,
             shopify_createdat,
             shopify_inactiveat,
@@ -35,13 +35,15 @@ with
             analytics_currency,
             shopify_planname,
             support_lastreplyat,
-            coalesce(support_lastreplyat is not null, false) as has_contacted_support,
-            coalesce((1.0 * analytics_gmv * in_usd) > 3000, false)
-            or shopify_planname
-            in ('professional', 'unlimited', 'shopify_plus') as is_mql,
+            {{ pacific_timestamp('apps_mesa_support_reviewrequestedat') }} AS app_store_review_requested_at_pt,
+            {{ pacific_timestamp('apps_mesa_shopify_appstorereviewat') }} AS app_store_reviewed_at_pt,
+            COALESCE(support_lastreplyat IS NOT NULL, FALSE) AS has_contacted_support,
+            COALESCE((1.0 * analytics_gmv * in_usd) > 3000, FALSE)
+                OR
+                shopify_planname IN ('professional', 'unlimited', 'shopify_plus') AS is_mql,
             {%- for app in constellation_apps %}
-                coalesce(
-                    coalesce(
+                COALESCE(
+                    COALESCE(
                         apps_
                         {%- if app == "infinite_options" -%} customizery
                         {%- else -%} {{ app }}
@@ -49,76 +51,76 @@ with
                         apps_
                         {%- if app == "infinite_options" -%} customizery
                         {%- else -%} {{ app }}
-                        {%- endif -%} _installedat is not null
+                        {%- endif -%} _installedat IS NOT NULL
                     ),
-                    false
-                ) as has_{{ app }},
-                coalesce(
+                    FALSE
+                ) AS has_{{ app }},
+                COALESCE(
                     apps_
                     {%- if app == "infinite_options" -%} customizery
                     {%- else -%} {{ app }}
-                    {%- endif -%} _installedat is not null,
-                    false
-                ) as has_ever_installed_{{ app }}
+                    {%- endif -%} _installedat IS NOT NULL,
+                    FALSE
+                ) AS has_ever_installed_{{ app }}
                 {%- if not loop.last %}, {% endif -%}
             {%- endfor %},
-            coalesce(
+            COALESCE(
                 {%- for app in constellation_apps -%}
-                    has_{{ app }} {%- if not loop.last %} or {% endif -%}
+                    has_{{ app }} {%- if not loop.last %} OR {% endif -%}
                 {% endfor %},
-                false
-            ) as has_shoppad_constellation_app,
-            coalesce(
+                FALSE
+            ) AS has_shoppad_constellation_app,
+            COALESCE(
                 {%- for app in constellation_apps %}
                     apps_
                     {%- if app == "infinite_options" -%} customizery
                     {%- else -%} {{ app }}
                     {%- endif -%} _installedat < apps_mesa_installedat
-                    {%- if not loop.last %} or {% endif -%}
+                    {%- if not loop.last %} OR {% endif -%}
                 {% endfor %},
-                false
-            ) as did_install_another_shoppad_app_first,
-            coalesce(did_install_another_shoppad_app_first, false) as is_pql,
-            case
+                FALSE
+            ) AS did_install_another_shoppad_app_first,
+            COALESCE(did_install_another_shoppad_app_first, FALSE) AS is_pql,
+            CASE
                 {% for app in constellation_apps -%}
-                    when
+                    WHEN
                         apps_
                         {%- if app == "infinite_options" -%} customizery
                         {%- else -%} {{ app }}
                         {%- endif -%} _installedat < apps_mesa_installedat
-                    then '{{ app }}'
+                    THEN '{{ app }}'
                 {% endfor -%}
-                else 'mesa'
-            end as first_shoppad_app_installed,
+                ELSE 'mesa'
+            END AS first_shoppad_app_installed,
 
-            least(
+            LEAST(
                 {%- for app in constellation_apps %}
-                    coalesce(
+                    COALESCE(
                         apps_
                         {%- if app == "infinite_options" -%} customizery
                         {%- else -%} {{ app }}
                         {%- endif -%} _installedat,
-                        current_timestamp()
+                        CURRENT_TIMESTAMP()
                     )
                     {%- if not loop.last %}, {% endif -%}
                 {% endfor %},
-                coalesce(apps_mesa_installedat, current_timestamp())
-            ) as first_shoppad_app_installed_at_utc,
+                COALESCE(apps_mesa_installedat, CURRENT_TIMESTAMP())
+            ) AS first_shoppad_app_installed_at_utc,
             {{ pacific_timestamp("first_shoppad_app_installed_at_utc") }}
-            as first_shoppad_app_installed_at_pt,
-            array_to_string(
-                array_sort(split(apps_mesa_meta_appsused_value, ',')), ','
-            ) as apps_used,
-            array_to_string(
-                array_sort(array_except(split(apps_used, ','), {{ var("glue_apps") }})),
+            AS first_shoppad_app_installed_at_pt,
+            ARRAY_TO_STRING(
+                ARRAY_SORT(SPLIT(apps_mesa_meta_appsused_value, ',')), ','
+            ) AS apps_used,
+            ARRAY_TO_STRING(
+                ARRAY_SORT(ARRAY_EXCEPT(SPLIT(apps_used, ','), {{ var("glue_apps") }})),
                 ','
-            ) as apps_used_without_glue
-        from {{ source("php_segment", "users") }}
-        left join conversion_rates using (analytics_currency)
-        qualify
-            row_number() over (partition by coalesce(uuid, id) order by createdat desc)
+            ) AS apps_used_without_glue
+        FROM {{ source("php_segment", "users") }}
+        LEFT JOIN conversion_rates USING (analytics_currency)
+        QUALIFY
+            ROW_NUMBER() OVER (PARTITION BY COALESCE(uuid, id) ORDER BY createdat DESC)
             = 1
     )
 
-select *
-from constellation_users
+SELECT *
+FROM constellation_users
