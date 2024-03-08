@@ -111,7 +111,13 @@ final AS (
         {# Make "app" cuter as "PQL" #}
         IFF(lower(traffic_source_medium) = 'app', 'PQL Link', traffic_source_medium) AS traffic_source_medium,
         IFF(lower(param_medium) = 'app', 'PQL Link', param_medium) AS param_medium,
-        IFF(lower(manual_medium) = 'app', 'PQL Link', manual_medium) AS manual_medium
+        IFF(lower(manual_medium) = 'app', 'PQL Link', manual_medium) AS manual_medium,
+        ROW_NUMBER() OVER (PARTITION BY event_name, ga_session_id ORDER BY event_timestamp_pt ASC) AS event_order,
+        event_name = 'page_view'
+        AND LAG(event_timestamp_pt) OVER (PARTITION BY event_name, ga_session_id ORDER BY event_timestamp_pt ASC) IS NULL AS is_landing_pageview,
+        event_name = 'page_view'
+        AND LEAD(event_timestamp_pt) OVER (PARTITION BY event_name, ga_session_id ORDER BY event_timestamp_pt ASC) IS NULL AS is_exit_pageview
+
     FROM reformatted
 )
 
