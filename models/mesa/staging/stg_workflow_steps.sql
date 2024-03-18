@@ -32,7 +32,8 @@ final AS (
         CONCAT(integration_app::STRING || ' - ' || COALESCE(operation_id, NULLIF(entity || '_' || action, '_'), integration_app::STRING)::STRING) AS step_name,
         REPLACE(REPLACE(IFF(is_deleted, 'DELETED - ' || trigger_name, trigger_name), 'In: ', ''), 'Out: ', '') AS step_custom_name,
         ROW_NUMBER() OVER (PARTITION BY workflow_id, step_type ORDER BY step_weight) as position_in_workflow,
-        integration_app IN ('{{ var("pro_apps") | join("', '") }}') AS is_pro_app
+        integration_app IN ('{{ var("pro_apps") | join("', '") }}') AS is_pro_app,
+        metadata::STRING AS metadata
     FROM workflow_steps
     LEFT JOIN workflows USING (workflow_id)
 )
