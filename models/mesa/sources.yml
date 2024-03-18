@@ -192,6 +192,7 @@ sources:
             description: unique identifier for the flow event.
       - name: workflow_events
         identifier: automation
+        freshness: null
         columns:
           - name: id
             description: unique identifier for the workflow event.
