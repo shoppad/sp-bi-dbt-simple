@@ -36,7 +36,7 @@ WITH
                 THEN billing:plan_interval
                 ELSE billing:plan:interval
             END::STRING AS plan_interval,
-            billing:plan_price::STRING AS plan_price,
+            billing:plan_price::NUMERIC AS plan_price,
             {# IFF(billing:plan_price = '', NULL, billing:plan_price)::NUMERIC AS plan_price, #}
             IFF(billing:plan:balance_used = '', NULL, billing:plan:balance_used)::NUMERIC AS balance_used,
             billing:plan_type::STRING AS plan_type,
