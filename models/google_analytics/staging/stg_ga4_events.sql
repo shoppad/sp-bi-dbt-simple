@@ -10,6 +10,9 @@ with
                 page_location NOT ilike '%2create.studio%'
                 AND
                 page_location NOT ILIKE '%wp-staging.net%'
+                AND
+                {# Remove referral spam #}
+                NOT (page_location ILIKE 'https://getmesa%' AND name ILIKE '%referral%')
             )
         {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
         {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
