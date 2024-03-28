@@ -1,14 +1,12 @@
 SELECT
-    SPLIT_PART("Currency", '/', 1) AS currency,
-    "Value" AS in_usd,
-    "Date" AS exchange_rate_at
+    quote_currency_id AS currency,
+    value AS in_usd,
+    date AS exchange_rate_at
 FROM {{ source('economy_data', 'currency_conversion_rates') }}
-WHERE "Indicator Name" = 'Close'
-    AND "Frequency" = 'D'
-    AND "Currency Unit" = 'USD'
-QUALIFY ROW_NUMBER() OVER (PARTITION BY "Currency Name" ORDER BY "Date" DESC) = 1
+WHERE base_currency_id = 'USD'
+{# QUALIFY ROW_NUMBER() OVER (PARTITION BY "Currency Name" ORDER BY "Date" DESC) = 1 #}
 UNION ALL
 SELECT
-    'USD',
-    1,
+    'USD' AS currency,
+    1 AS in_usd,
     CURRENT_DATE() AS exchange_rate_at
