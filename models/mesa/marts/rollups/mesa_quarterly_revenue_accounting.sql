@@ -48,6 +48,7 @@ WITH
                 case when last_q.inc_amount > 0 and (this_q.shop_subdomain is NULL or this_q.inc_amount = 0)
                 then last_q.inc_amount else 0 end
             ) as churned,
+            (contraction + churned) AS lost_revenue,
             COUNT(DISTINCT this_q.shop_subdomain) AS customer_count,
             COUNT_IF(last_q.shop_subdomain IS NULL) AS new_customer_count,
             COUNT_IF(this_q.shop_subdomain IS NOT NULL AND last_q.shop_subdomain IS NOT NULL) AS retained_customer_count,
@@ -58,8 +59,8 @@ WITH
             ) AS resurrected_customer_count,
             COUNT_IF(this_q.shop_subdomain IS NULL) AS churned_customer_count,
             rev * 1.0 / customer_count AS arpu,
-            COALESCE((contraction + churned) / sum(last_q.inc_amount), 0) AS revenue_churn_rate
-
+            COALESCE(-1 * lost_revenue / sum(last_q.inc_amount), 0) AS revenue_churn_rate,
+            arpu * 1.0 / NULLIF(revenue_churn_rate, 0) AS predictive_ltv
         from
             {{ ref('int_shop_quarters') }} AS this_q
             full outer join {{ ref('int_shop_quarters') }} AS last_q on (
