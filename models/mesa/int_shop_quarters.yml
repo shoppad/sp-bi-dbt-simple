@@ -1,0 +1,10 @@
+version: 2
+models:
+  - name: int_shop_quarters
+    columns:
+      - name: quarter
+        description: The quarter of the year
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: inc_amount
+      - name: first_quarter
