@@ -83,4 +83,4 @@ select *,
         (customer_count * 1.0 / LAG(customer_count) OVER (ORDER BY quarter ASC)) - 1,
         0
     ) AS customer_growth_rate
- from qrr_growth_accounting WHERE quarter <= date_trunc('quarter', current_date()) ORDER BY quarter DESC
+ from qrr_growth_accounting WHERE quarter < current_date() ORDER BY quarter DESC

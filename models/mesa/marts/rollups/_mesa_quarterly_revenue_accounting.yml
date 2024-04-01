@@ -78,3 +78,9 @@ models:
         description: The number of new customers for the quarter
         tests:
           - not_null
+      - name: lost_revenue
+        description: The lost revenue for the quarter
+        tests:
+          - not_null
+      - name: predictive_ltv
+        description: The predictive LTV for the quarter
