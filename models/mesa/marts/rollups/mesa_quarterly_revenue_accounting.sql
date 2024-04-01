@@ -48,6 +48,7 @@ WITH
                 case when last_q.inc_amount > 0 and (this_q.shop_subdomain is NULL or this_q.inc_amount = 0)
                 then last_q.inc_amount else 0 end
             ) as churned,
+            (new + expansion) AS gained_revenue,
             (contraction + churned) AS lost_revenue,
             COUNT(DISTINCT this_q.shop_subdomain) AS customer_count,
             COUNT_IF(last_q.shop_subdomain IS NULL) AS new_customer_count,

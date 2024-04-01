@@ -84,3 +84,5 @@ models:
           - not_null
       - name: predictive_ltv
         description: The predictive LTV for the quarter
+      - name: gained_revenue
+        description: The gained revenue for the quarter. Includes new revenue and expansion revenue. Will naturally include revenue of Shops that upgraded in the middle of the last quarter that surpasses what they paid in that quarter.
