@@ -45,3 +45,4 @@ models:
       - name: app_store_surface_intra_position
       - name: app_store_surface_inter_position
       - name: app_store_locale
+      - name: event_order

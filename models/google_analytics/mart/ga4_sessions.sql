@@ -18,17 +18,22 @@ page_counts AS (
 
 landing_pages AS (
     SELECT
-        ga_session_id,
-        event_timestamp_pt AS landing_page_timestamp,
-        page_title AS landing_page_title,
-        page_location_page_type AS landing_page_type,
-        page_location_path AS landing_page_path,
-        page_location_url AS landing_page_url,
-        page_location_query AS landing_page_query,
-        page_location_host AS landing_page_host,
-        traffic_source_medium,
-        traffic_source_source,
-        traffic_source_name
+        * EXCLUDE (
+          event_name,
+          event_id,
+          event_order,
+          is_landing_pageview,
+          is_exit_pageview
+        ) RENAME (
+            event_timestamp_pt AS landing_page_timestamp,
+            page_title AS landing_page_title,
+            page_location_page_type AS landing_page_type,
+            page_location_path AS landing_page_path,
+            page_location_url AS landing_page_url,
+            page_location_query AS landing_page_query,
+            page_location_host AS landing_page_host
+        )
+
     FROM ga4_events
     WHERE is_landing_pageview
 ),
