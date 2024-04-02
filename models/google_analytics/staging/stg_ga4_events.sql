@@ -44,6 +44,7 @@ with
                 __hevo__loaded_at,
                 surface_detail,
                 surface_type,
+                medium,
                 page_referrer,
                 user_id,
                 page_location,
@@ -52,7 +53,6 @@ with
             rename (
                 __hevo_id as event_id,
                 name as traffic_source_name,
-                medium as traffic_source_medium,
                 source as traffic_source_source,
                 category as device_category,
                 language as device_language,
@@ -72,6 +72,14 @@ with
                     )) AS shop_subdomain,
             {# TODO: Coalesce the surface_type and surface_detail from past pageloads. #}
 
+            {# Filter out the referral medium if it's our surface area. #}
+            CASE
+                WHEN medium ILIKE '%referral%'
+                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%')
+                    THEN NULL
+                ELSE medium
+            END as traffic_source_medium,
+
             {# Page components #}
             parse_url(page_location) as parsed_url,
             parsed_url:host::STRING as page_location_host,
@@ -85,7 +93,13 @@ with
             parsed_url:parameters:utm_term::STRING as param_term,
 
             {# Referrer #}
-            parse_url(page_referrer) as parsed_referrer,
+            {# Remove referrer when traffic_source_medium is referral and referrer is our own property. #}
+            CASE
+                WHEN traffic_source_medium ILIKE '%referral%'
+                    AND (page_referrer ILIKE '%apps.shopify.com%' OR page_referrer ILIKE '%getmesa.com%')
+                    THEN '{}'::VARIANT
+                ELSE parse_url(page_referrer)
+            END as parsed_referrer,
             parsed_referrer:host::STRING as referrer_host,
             '/' || parsed_referrer:path as referrer_path,
             '?' || parsed_referrer:query as referrer_query,
