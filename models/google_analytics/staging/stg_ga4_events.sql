@@ -45,6 +45,10 @@ with
                 surface_detail,
                 surface_type,
                 medium,
+                name,
+                source,
+                param_source,
+                param_medium,
                 page_referrer,
                 user_id,
                 page_location,
@@ -52,8 +56,6 @@ with
             )
             rename (
                 __hevo_id as event_id,
-                name as traffic_source_name,
-                source as traffic_source_source,
                 category as device_category,
                 language as device_language,
                 country AS location_country,
@@ -72,13 +74,7 @@ with
                     )) AS shop_subdomain,
             {# TODO: Coalesce the surface_type and surface_detail from past pageloads. #}
 
-            {# Filter out the referral medium if it's our surface area. #}
-            CASE
-                WHEN medium ILIKE '%referral%'
-                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%')
-                    THEN NULL
-                ELSE medium
-            END as traffic_source_medium,
+
 
             {# Page components #}
             parse_url(page_location) as parsed_url,
@@ -93,18 +89,54 @@ with
             parsed_url:parameters:utm_term::STRING as param_term,
 
             {# Referrer #}
+
+
+
+                {# Filter out the referral medium and source if it's our surface area. #}
+            CASE
+                WHEN param_source = 'shopify_forums' THEN 'referral'
+                WHEN medium ILIKE '%referral%'
+                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%' OR page_referrer ILIKE '%shoppad.com%')
+                    THEN 'internal'
+                ELSE medium
+            END as traffic_source_medium,
+            CASE
+                WHEN param_source = 'shopify_forums' THEN 'Shopify Forums'
+                WHEN name ILIKE '%referral%'
+                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%' OR page_referrer ILIKE '%shoppad.com%')
+                    THEN '(internal)'
+                ELSE name
+            END as traffic_source_name,
+
+            CASE
+                WHEN param_source = 'shopify_forums' THEN 'community.shopify.com'
+                ELSE source
+            END as traffic_source_source,
+
             {# Remove referrer when traffic_source_medium is referral and referrer is our own property. #}
             CASE
-                WHEN traffic_source_medium ILIKE '%referral%'
+                WHEN param_source = 'shopify_forums' THEN parse_url('https://community.shopify.com/')
+                WHEN traffic_source_medium ILIKE '%referral%' OR traffic_source_name ILIKE '%referral%'
                     AND (page_referrer ILIKE '%apps.shopify.com%' OR page_referrer ILIKE '%getmesa.com%')
                     THEN '{}'::VARIANT
                 ELSE parse_url(page_referrer)
             END as parsed_referrer,
+
             parsed_referrer:host::STRING as referrer_host,
             '/' || parsed_referrer:path as referrer_path,
             '?' || parsed_referrer:query as referrer_query,
             referrer_host || referrer_path AS referrer_url,
             referrer_host || referrer_path || COALESCE(referrer_query, '') AS referrer_full,
+
+            CASE
+                WHEN param_source = 'shopify_forums' THEN 'referral'
+                ELSE param_medium
+            END as param_medium,
+
+            CASE
+                WHEN param_source = 'shopify_forums' THEN 'referral'
+                ELSE param_source
+            END as param_source,
 
             {# App Store #}
             TRIM(
@@ -122,6 +154,8 @@ with
                 )
             ) AS app_store_surface_detail,
             coalesce(
+
+
                 nullif(surface_type, ''), parsed_url:parameters:surface_type, parsed_referrer:parameters:surface_type
             )::STRING as app_store_surface_type,
             COALESCE(
@@ -133,7 +167,7 @@ with
             COALESCE(parsed_url:parameters:locale, parsed_referrer:parameters:locale)::STRING
                 as app_store_locale
         FROM filtered_raw_ga4_events
-    )
+    ),
 
     {% set not_empty_string_fields = [
         "param_campaign",
@@ -152,11 +186,15 @@ with
         "shop_subdomain"
     ] %}
 
-SELECT
+final AS (
+    SELECT
     * exclude (parsed_url, parsed_referrer)
     replace (
         {% for field in not_empty_string_fields %}
             nullif({{ field }}, '') as {{ field }}{% if not loop.last %},{% endif %}
         {% endfor %}
     )
-from ga4_events
+    from ga4_events
+)
+
+SELECT * FROM final
