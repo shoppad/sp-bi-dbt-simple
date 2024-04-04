@@ -89,8 +89,9 @@ decorated_shops as (
                 NULL
             ) as launch_session_date,
             not launch_session_date
-            is NULL as has_had_launch_session
+                is NULL as has_had_launch_session
         from {{ ref("stg_shops") }}, lateral flatten(input => meta) as meta_attribs
+        QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY launch_session_date DESC) = 1
     ),
 
     paid_shop_days as (
