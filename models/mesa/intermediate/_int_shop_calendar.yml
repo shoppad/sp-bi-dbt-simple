@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: int_shop_calendar
-    tests:
+    data_tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list:
             - dt
@@ -9,17 +9,23 @@ models:
     columns:
       - name: shop_subdomain
         type: string
-        tests:
+        data_tests:
           - not_null
         description: The foreign key for the Shop.
       - name: dt
-        tests:
+        data_tests:
           - not_null
+        description: The calendar date of the shop day.
       - name: daily_plan_revenue
-        tests:
+        data_tests:
           - not_null
+        description: The amount of revenue from plan charges for this day.
       - name: MESA_PLAN
       - name: SHOPIFY_PLAN
       - name: is_shopify_zombie_plan
-        tests:
+        data_tests:
           - not_null
+        description:
+          Indicates whether the store is on a 'frozen', 'fraudulent', 'paused',
+          'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means they
+          are not.

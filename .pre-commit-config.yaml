@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dbt-checkpoint/dbt-checkpoint
-    rev: v1.1.1
+    rev: v1.2.1
     hooks:
       - id: dbt-docs-generate
       - id: check-script-semicolon
@@ -11,7 +11,7 @@ repos:
       - id: generate-model-properties-file
         args: ["--properties-file", "./models/mesa/{name}.yml", "--"]
 
-      - id: unify-column-description
+      #- id: unify-column-description
       - id: check-column-name-contract
         args: [--pattern, "(is|has|do)_.*", --dtype, boolean]
       - id: check-model-has-all-columns

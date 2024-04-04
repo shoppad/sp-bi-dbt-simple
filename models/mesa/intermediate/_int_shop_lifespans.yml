@@ -1,28 +1,28 @@
 version: 2
 models:
   - name: int_shop_lifespans
-    tests:
+    data_tests:
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
           column_A: last_dt
           column_B: first_dt
           or_equal: true
           config:
-                where: first_dt > '2022-01-01'
+            where: first_dt > '2022-01-01'
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - unique
           - dbt_expectations.expect_column_to_exist
 
         description: The foreign key for the Shop.
       - name: first_dt
-        tests:
+        data_tests:
           - dbt_expectations.expect_column_to_exist
           - not_null
       - name: last_dt
-        tests:
+        data_tests:
           - dbt_expectations.expect_column_to_exist
           - not_null
       - name: LIFESPAN_LENGTH
-        tests:
+        data_tests:
           - dbt_expectations.expect_column_to_exist

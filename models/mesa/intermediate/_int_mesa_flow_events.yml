@@ -3,7 +3,7 @@ models:
   - name: int_mesa_flow_events
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('int_shops')
@@ -37,7 +37,7 @@ models:
       - name: context_campaign_content
       - name: event_text
       - name: id
-        tests:
+        data_tests:
           - unique
       - name: properties_action
       - name: properties_goal
@@ -79,6 +79,7 @@ models:
       - name: category
       - name: value
       - name: key
+        description: The code-friendly key of the workflow.
       - name: workflow_id
         description: The foreign key to the originating workflow
       - name: source

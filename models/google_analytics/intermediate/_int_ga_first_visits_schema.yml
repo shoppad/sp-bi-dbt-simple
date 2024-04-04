@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: int_ga_first_visits
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 100
     description: ""
@@ -41,6 +41,6 @@ models:
         description: The locale of the first touch in the app store.
       - name: shop_subdomain
         description: The foreign key for the Shop.
-        tests:
+        data_tests:
           - not_null
           - unique

@@ -1,29 +1,33 @@
 version: 2
 models:
   - name: int_successful_step_run_day_counts
-    tests:
+    data_tests:
       - dbt_expectations.expect_compound_columns_to_be_unique:
           column_list:
             - dt
             - shop_subdomain
     columns:
       - name: shop_subdomain
-        description: The foreign key of the Shop.
-        tests:
+        description: The foreign key for the Shop.
+        data_tests:
           - not_null
       - name: dt
-        description: The date that the workflow was run.
-        tests:
+        description: The calendar date of the shop day.
+        data_tests:
           - not_null
       - name: total_workflow_steps_count
         description: The total number of Workflow Steps completed this day.
-        tests:
+        data_tests:
           - not_null
       - name: input_step_count
-        description: The number of "input" (aka Trigger) Workflow Steps that were run this day.
-        tests:
+        description:
+          The number of "input" (aka Trigger) Workflow Steps that were run
+          this day.
+        data_tests:
           - not_null
       - name: output_step_count
-        description: The number of "output" (aka Action) Workflow Steps that were run this day.
-        tests:
+        description:
+          The number of "output" (aka Action) Workflow Steps that were run
+          this day.
+        data_tests:
           - not_null

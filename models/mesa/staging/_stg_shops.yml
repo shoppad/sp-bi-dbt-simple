@@ -2,12 +2,12 @@ version: 2
 models:
   - name: stg_shops
     description: '{{ doc("staging_shops") }}'
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - unique
         description: The foreign key for the Shop.
@@ -23,11 +23,11 @@ models:
         description: a field used by account services to record onboarding sessions.
       - name: handle
       - name: first_installed_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The effective created at for the shop.
       - name: latest_installed_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The most recent app installation date.
       - name: mongoid
@@ -43,12 +43,12 @@ models:
       - name: metabase
       - name: schema
       - name: uninstalled_at_pt
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
         description: The timestamp of the latest uninstallation of the app.
       - name: minutes_until_uninstall
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.5
         description: The minutes between initial install and the latest uninstall.

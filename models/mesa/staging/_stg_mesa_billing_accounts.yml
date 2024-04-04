@@ -1,31 +1,33 @@
 version: 2
 models:
   - name: stg_mesa_billing_accounts
-    tests:
+    data_tests:
       - dbt_utils.equal_rowcount:
           compare_model: ref('shops')
     columns:
       - name: SHOP_subdomain
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: BILLING_METHOD_NAME
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
-              values: ["shopify", "chargebee"]
+              values:
+                - shopify
+                - chargebee
       - name: daily_plan_revenue
-        description: The revenue generated from the plan on a daily basis.
+        description: The amount of revenue from plan charges for this day.
       - name: balance_used
         description: The amount of the plan's balance that has been used.
       - name: shopify_id
-        description: The unique identifier for the shop in Shopify.
+        description: The official shopify identifier for the shop.
       - name: plan_price
         description: The price of the plan.
       - name: plan_used
         description: The extent to which the plan's resources have been utilized.
       - name: status
-        description: The current status of the billing account.
+        description: The usage status of the shop.
       - name: percent_complete
         description: The percentage of the plan period that has been completed.
       - name: billing_on_pt

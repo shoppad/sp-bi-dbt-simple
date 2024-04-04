@@ -3,17 +3,20 @@ models:
   - name: workflow_steps
     description: This table contains the individual Steps of a Workflow.
     meta:
-      metabase.caveats: |
-        Some records are for Deleted Workflows, so be sure to filter on is_deleted.
+      metabase.caveats:
+        "Some records are for Deleted Workflows, so be sure to filter
+        on is_deleted.
+
+        "
     columns:
       - name: workflow_step_id
-        description: Unique identifier for each workflow step.
-        tests:
+        description: The foreign key to the originating workflow step.
+        data_tests:
           - unique
           - not_null
       - name: shop_subdomain
-        description: Subdomain of the shop where the workflow step is executed.
-        tests:
+        description: The foreign key for the Shop.
+        data_tests:
           - not_null
           - relationships:
               to: ref('shops')
@@ -21,23 +24,23 @@ models:
       - name: integration_app
         description: The app integrated with the workflow step.
       - name: workflow_id
-        description: Identifier of the workflow that the step belongs to.
-        tests:
+        description: The foreign key to the originating workflow
+        data_tests:
           - not_null
           - relationships:
               to: ref('workflows')
               field: workflow_id
       - name: step_type
-        description: Type of the workflow step.
-        tests:
+        description: The type of step that was run. `input` or `output`.
+        data_tests:
           - not_null
       - name: step_weight
         description: Weight of the workflow step.
       - name: position_in_workflow
         description: Position of the step in the workflow.
       - name: is_deleted
-        description: Flag indicating if the workflow step is deleted.
-        tests:
+        description: Whether the workflow has been deleted by the Shop.
+        data_tests:
           - not_null
       - name: created_at_pt
         description: Timestamp when the workflow step was created.
@@ -55,3 +58,11 @@ models:
         description: Success rate of the workflow step.
       - name: run_count_failure
         description: Number of failed runs of the workflow step.
+      - name: step_custom_name
+        description: Custom name of the workflow step.
+      - name: operation_id
+        description: The operation id of the workflow step.
+      - name: metadata
+        description: Metadata of the workflow step.
+      - name: description
+        description: Description of the workflow step.

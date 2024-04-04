@@ -5,6 +5,6 @@ models:
     columns:
       - name: date_day
         description: The calendar day.
-        tests:
+        data_tests:
           - unique
           - not_null

@@ -12,13 +12,13 @@ models:
         "
     columns:
       - name: workflow_id
-        description: The unique identifier for the workflow.
-        tests:
+        description: The foreign key to the originating workflow
+        data_tests:
           - unique
           - not_null
       - name: shop_subdomain
-        description: The foreign key of the Shop.
-        tests:
+        description: The foreign key for the Shop.
+        data_tests:
           - not_null
           - relationships:
               field: shop_subdomain
@@ -27,72 +27,72 @@ models:
         description: The name of the template the workflow originated from.
       - name: title
         description: The title of the workflow.
-        tests:
+        data_tests:
           - not_null
       - name: is_premium
         description: Whether the workflow is premium or not.
-        tests:
+        data_tests:
           - not_null
       - name: description
         description: The Shop-provided description of the workflow.
-        tests:
+        data_tests:
           - not_null
       - name: key
         description: The code-friendly key of the workflow.
-        tests:
+        data_tests:
           - not_null
       - name: tags
         description: The tags associated with the workflow.
-        tests:
+        data_tests:
           - not_null
       - name: step_count
         description: The current number of steps in the workflow.
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
               max_value: 100
       - name: first_run_at_pt
         description: The timestamp of the first run of the workflow.
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: first_successful_run_at_pt
         description: The timestamp of the first successful run of the workflow in PT.
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: trigger_count
         description: The number of times the workflow has been run.
-        tests:
+        data_tests:
           - not_null
       - name: run_success_count
         description: The number of times the workflow has been run successfully.
-        tests:
+        data_tests:
           - not_null
       - name: run_success_percent
         description: The percent of workflow run attempts that successfully ran.
       - name: is_enabled
         description: Whether the workflow is currently enabled or not.
-        tests:
+        data_tests:
           - not_null
       - name: first_test_at_pt
         description: The timestamp of the first test attempt of the workflow in PT.
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: first_successful_test_at_pt
         description:
           The timestamp of the first successful test attempt of the workflow
           in PT.
-        tests:
+        data_tests:
           - dbt_utils.not_null_proportion:
               at_least: 0.1
       - name: test_attempt_count
         description: The number of times the workflow has had a test attempt.
-        tests:
+        data_tests:
           - not_null
       - name: test_success_count
         description: The number of times the workflow has had a successful test attempt.
-        tests:
+        data_tests:
           - not_null
       - name: test_success_percent
         description: The percent of test attempts that have completed successfully.
@@ -100,51 +100,51 @@ models:
         description:
           Whether the workflow has been edited or saved. Determined by presence
           of `workflow_save` and `dashboard_workflow_edit` events.
-        tests:
+        data_tests:
           - not_null
       - name: has_viewed_workflow
         description:
           Whether the workflow has been viewed. Determined by presence of Pageview
           of the workflow's URL.
-        tests:
+        data_tests:
           - not_null
       - name: has_enabled_workflow
         description:
           Whether the workflow has been enabled. Determined by presence of
           `workflow_enable` event featuring the workflow_id.
-        tests:
+        data_tests:
           - not_null
       - name: created_at_pt
         description: The timestamp of the workflow's creation in PT.
-        tests:
+        data_tests:
           - not_null
       - name: updated_at_pt
         description: The timestamp of the workflow's last update in PT.
-        tests:
+        data_tests:
           - not_null
       - name: enable_count
         description: The number of times the workflow has been enabled.
-        tests:
+        data_tests:
           - not_null
       - name: save_count
         description: The number of times the workflow has been saved.
-        tests:
+        data_tests:
           - not_null
       - name: has_test_attempted_workflow
         description: Whether the workflow has had a test attempt.
-        tests:
+        data_tests:
           - not_null
       - name: has_test_succeeded_workflow
         description: Whether the workflow has had a successful test attempt.
-        tests:
+        data_tests:
           - not_null
       - name: page_view_count
         description: The number of times the workflow has been viewed.
-        tests:
+        data_tests:
           - not_null
       - name: is_deleted
         description: Whether the workflow has been deleted by the Shop.
-        tests:
+        data_tests:
           - not_null
       - name: setup
         description: The stage of a template-wizard workflow setup process.
@@ -198,12 +198,12 @@ models:
         description: The app that triggered the workflow.
       - name: created_on_pt
         description: The timestamp of the workflow's creation in PT.
-        tests:
+        data_tests:
           - not_null
       - name: source_destination_pair
-        description: The source and destination apps in the workflow.
+        description: The source and destination app integration in one string.
       - name: destination_app
-        description: The destination app in the workflow.
+        description: The final app integration at the end of the workflow run.
       - name: is_from_template
         description: Whether the workflow was created from a template.
       - name: deleted_step_count
@@ -216,13 +216,21 @@ models:
         description: The current number of steps in the workflow, including deleted steps.
       - name: is_puc
         description: Whether the workflow is a PUC workflow.
-        tests:
+        data_tests:
           - not_null
       - name: is_created_by_shoppad
         description: Whether the workflow was created by Shoppad.
-        tests:
+        data_tests:
           - not_null
       - name: created_by
         description: The user who created the workflow.
       - name: step_descriptions
         description: The descriptions of the steps in the workflow.
+      - name: destination_operation_id
+        description: The operation id of the destination app in the workflow.
+      - name: trigger_operation_id
+        description: The operation id of the trigger app in the workflow.
+      - name: trigger_step_name
+        description: The name of the trigger step in the workflow.
+      - name: destination_step_name
+        description: The name of the destination step in the workflow.

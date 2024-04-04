@@ -1,14 +1,14 @@
 version: 2
 models:
   - name: int_shop_install_sources
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 2000
       - dbt_utils.equal_rowcount:
           compare_model: ref('int_shops')
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - unique
         description: The foreign key for the Shop.
@@ -25,7 +25,7 @@ models:
       - name: ga_first_touch_traffic_source_source
         description: The source that the shop was acquired through.
       - name: ga_first_touch_traffic_source_medium
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: shop_subdomain IN ('locker-toys', 'drink-renude')
@@ -36,7 +36,7 @@ models:
       - name: ga_first_touch_traffic_source_source_medium
         description: The source & medium that drove the Shop's first visit.
       - name: is_blog_referral
-        tests:
+        data_tests:
           - not_null
           - check_boolean_values
         description:

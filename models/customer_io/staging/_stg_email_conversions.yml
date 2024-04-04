@@ -1,15 +1,16 @@
 version: 2
-
 models:
   - name: stg_email_conversions
     description: Staging table for email conversion details
-    tags: ["staging", "customer_io"]
+    tags:
+      - staging
+      - customer_io
     columns:
-        - name: delivery_id
-          description: "Unique ID for the email delivery"
-          tests:
-            - not_null
-        - name: shop_subdomain
-          description: "Shopify subdomain"
-          tests:
-            - not_null
+      - name: delivery_id
+        description: Unique ID for the email delivery
+        data_tests:
+          - not_null
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+        data_tests:
+          - not_null

@@ -7,11 +7,11 @@ models:
     columns:
       - name: month
         description: The month of the User Growth Accounting.
-        tests:
+        data_tests:
           - unique
       - name: mau
         description: The number of paying Shops in the month.
-        tests:
+        data_tests:
           - not_null
         meta:
           metabase.display_name: Monthly Active Shops
@@ -19,7 +19,7 @@ models:
 
       - name: retained
         description: The amount of pre-existing paying Shops that previously paid before the period.
-        tests:
+        data_tests:
           - not_null
         meta:
           metabase.display_name: Retained Shops
@@ -27,7 +27,7 @@ models:
 
       - name: new
         description: The amount of new paying Shops this period.
-        tests:
+        data_tests:
           - not_null
         meta:
           metabase.display_name: New Active Shops
@@ -35,7 +35,7 @@ models:
 
       - name: resurrected
         description: The amount of pre-existing paying Shops this period who were not active in the last period.
-        tests:
+        data_tests:
           - not_null
         meta:
           metabase.display_name: Resurrected Shops
@@ -43,7 +43,7 @@ models:
 
       - name: churned
         description: The amount of Shops paying in the last period who didn't pay this period.
-        tests:
+        data_tests:
           - not_null
         meta:
           metabase.display_name: Churned Shops

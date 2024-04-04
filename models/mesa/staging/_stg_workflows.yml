@@ -3,18 +3,21 @@ models:
   - name: stg_workflows
     columns:
       - name: workflow_id
-        tests:
+        data_tests:
           - unique
           - not_null
+        description: The foreign key to the originating workflow
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - relationships:
               field: shop_subdomain
               to: ref('stg_shops')
+        description: The foreign key for the Shop.
       - name: template_name
         description: The name of the template the workflow originated from.
       - name: SHOP_SUBDOMAIN
+        description: The foreign key of the Shop.
       - name: TITLE
       - name: IS_PREMIUM
       - name: DESCRIPTION

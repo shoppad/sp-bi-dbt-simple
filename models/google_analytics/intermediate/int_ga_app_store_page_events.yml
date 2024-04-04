@@ -10,7 +10,7 @@ models:
       - name: app_store_locale
       - name: app_store_detail
       - name: event_name
-        tests:
+        data_tests:
           - dbt_expectations.expect_column_distinct_count_to_be_greater_than:
               value: 0
               row_condition: event_name = 'shopify_app_install'

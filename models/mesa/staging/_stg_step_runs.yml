@@ -1,17 +1,17 @@
 version: 2
 models:
   - name: stg_step_runs
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000000
     columns:
       - name: step_run_id
-        tests:
+        data_tests:
           - not_null
           - unique
         description: The unique identifier for the step run.
       - name: workflow_run_id
-        tests:
+        data_tests:
           - not_null
         description: The foreign key to the Workflow Run.
       - name: workflow_id
@@ -19,7 +19,7 @@ models:
           metabase.semantic_type: type/FK
           metabase.fk_target_table: ref('stg_workflows')
           metabase.fk_target_field: workflow_id
-        tests:
+        data_tests:
           - not_null
           - relationships_proportion:
               to: ref('stg_workflows')
@@ -28,15 +28,15 @@ models:
               error_if: ">5"
         description: The foreign key to the originating workflow
       - name: step_run_at_utc
-        tests:
+        data_tests:
           - not_null
         description: The timestamp for when the step was run in UTC.
       - name: step_run_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The timestamp for when the step was run in PT.
       - name: workflow_step_name
-        tests:
+        data_tests:
           - not_null
         description: The name of the originating workflow step.
       - name: workflow_step_key
@@ -46,7 +46,7 @@ models:
           metabase.semantic_type: type/FK
           metabase.fk_target_table: ref('stg_workflow_steps')
           metabase.fk_target_field: workflow_step_id
-        tests:
+        data_tests:
           - not_null:
               warn_if: ">1"
               error_if: ">50"
@@ -60,30 +60,33 @@ models:
               config:
                 where: step_run_at_utc > '2021-08-20'
       - name: STEP_RUN_ON_PT
-        tests:
+        data_tests:
           - not_null
       - name: step_type
-        tests:
+        data_tests:
           - not_null
         description: The type of step that was run. `input` or `output`.
       - name: RUN_STATUS
-        tESTS:
+        data_tests:
           - not_null
       - name: TRIES
       - name: UPDATED_AT
       - name: SHOP_SUBDOMAIN
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('stg_shops')
               field: shop_subdomain
+        description: The foreign key of the Shop.
       - name: is_workflow_hard_deleted
-        tests:
+        data_tests:
           - not_null
-        description: Whether the workflow was hard deleted from the database and therefore missing
+        description:
+          Whether the workflow was hard deleted from the database and therefore
+          missing
       - name: INTEGRATION_NAME
       - name: WORKFLOW_NAME
       - name: INTEGRATION_KEY
       - name: is_test_run
-        tests:
+        data_tests:
           - not_null

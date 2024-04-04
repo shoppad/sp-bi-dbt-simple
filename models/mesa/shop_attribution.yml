@@ -4,7 +4,7 @@ models:
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.
-        tests:
+        data_tests:
           - not_null
       - name: unified_traffic_source
         description: The source of the traffic that led to the shop.
@@ -31,7 +31,9 @@ models:
       - name: unified_referrer_host
         description: The host that referred the user to the shop.
       - name: is_blog_referral
-        description: Whether the Shop was referred/entered the marketing site by a blog post.
+        description:
+          Whether the Shop was referred/entered the marketing site by a blog
+          post.
       - name: days_to_install
         description:
           The number of days it took for the user to install the app after
@@ -40,7 +42,7 @@ models:
         description:
           Indicates whether the referral to the shop came from an app store
           search ad.
-        tests:
+        data_tests:
           - not_null
       - name: referrer_medium
         description: The medium of the referrer that led the user to the shop.
@@ -134,7 +136,7 @@ models:
         name: ga_first_touch_referrer_host
       - description: The medium that the shop was acquired through.
         name: ga_first_touch_traffic_source_medium
-      - description: The source of the traffic source during the first touch event.
+      - description: The source that the shop was acquired through.
         name: ga_first_touch_traffic_source_source
       - description:
           The intra position of the app store surface during the app store

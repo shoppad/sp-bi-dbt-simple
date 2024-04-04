@@ -3,18 +3,18 @@ models:
   - name: step_runs
     description: "individual mesa workflow step executions."
 
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
     columns:
       - name: step_run_id
         description: The unique identifier for the step run.
-        tests:
+        data_tests:
           - not_null
           - unique
       - name: workflow_run_id
         description: The foreign key to the Workflow Run.
-        tests:
+        data_tests:
           - not_null
           - relationships_proportion:
               to: ref('workflow_runs')
@@ -22,14 +22,14 @@ models:
               error_if: ">1"
       - name: workflow_id
         description: The foreign key to the originating workflow
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('workflows')
               field: workflow_id
       - name: shop_subdomain
         description: The foreign key for the Shop.
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('shops')
@@ -40,7 +40,7 @@ models:
           metabase.semantic_type: type/FK
           metabase.fk_target_table: ref('workflow_steps')
           metabase.fk_target_field: workflow_step_id
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: step_run_at_utc > '2021-08-20'
@@ -56,23 +56,23 @@ models:
                 where: step_run_at_utc > '2021-08-20'
       - name: step_run_at_utc
         description: The timestamp for when the step was run in UTC.
-        tests:
+        data_tests:
           - not_null
       - name: step_run_at_pt
         description: The timestamp for when the step was run in PT.
-        tests:
+        data_tests:
           - not_null
       - name: step_run_on_pt
         description: The date for when the step was run in PT.
-        tests:
+        data_tests:
           - not_null
       - name: step_type
         description: The type of step that was run. `input` or `output`.
-        tests:
+        data_tests:
           - not_null
       - name: run_status
         description: The status of the step run. `success` or `failure`.
-        tests:
+        data_tests:
           - not_null
           - accepted_values:
               values: ["success", "fail", "replayed", "running", "stop"]
@@ -80,15 +80,15 @@ models:
         description: The number of attempts to run the step.
       - name: updated_at
         description: Used to build incremental models.
-        tests:
+        data_tests:
           - not_null
       - name: workflow_step_name
         description: The name of the originating workflow step.
-        tests:
+        data_tests:
           - not_null
       - name: workflow_step_key
         description: The code-friendly string of the workflow step.
-        tests:
+        data_tests:
           - not_null
       - name: position_in_workflow_run
         description: The chronological execution order of the step within the workflow run.

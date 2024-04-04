@@ -3,12 +3,12 @@ models:
   - name: currency_conversion_rates
     columns:
       - name: CURRENCY
-        tests:
+        data_tests:
           - not_null
           - unique
       - name: IN_USD
-        tests:
+        data_tests:
           - not_null
       - name: EXCHANGE_RATE_AT
-        tests:
+        data_tests:
           - not_null

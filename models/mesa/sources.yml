@@ -42,14 +42,14 @@ sources:
         columns:
           - name: _id
             description: unique identifier for the task.
-            tests:
+            data_tests:
               - unique
               - not_null
           - name: created_at
             description: do not use. this column is sometimes null.
           - name: _created_at
             description: The time the task was created.
-            tests:
+            data_tests:
               - not_null
 
       - name: shops
@@ -59,16 +59,16 @@ sources:
         columns:
           - name: _id
             description: unique identifier for the shop account.
-            tests:
+            data_tests:
               - unique
               - not_null
           - name: _created_at
             description: The time the shop account was created by installing the app.
-            tests:
+            data_tests:
               - not_null
           - name: uuid
             description: The shopify subdomain of the shop account.
-            tests:
+            data_tests:
               - not_null
 
       - name: mesa_charges
@@ -76,11 +76,11 @@ sources:
         columns:
           - name: _id
             description: unique identifier for the charge.
-            tests:
+            data_tests:
               - unique
               - not_null
           - name: created_at
-            tests:
+            data_tests:
               - not_null
       - name: mesa_install_records
         identifier: m3_mesa_installs

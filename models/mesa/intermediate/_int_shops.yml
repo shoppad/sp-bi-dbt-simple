@@ -1,12 +1,12 @@
 version: 2
 models:
   - name: int_shops
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
     columns:
       - name: currency
-        tests:
+        data_tests:
           - not_null
           - relationships_proportion:
               to: ref('currency_conversion_rates')
@@ -15,15 +15,15 @@ models:
               field: currency
         description: The financial currency used by the shop with its customers.
       - name: install_status
-        tests:
+        data_tests:
           - not_null
         description: The current mesa app installation status of the shop.
       - name: shopify_plan_name
-        tests:
+        data_tests:
           - not_null
         description: The shopify plan used by the shop.
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - unique
         description: The foreign key for the Shop.
@@ -32,7 +32,7 @@ models:
       - name: shopify_shop_orders_initial_count
         description: The 30-day order count volume at the time of app installation.
       - name: first_installed_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The effective created at for the shop.
       - name: referral

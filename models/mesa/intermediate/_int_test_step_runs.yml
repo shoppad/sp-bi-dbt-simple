@@ -3,10 +3,10 @@ models:
   - name: int_test_step_runs
     columns:
       - name: test_run_id
-        tests:
+        data_tests:
           - not_null
       - name: test_step_run_id
-        tests:
+        data_tests:
           - not_null
           - unique
       - name: workflow_step_id

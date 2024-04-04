@@ -6,7 +6,7 @@ models:
     description: Records of usage charges for Mesa Shops.
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - relationships:
               to: ref('int_shops')
               field: shop_subdomain
@@ -19,13 +19,13 @@ models:
         description: The amount charged to the customer with this charge.
       - name: charged_at_pt
         description: The timestamp of the charge in PT.
-        tests:
+        data_tests:
           - not_null
       - name: charged_on_pt
         description: The date of the charge in PT.
-        tests:
+        data_tests:
           - not_null
       - name: charge_id
         description: The unique identifier of the charge.
-        tests:
+        data_tests:
           - unique

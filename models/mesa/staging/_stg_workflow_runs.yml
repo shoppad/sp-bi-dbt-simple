@@ -4,22 +4,22 @@ models:
     description:
       a intermediate model that isolates the very first step executed of
       each workflow run.
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 100000
     columns:
       - name: workflow_run_id
-        tests:
+        data_tests:
           - not_null
         description: The foreign key to the Workflow Run.
       - name: is_billable
         description:
           a step/workflow is only billed once -- not for each step. so only
           true for the first trigger.
-        tests:
+        data_tests:
           - not_null
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('stg_shops')
@@ -35,19 +35,19 @@ models:
           - not_null
         description: The status of the step run. `success` or `failure`.
       - name: workflow_id
-        tests:
+        data_tests:
           - not_null
         description: The foreign key to the originating workflow
       - name: workflow_run_at_utc
-        tests:
+        data_tests:
           - not_null
         description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The timestamp of the workflow run execution in PT.
       - name: workflow_run_on_pt
-        tests:
+        data_tests:
           - not_null
         description: The date of the workflow run execution in PT.
       - name: unbillable_reason
@@ -57,11 +57,11 @@ models:
           The originating app that triggered the execution of the workflow
           run.
       - name: updated_at
-        tests:
+        data_tests:
           - not_null
         description: Used to build incremental models.
       - name: is_workflow_hard_deleted
-        tests:
+        data_tests:
           - not_null
         description:
           Whether the workflow was hard deleted from the database and therefore
@@ -77,5 +77,5 @@ models:
       - name: workflow_name
         description: The customer-provided name of the originating workflow.
       - name: is_test_run
-        tests:
+        data_tests:
           - not_null

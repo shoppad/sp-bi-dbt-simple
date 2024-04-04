@@ -1,12 +1,12 @@
 version: 2
 models:
   - name: stg_mesa_install_records
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 200
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - unique
           - not_null
         description: The foreign key for the Shop.

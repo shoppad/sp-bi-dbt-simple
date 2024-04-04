@@ -3,7 +3,7 @@ models:
   - name: stg_mesa_flow_events
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
         description: The foreign key for the Shop.
       - name: properties_step_label
@@ -34,7 +34,7 @@ models:
       - name: context_campaign_content
       - name: event_text
       - name: mesa_flow_event_id
-        tests:
+        data_tests:
           - unique
           - not_null
       - name: properties_action
@@ -76,6 +76,7 @@ models:
       - name: category
       - name: value
       - name: key
+        description: The code-friendly key of the workflow.
       - name: workflow_id
         description: The foreign key to the originating workflow
       - name: source

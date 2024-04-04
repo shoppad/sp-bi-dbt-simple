@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: monthly_subscriber_retentions
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - cohort_month
@@ -16,7 +16,7 @@ models:
       - name: period
         description: Period of the cohort
       - name: cohort_month
-        description: Month of the cohort
+        description: The month of the Shop's first app installation.
       - name: retained_shops
         description: Number of retained shops
       - name: cohort_info

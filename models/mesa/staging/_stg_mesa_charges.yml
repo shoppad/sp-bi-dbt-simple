@@ -3,7 +3,7 @@ models:
   - name: stg_mesa_charges
     columns:
       - name: charge_id
-        tests:
+        data_tests:
           - unique
         description: The unique identifier of the charge.
       - name: shop_subdomain
@@ -15,10 +15,10 @@ models:
       - name: billed_amount
         description: The amount charged to the customer with this charge.
       - name: charged_at_pt
-        tests:
+        data_tests:
           - not_null
         description: The timestamp of the charge in PT.
       - name: charged_on_pt
-        tests:
+        data_tests:
           - not_null
         description: The date of the charge in PT.

@@ -2,7 +2,7 @@ version: 2
 models:
   - name: workflow_runs
     description: individual mesa workflow executions.
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 10000
       - dbt_expectations.expect_table_row_count_to_be_between:
@@ -16,17 +16,17 @@ models:
           row_condition: is_free_workflow
     columns:
       - name: workflow_run_id
-        tests:
+        data_tests:
           - not_null
         description: The foreign key to the Workflow Run.
       - name: is_billable
         description:
           a step/workflow is only billed once -- not for each step. so only
           true for the first trigger.
-        tests:
+        data_tests:
           - not_null
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('shops')
@@ -43,22 +43,22 @@ models:
       - name: workflow_id
         description: The foreign key to the originating workflow
       - name: workflow_run_at_utc
-        tests:
+        data_tests:
           - not_null
         description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
         description: The timestamp of the workflow run execution in PT.
-        tests:
+        data_tests:
           - not_null
       - name: workflow_run_on_pt
         description: The date of the workflow run execution in PT.
-        tests:
+        data_tests:
           - not_null
       - name: unbillable_reason
         description: The reason why a workflow run is not billable.
         meta:
           metabase.caveats: Seems to often say that billing is not set up when it is.
-        tests:
+        data_tests:
           - not_null:
               where: not(is_billable)
       - name: source_app
@@ -69,11 +69,11 @@ models:
         description: Used to build incremental models.
       - name: executed_step_count
         description: The number of steps that were executed in the workflow run.
-        tests:
+        data_tests:
           - not_null
       - name: child_failure_count
         description: The number of steps that failed in the workflow run.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: workflow_run_on_pt > '2021-09-20'
@@ -81,7 +81,7 @@ models:
         description:
           Whether the workflow run was successfully until the end or a safe
           exit.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: workflow_run_on_pt > '2021-09-20'
@@ -97,7 +97,7 @@ models:
         description:
           Whether the workflow run was a free workflow. Free workflows are
           not billed.
-        tests:
+        data_tests:
           - not_null
       - name: is_workflow_hard_deleted
         description:
@@ -113,30 +113,30 @@ models:
         description: The funnel phase the Shop was in when the workflow run was executed.
       - name: did_end_with_delay
         description: Whether the workflow run ended with a delay.
-        tests:
+        data_tests:
           - not_null
       - name: child_complete_count
         description: The number of steps that completed in the workflow run.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: WORKFLOW_RUN_AT_UTC > '2022-12-06'
       - name: did_move_data
         description: Whether the workflow run moved data.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: workflow_run_at_utc > '2022-12-06'
 
       - name: was_filter_stopped
         description: Whether the workflow run was stopped by a filter.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: workflow_run_at_utc > '2022-12-06'
       - name: child_stop_count
         description: The number of steps that were stopped in the workflow run.
-        tests:
+        data_tests:
           - not_null:
               config:
                 where: WORKFLOW_RUN_AT_UTC > '2022-12-06'

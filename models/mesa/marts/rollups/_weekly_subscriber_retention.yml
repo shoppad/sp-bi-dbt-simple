@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: weekly_subscriber_retention
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - cohort_week
@@ -12,7 +12,7 @@ models:
       - name: retained_shops
         description: Number of retained shops
       - name: cohort_week
-        description: Week of the cohort
+        description: The week of the Shop's first app installation.
       - name: revenue_retention_rate
         description: Revenue retention rate of shops
       - name: retained_mrr

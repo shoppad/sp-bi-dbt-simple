@@ -1,7 +1,7 @@
 version: 2
 models:
   - name: int_mesa_shop_days
-    tests:
+    data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1
           config:
@@ -12,7 +12,7 @@ models:
             - shop_subdomain
     columns:
       - name: shop_subdomain
-        tests:
+        data_tests:
           - not_null
           - relationships:
               to: ref('int_shops')
@@ -21,45 +21,45 @@ models:
                 where: mesa_plan != 'custom-app'
         description: The foreign key for the Shop.
       - name: dt
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
               max_value: current_date()
         description: The calendar date of the shop day.
       - name: workflow_runs_attempted_count
-        tests:
+        data_tests:
           - not_null
         description: The number of Workflow Run attempts that have been started.
       - name: workflow_runs_success_count
-        tests:
+        data_tests:
           - not_null
         description: The number of workflow runs that succeeded on this day.
       - name: workflow_success_percent
-        tests:
+        data_tests:
           - not_null
         description: The percentage of workflow runs that succeeded on this day.
       - name: billed_count
-        tests:
+        data_tests:
           - not_null
         description: "[Fill]"
       - name: daily_usage_revenue
-        tests:
+        data_tests:
           - not_null
         description: The amount of revenue from usage charges for this day.
       - name: workflow_run_success_rolling_thirty_day_count
-        tests:
+        data_tests:
           - not_null
         description: The number of successful workflow run attempts initiated in the last 30 days as of this day.
       - name: workflow_run_success_rolling_year_count
-        tests:
+        data_tests:
           - not_null
         description: The number of successful workflow run attempts initiated in the last year as of this day.
       - name: is_active
-        tests:
+        data_tests:
           - not_null
         description: Whether the shop is considered active on this day.
       - name: mesa_shop_days_id
-        tests:
+        data_tests:
           - not_null
           - unique
         description: Unique identifier for each row
