@@ -207,11 +207,3 @@ models:
         +schema: support
       intermediate:
         +schema: support
-
-tests:
-  shoppad:
-    mesa:
-      staging:
-        enabled: true #"{{ target.name not in ['prod', 'default'] }}"
-      intermediate:
-        enabled: true #"{{ target.name not in ['prod', 'default'] }}"

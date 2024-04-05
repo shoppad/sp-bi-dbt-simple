@@ -1,6 +1,5 @@
-# dbt-snowflake
+dbt-snowflake
 # dbt-core
-dbt-rpc
 sqlfluff
 dbt-metabase
 pre-commit

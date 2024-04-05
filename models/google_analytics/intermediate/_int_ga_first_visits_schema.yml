@@ -25,7 +25,7 @@ models:
         description: The medium that the shop was acquired through.
       - name: ga_first_touch_traffic_source_source
         description: The source that the shop was acquired through.
-      - name: ga_first_touch_referrer_host
+      - name: ga_first_touch_page_referrer_host
         description: The referrer host that referrered the shop's first visit.
       - name: ga_first_touch_app_store_surface_detail
         description: The detail of the app store surface during the first touch event.

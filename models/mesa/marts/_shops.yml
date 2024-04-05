@@ -856,15 +856,15 @@ models:
         description: The campaign of the traffic during acquisition.
       - name: acq_unified_traffic_source
         description: The source of the traffic during acquisition.
-      - name: acq_unified_referrer_host
+      - name: acq_unified_page_referrer_host
         description: The host of the referrer during acquisition.
       - name: acq_unified_traffic_url
         description: The URL of the traffic during acquisition.
       - name: acq_unified_traffic_path
         description: The path of the traffic during acquisition.
-      - name: acq_referrer_source
+      - name: acq_page_referrer_source
         description: The source of the referrer during acquisition.
-      - name: acq_referrer_medium
+      - name: acq_page_referrer_medium
         description: The medium of the referrer during acquisition.
       - name: acq_unified_traffic_page_host
         description: The host of the traffic page during acquisition.
@@ -894,7 +894,7 @@ models:
         description: The URL path chain of important touch points during acquisition.
       - name: acq_unified_page_host_chain
         description: The host chain of important touch points during acquisition.
-      - name: acq_unified_referrer_host_chain
+      - name: acq_unified_page_referrer_host_chain
         description: The referrer host chain of important touch points during acquisition.
       - name: first_workflow_destination_operation_id
         description: The operation ID of the first workflow destination.

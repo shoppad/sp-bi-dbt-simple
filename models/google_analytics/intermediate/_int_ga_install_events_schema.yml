@@ -17,11 +17,11 @@ models:
         description: ""
       - name: REFERRER
         description: ""
-      - name: REFERRER_HOST
+      - name: page_referrer_host
         description: ""
-      - name: REFERRER_SOURCE
+      - name: page_referrer_SOURCE
         description: ""
-      - name: REFERRER_MEDIUM
+      - name: page_referrer_MEDIUM
         description: ""
       - name: SHOP_ID
         description: ""

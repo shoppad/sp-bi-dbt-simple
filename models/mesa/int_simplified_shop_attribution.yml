@@ -28,7 +28,7 @@ models:
         description: The type of surface in the app store during acquisition.
       - name: acq_unified_app_store_surface_detail
         description: The detail of the surface in the app store during acquisition.
-      - name: acq_unified_referrer_host
+      - name: acq_unified_page_referrer_host
         description: The host of the referrer during acquisition.
       - name: acq_is_blog_referral
         description:
@@ -38,7 +38,7 @@ models:
         description: The number of days it took to install after acquisition.
       - name: acq_is_app_store_search_ad_referral
         description: Whether the acquisition is a referral from an app store search ad.
-      - name: acq_referrer_medium
+      - name: acq_page_referrer_medium
         description: The medium of the referrer during acquisition.
-      - name: acq_referrer_source
+      - name: acq_page_referrer_source
         description: The source of the referrer during acquisition.

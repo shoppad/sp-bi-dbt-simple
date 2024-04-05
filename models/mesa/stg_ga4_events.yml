@@ -37,10 +37,10 @@ models:
       - name: param_content
       - name: param_term
       - name: referrer
-      - name: referrer_host
-      - name: referrer_source
+      - name: page_referrer_host
+      - name: page_referrer_source
         description: The source of the referrer that led the user to the shop.
-      - name: referrer_medium
+      - name: page_referrer_medium
         description: The medium of the referrer that led the user to the shop.
       - name: app_store_surface_detail
       - name: app_store_surface_type

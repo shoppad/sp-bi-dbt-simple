@@ -164,14 +164,16 @@ combined_attribution AS (
             app_store_organic_click_app_store_surface_detail
         ) AS unified_app_store_surface_detail,
         REPLACE(COALESCE(
-            ga_first_touch_referrer_host,
-            ga_last_touch_referrer_host,
+            {# Fixes a weird GA4 thing that doesn't attribute referral traffic to Youtube.com #}
+            IFF(unified_traffic_source ILIKE '%youtube%', 'youtube.com', NULL),
+            ga_first_touch_page_referrer_host,
+            ga_last_touch_page_referrer_host,
             segment_first_touch_referrer_host,
             segment_last_touch_referrer_host,
-            app_store_install_referrer_host,
-            app_store_ad_click_referrer_host,
-            app_store_organic_click_referrer_host
-        ), 'www.', '') AS unified_referrer_host,
+            app_store_install_page_referrer_host,
+            app_store_ad_click_page_referrer_host,
+            app_store_organic_click_page_referrer_host
+        ), 'www.', '') AS unified_page_referrer_host,
 
         {# Chain Columns #}
 
@@ -287,15 +289,15 @@ combined_attribution AS (
 
         REPLACE(ARRAY_TO_STRING(
             ARRAY_CONSTRUCT(
-                ga_first_touch_referrer_host,
-                ga_last_touch_referrer_host,
+                ga_first_touch_page_referrer_host,
+                ga_last_touch_page_referrer_host,
                 segment_first_touch_referrer_host,
                 segment_last_touch_referrer_host,
-                app_store_install_referrer_host,
-                app_store_ad_click_referrer_host,
-                app_store_organic_click_referrer_host
+                app_store_install_page_referrer_host,
+                app_store_ad_click_page_referrer_host,
+                app_store_organic_click_page_referrer_host
             ), ' • '
-        ), 'www.', '') AS unified_referrer_host_chain
+        ), 'www.', '') AS unified_page_referrer_host_chain
 
     FROM shops
     LEFT JOIN formatted_install_records USING (shop_subdomain)
@@ -304,7 +306,7 @@ combined_attribution AS (
     LEFT JOIN segment_attribution USING (shop_subdomain)
 ),
 
-referrer_mapping as (select * FROM {{ ref("referrer_mapping") }}),
+page_referrer_mapping as (select * FROM {{ ref("referrer_mapping") }}),
 
 reformatted AS (
     SELECT
@@ -313,9 +315,9 @@ reformatted AS (
         {# Referrer Mapping #}
         INITCAP(
             COALESCE(
-                referrer_mapping.source,
+                page_referrer_mapping.source,
                 IFF(
-                    (unified_traffic_source IS NULL AND unified_referrer_host ILIKE '%shopify%')
+                    (unified_traffic_source IS NULL AND unified_page_referrer_host ILIKE '%shopify%')
                         OR
                         unified_traffic_source ILIKE '%shopify%',
                     'Shopify',
@@ -325,27 +327,28 @@ reformatted AS (
         ) AS unified_traffic_source,
         INITCAP(
             COALESCE(
-                referrer_mapping.medium,
+                page_referrer_mapping.medium,
                 IFF(
-                    (unified_traffic_medium IS NULL AND unified_referrer_host ILIKE '%apps.shopify.com%') OR unified_traffic_medium ILIKE '%apps.shopify.com%',
+                    (unified_traffic_medium IS NULL AND unified_page_referrer_host ILIKE '%apps.shopify.com%')
+                    OR unified_traffic_medium ILIKE '%apps.shopify.com%',
                     'app store',
                     unified_traffic_medium
                 )
             )
         ) AS unified_traffic_medium,
 
-        referrer_mapping.medium AS referrer_medium,
-        referrer_mapping.source AS referrer_source
+        page_referrer_mapping.medium AS page_referrer_medium,
+        page_referrer_mapping.source AS page_referrer_source
     FROM shops
     LEFT JOIN combined_attribution USING (shop_subdomain)
     LEFT JOIN
-        referrer_mapping
+        page_referrer_mapping
             ON
                 LOWER(REPLACE(combined_attribution.unified_traffic_source, 'www.', ''))
-                    = lower(referrer_mapping.host)
+                    = lower(page_referrer_mapping.host)
                 OR
-                lower(REPLACE(combined_attribution.unified_referrer_host, 'www.', ''))
-                    = lower(referrer_mapping.host)
+                lower(REPLACE(combined_attribution.unified_page_referrer_host, 'www.', ''))
+                    = lower(page_referrer_mapping.host)
 ),
 
 final AS (

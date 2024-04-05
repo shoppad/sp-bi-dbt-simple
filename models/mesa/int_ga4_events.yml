@@ -35,11 +35,11 @@ models:
       - name: page_location
       - name: param_content
       - name: param_term
-      - name: referrer_host
-      - name: referrer_path
-      - name: referrer_query
-      - name: referrer_url
-      - name: referrer_full
+      - name: page_referrer_host
+      - name: page_referrer_path
+      - name: page_referrer_query
+      - name: page_referrer_url
+      - name: page_referrer_full
       - name: app_store_surface_detail
       - name: app_store_surface_type
       - name: app_store_surface_intra_position

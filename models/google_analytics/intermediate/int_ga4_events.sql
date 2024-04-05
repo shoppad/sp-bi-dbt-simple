@@ -31,17 +31,17 @@ reformatted AS (
             WHEN lower(traffic_source_medium) = '(none)'
                 THEN
                     CASE
-                        WHEN lower(referrer_host) = 'apps.shopify.com'
+                        WHEN lower(page_referrer_host) = 'apps.shopify.com'
                             THEN 'App Store - Direct/Other'
                         ELSE COALESCE(
                             param_medium,
                             IFF(
-                                referrer_full IS NOT NULL,
-                                nullif(PARSE_URL('https://' || referrer_full):parameters:utm_medium, ''),
+                                page_referrer_full IS NOT NULL,
+                                nullif(PARSE_URL('https://' || page_referrer_full):parameters:utm_medium, ''),
                                 NULL
                             ),
                             IFF(
-                                referrer_full ILIKE '%apps.shopify.com%', 'App Store - Direct/Other', 'direct'
+                                page_referrer_full ILIKE '%apps.shopify.com%', 'App Store - Direct/Other', 'direct'
                             ) {# Do a bunch of stuff to override direct because of the way the
                                 App Store works. #}
                         )
@@ -62,12 +62,12 @@ reformatted AS (
                     THEN COALESCE(
                             param_source,
                             IFF(
-                                referrer_full IS NOT NULL,
-                                nullif(PARSE_URL('https://' || referrer_full):parameters:utm_source, ''),
+                                page_referrer_full IS NOT NULL,
+                                nullif(PARSE_URL('https://' || page_referrer_full):parameters:utm_source, ''),
                                 NULL
                             ),
                             IFF(
-                                referrer_full ILIKE '%apps.shopify.com%', 'shopify', 'direct'
+                                page_referrer_full ILIKE '%apps.shopify.com%', 'shopify', 'direct'
                             ) {# Do a bunch of stuff to override direct because of the way
                                 the App Store works. #}
                     )

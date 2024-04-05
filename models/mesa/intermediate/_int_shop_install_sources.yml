@@ -16,9 +16,9 @@ models:
         description: The campaign that the shop was acquired through.
       - name: ga_first_touch_content
         description: The content that the shop was acquired through.
-      - name: ga_first_touch_referrer
+      - name: ga_first_touch_page_referrer
         description: The referrer URL that referred the Shop's first visit.
-      - name: ga_first_touch_referrer_host
+      - name: ga_first_touch_page_referrer_host
         description: The referrer host that referrered the shop's first visit.
       - name: ga_first_touch_first_page_path
         description: The first page path that the shop was acquired through.

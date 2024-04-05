@@ -16,6 +16,9 @@ with
             )
         {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
         {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
+
+        {# We still get duplicates sometimes. #}
+        QUALIFY ROW_NUMBER() OVER (PARTITION BY user_pseudo_id, event_name, event_timestamp ORDER BY source) = 1
     ),
 
     filtered_raw_ga4_events AS (
@@ -95,16 +98,10 @@ with
                 {# Filter out the referral medium and source if it's our surface area. #}
             CASE
                 WHEN param_source = 'shopify_forums' THEN 'referral'
-                WHEN medium ILIKE '%referral%'
-                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%' OR page_referrer ILIKE '%shoppad.com%')
-                    THEN 'internal'
-                ELSE medium
+                else medium
             END as traffic_source_medium,
             CASE
                 WHEN param_source = 'shopify_forums' THEN 'Shopify Forums'
-                WHEN name ILIKE '%referral%'
-                    AND (page_referrer ILIKE '%shopify.com%' OR page_referrer ILIKE '%getmesa.com%' OR page_referrer ILIKE '%shoppad.com%')
-                    THEN '(internal)'
                 ELSE name
             END as traffic_source_name,
 
@@ -113,7 +110,6 @@ with
                 ELSE source
             END as traffic_source_source,
 
-            {# Remove referrer when traffic_source_medium is referral and referrer is our own property. #}
             CASE
                 WHEN param_source = 'shopify_forums' THEN parse_url('https://community.shopify.com/')
                 WHEN traffic_source_medium ILIKE '%referral%' OR traffic_source_name ILIKE '%referral%'
@@ -122,11 +118,11 @@ with
                 ELSE parse_url(page_referrer)
             END as parsed_referrer,
 
-            parsed_referrer:host::STRING as referrer_host,
-            '/' || parsed_referrer:path as referrer_path,
-            '?' || parsed_referrer:query as referrer_query,
-            referrer_host || referrer_path AS referrer_url,
-            referrer_host || referrer_path || COALESCE(referrer_query, '') AS referrer_full,
+            parsed_referrer:host::STRING as page_referrer_host,
+            '/' || parsed_referrer:path as page_referrer_path,
+            '?' || parsed_referrer:query as page_referrer_query,
+            page_referrer_host || page_referrer_path AS page_referrer_url,
+            page_referrer_host || page_referrer_path || COALESCE(page_referrer_query, '') AS page_referrer_full,
 
             CASE
                 WHEN param_source = 'shopify_forums' THEN 'referral'
@@ -178,11 +174,11 @@ with
         "traffic_source_name",
         "traffic_source_source",
         "traffic_source_medium",
-        "referrer_host",
-        "referrer_full",
-        "referrer_url",
-        "referrer_query",
-        "referrer_path",
+        "page_referrer_host",
+        "page_referrer_full",
+        "page_referrer_url",
+        "page_referrer_query",
+        "page_referrer_path",
         "shop_subdomain"
     ] %}
 
