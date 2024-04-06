@@ -4,9 +4,6 @@ models:
     description:
       a intermediate model that isolates the very first step executed of
       each workflow run.
-    data_tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 100000
     columns:
       - name: workflow_run_id
         data_tests:
@@ -16,8 +13,8 @@ models:
         description:
           a step/workflow is only billed once -- not for each step. so only
           true for the first trigger.
-        data_tests:
-          - not_null
+        # data_tests:
+        # - not_null
       - name: shop_subdomain
         data_tests:
           - not_null

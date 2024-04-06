@@ -26,9 +26,6 @@ clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-data_tests:
-  +store_failures: true
-
 on-run-start:
   - "{{ url_decode_udf() }}"
 
@@ -135,11 +132,10 @@ models:
 
     generic:
       +schema: support
-      staging:
-        stg_shop_infos:
-          # +materialized: incremental
-          # +on_schema_change: "sync_all_columns"
-          # +unique_key: shop_subdomain
+      #staging:
+      #  stg_shop_infos:
+      # +on_schema_change: "sync_all_columns"
+      # +unique_key: shop_subdomain
     mesa:
       marts:
         step_runs:
@@ -179,17 +175,17 @@ models:
         # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
         stg_step_runs:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: step_run_id
-          +cluster_by: ["workflow_run_id"]
+          +materialized: view
+          # +on_schema_change: "sync_all_columns"
+          # +unique_key: step_run_id
+          # +cluster_by: ["workflow_run_id"]
         stg_workflows:
           +unique_key: workflow_id
         stg_workflow_runs:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: workflow_run_id
-          +cluster_by: ["shop_subdomain"]
+          +materialized: view
+          # +on_schema_change: "sync_all_columns"
+          # +unique_key: workflow_run_id
+          # +cluster_by: ["shop_subdomain"]
         stg_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain

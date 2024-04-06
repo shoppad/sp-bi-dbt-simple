@@ -4,7 +4,7 @@ models:
     description: individual mesa workflow executions.
     data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 10000
+          min_value: 100000
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 1000
           row_condition: is_billable

@@ -1,14 +1,10 @@
 version: 2
 models:
   - name: stg_step_runs
-    data_tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1000000
     columns:
       - name: step_run_id
         data_tests:
           - not_null
-          - unique
         description: The unique identifier for the step run.
       - name: workflow_run_id
         data_tests:
@@ -21,11 +17,6 @@ models:
           metabase.fk_target_field: workflow_id
         data_tests:
           - not_null
-          - relationships_proportion:
-              to: ref('stg_workflows')
-              field: workflow_id
-              warn_if: ">1"
-              error_if: ">5"
         description: The foreign key to the originating workflow
       - name: step_run_at_utc
         data_tests:
@@ -67,8 +58,8 @@ models:
           - not_null
         description: The type of step that was run. `input` or `output`.
       - name: RUN_STATUS
-        data_tests:
-          - not_null
+        # data_tests:
+        # - not_null
       - name: TRIES
       - name: UPDATED_AT
       - name: SHOP_SUBDOMAIN

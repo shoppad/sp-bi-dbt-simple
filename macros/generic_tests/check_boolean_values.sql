@@ -1,4 +1,4 @@
--- tests/check_boolean_values.sql
+-- generic_tests/check_boolean_values.sql
 {# Checks that a column has both True and False values. #}
 {% macro test_check_boolean_values(model, column_name) %}
     with validation as (
