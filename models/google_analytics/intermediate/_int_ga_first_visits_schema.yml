@@ -6,8 +6,7 @@ models:
           min_value: 100
     description: ""
     columns:
-      - name: user_pseudo_id
-        decription: the anonymous google analytics id
+      - name: USER_PSEUDO_ID
         description: the anonymouse google analytics user id
       - name: ga_first_touch_at_pt
         description: The timestamp of the first touch.
