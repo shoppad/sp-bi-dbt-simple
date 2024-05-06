@@ -15,7 +15,7 @@ shops AS (
 final AS (
     SELECT
         ga4_events.*,
-        COALESCE(event_timestamp_pt < shop_first_installed_at, FALSE) AS is_pre_install
+        COALESCE(event_timestamp_pt < shop_first_installed_at, TRUE) AS is_pre_install
     FROM ga4_events
     LEFT JOIN shops
         ON ga4_events.shop_subdomain = shops.shop_subdomain
