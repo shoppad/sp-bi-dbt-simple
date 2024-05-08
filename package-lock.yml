@@ -1,10 +1,10 @@
 packages:
   - package: calogica/dbt_date
-    version: 0.10.0
-  - package: calogica/dbt_expectations
     version: 0.10.1
+  - package: calogica/dbt_expectations
+    version: 0.10.3
   - package: dbt-labs/dbt_utils
     version: 1.1.1
   - package: Fleetio/dbt_segment
-    version: 0.3.0
-sha1_hash: 79057121caaf40aa8df90326f52997f57c2735bd
+    version: 0.3.1
+sha1_hash: c2f8a36e447aee89cb9e1934785b4c8cab91c92e
