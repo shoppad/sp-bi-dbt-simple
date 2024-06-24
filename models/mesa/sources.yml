@@ -198,6 +198,13 @@ sources:
             description: unique identifier for the workflow event.
       - name: install_events
         identifier: getmesa_install_convert
+        freshness:
+          warn_after:
+            count: 36
+            period: hour
+          error_after:
+            count: 48
+            period: hour
 
   - name: php_segment
     description: identified users via the getmesa segment app.

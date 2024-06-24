@@ -32,11 +32,11 @@ first_step_runs AS (
         COALESCE(NOT IS_NULL_VALUE(metadata:backfill_id), FALSE) AS is_time_travel
     FROM {{ source('mongo_sync', 'tasks') }}
     WHERE
-        NOT(__hevo__marked_deleted)
+        NOT (__hevo__marked_deleted)
         AND metadata:trigger:trigger_type = 'input'
         AND workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's
-        AND run_status IN ('fail', 'success', 'replayed', 'stop')
-        AND NOT(integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
+        AND run_status IN ('fail', 'success', 'replayed', 'stop', 'error')
+        AND NOT (integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
 ),
 
 final AS (
