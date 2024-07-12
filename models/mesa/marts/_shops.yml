@@ -704,6 +704,8 @@ models:
         name: workflow_run_stop_rolling_thirty_day_count
       - description: The number of workflow runs that have resulted in Failure.
         name: workflow_runs_fail_count
+        data_tests:
+          - not_null
       - description:
           The number of workflow runs that have resulted in Failure in the
           last 30 days.
@@ -914,3 +916,37 @@ models:
         description: The timestamp of when we sent the Shop a request to review MESA in the app store in Pacific Time.
       - name: has_app_store_reviewed
         description: Whether the Shop has reviewed MESA in the app store.
+      - name: has_taken_billing_breaks
+        description: Indicates if there's been a gap between days that the merchant has been billed, usually meaning they uninstalled and later reinstalled the app.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      - name: billing_break_days
+        description: >
+          The total number of days without billing, including a 7-day detection period for each break.
+          This accounts for the rolling 7-day window used to determine revenue periods.
+          NULL if the shop has never been billed or has no billing breaks.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 8
+              inclusive: true
+              where: "billing_break_days is not null"
+      - name: billing_breaks
+        description: A JSON array representation of all billing breaks, including start date, end date, and duration of each break. NULL if the shop has never been billed.
+      - name: paid_days_completed_tier
+        description: A categorization of the number of paid days completed, providing insight into customer retention at different stages. NULL if the shop has never been billed.
+        data_tests:
+          - accepted_values:
+              values:
+                [
+                  NULL,
+                  "A-1 day",
+                  "B-2-7 days",
+                  "C-8-30 days",
+                  "D-31-60 days",
+                  "E-61-90 days",
+                  "F-91-180 days",
+                  "G-181-365 days",
+                  "H-365+ days",
+                ]

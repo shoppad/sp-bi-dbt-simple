@@ -489,7 +489,6 @@ churn_types AS (
 churn_dates AS (
     SELECT
         shop_subdomain,
-        {# day_before_inc_amount, #}
         MAX(dt) AS churned_on_pt
     FROM shops
     LEFT JOIN inc_amount_days_and_day_befores USING (shop_subdomain)
@@ -500,6 +499,72 @@ churn_dates AS (
         OR
         (inc_amount = 0 AND day_before_inc_amount > 0)
     GROUP BY 1, uninstalled_at_pt
+),
+
+daily_revenue AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        inc_amount,
+        SUM(inc_amount) OVER (PARTITION BY shop_subdomain ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7_day_revenue
+    FROM {{ ref('int_mesa_shop_days') }}
+),
+
+revenue_periods AS (
+    SELECT
+        shop_subdomain,
+        dt,
+        inc_amount,
+        rolling_7_day_revenue,
+        CASE
+            WHEN rolling_7_day_revenue > 0 THEN 1
+            ELSE 0
+        END AS is_revenue_period,
+        SUM(CASE WHEN rolling_7_day_revenue > 0 THEN 1 ELSE 0 END) OVER (PARTITION BY shop_subdomain ORDER BY dt) AS revenue_period_group
+    FROM daily_revenue
+),
+
+billing_breaks AS (
+    SELECT
+        shop_subdomain,
+        MIN(dt) AS start_date,
+        MAX(dt) AS end_date,
+        DATEDIFF(day, MIN(dt), MAX(dt)) + 1 AS days
+    FROM revenue_periods
+    WHERE is_revenue_period = 0
+    GROUP BY shop_subdomain, revenue_period_group
+    HAVING days > 7  -- Only consider breaks longer than a week
+),
+
+shop_billing_breaks AS (
+    SELECT
+        shop_subdomain,
+        ARRAY_AGG(OBJECT_CONSTRUCT(
+            'start', DATEADD('day', -7, start_date),  -- Adjust start date
+            'end', end_date,
+            'days', days + 7  -- Add 7 days to the break duration
+        )) AS billing_breaks,
+        NULLIF(SUM(days + 7), 7) AS billing_break_days,  -- Add 7 days to each break
+        COUNT(*) > 0 AS has_taken_billing_breaks
+    FROM billing_breaks
+    GROUP BY shop_subdomain
+),
+
+paid_days_tiers AS (
+    SELECT
+        shop_subdomain,
+        CASE
+            WHEN paid_days_completed = 0 THEN NULL
+            WHEN paid_days_completed = 1 THEN 'A-1 day'
+            WHEN paid_days_completed BETWEEN 2 AND 7 THEN 'B-2-7 days'
+            WHEN paid_days_completed BETWEEN 8 AND 30 THEN 'C-8-30 days'
+            WHEN paid_days_completed BETWEEN 31 AND 60 THEN 'D-31-60 days'
+            WHEN paid_days_completed BETWEEN 61 AND 90 THEN 'E-61-90 days'
+            WHEN paid_days_completed BETWEEN 91 AND 180 THEN 'F-91-180 days'
+            WHEN paid_days_completed BETWEEN 181 AND 365 THEN 'G-181-365 days'
+            WHEN paid_days_completed > 365 THEN 'H-365+ days'
+        END AS paid_days_completed_tier
+    FROM shops
 ),
 
 final AS (
@@ -518,7 +583,9 @@ final AS (
                 COALESCE((1.0 * shopify_shop_gmv_initial_total_usd) >= 3000, FALSE)
                 OR
                 shopify_plan_name IN ('professional', 'unlimited', 'shopify_plus')
-            ) AS is_mql
+            ) AS is_mql,
+            COALESCE(shop_billing_breaks.has_taken_billing_breaks, FALSE) AS has_taken_billing_breaks,
+            COALESCE(shop_billing_breaks.billing_break_days, NULL) AS billing_break_days
         ),
         NOT activation_date_pt IS NULL AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
@@ -702,7 +769,6 @@ final AS (
         COALESCE(
             iff(projected_mrr > 0, projected_mrr, iff(last_plan_price > 0, last_plan_price, plan_price)), 0
         ) AS shop_value_per_month
-
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
@@ -733,6 +799,9 @@ final AS (
     LEFT JOIN churn_types USING (shop_subdomain)
     LEFT JOIN workflow_source_destination_pairs USING (shop_subdomain)
     LEFT JOIN last_plan_prices USING (shop_subdomain)
+    LEFT JOIN shop_billing_breaks USING (shop_subdomain)
+    LEFT JOIN paid_days_tiers USING (shop_subdomain)
+
 )
 
 SELECT *
