@@ -432,6 +432,7 @@ inc_amount_days_and_day_befores AS (
         dt,
         inc_amount,
         is_shopify_zombie_plan,
+        is_involuntary,
         COALESCE(
             LAG(inc_amount, 1, NULL) OVER (PARTITION BY shop_subdomain ORDER BY dt),
             0
@@ -489,6 +490,7 @@ churn_types AS (
 churn_dates AS (
     SELECT
         shop_subdomain,
+        MAX_BY(dt, is_involuntary) AS has_churned_paid_as_involuntary,
         MAX(dt) AS churned_on_pt
     FROM shops
     LEFT JOIN inc_amount_days_and_day_befores USING (shop_subdomain)
@@ -768,7 +770,8 @@ final AS (
         ) AS churned_customer_duration_in_months,
         COALESCE(
             iff(projected_mrr > 0, projected_mrr, iff(last_plan_price > 0, last_plan_price, plan_price)), 0
-        ) AS shop_value_per_month
+        ) AS shop_value_per_month,
+        IFF(is_currently_paying AND workflow_run_success_rolling_thirty_day_count < 1, TRUE, FALSE) AS is_currently_involuntary
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)

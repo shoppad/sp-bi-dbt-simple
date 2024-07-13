@@ -192,3 +192,5 @@ models:
         description: The number of workflow runs that failed in the last 30 days as of this day.
       - name: workflow_run_failure_rolling_year_count
         description: The number of workflow runs that failed in the last year as of this day.
+      - name: is_involuntary
+        description: The customer paid on this day but had not run any successful workflows in 30+ days.

@@ -35,7 +35,9 @@ workflow_counts AS (
 ),
 
 final AS (
-    SELECT *
+    SELECT
+        *,
+        IFF(inc_amount > 0 AND NOT is_active, TRUE, FALSE) AS is_involuntary
     FROM shop_days
     LEFT JOIN workflow_counts USING (shop_subdomain, dt)
 )

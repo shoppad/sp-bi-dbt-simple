@@ -950,3 +950,7 @@ models:
                   "G-181-365 days",
                   "H-365+ days",
                 ]
+      - name: has_churned_paid_as_involuntary
+        description: The Shop paid and no longer pays and never activated.
+      - name: is_currently_involuntary
+        description: The shop has not run a successful workflow in 30+ days
