@@ -771,7 +771,12 @@ final AS (
         COALESCE(
             iff(projected_mrr > 0, projected_mrr, iff(last_plan_price > 0, last_plan_price, plan_price)), 0
         ) AS shop_value_per_month,
-        IFF(is_currently_paying AND workflow_run_success_rolling_thirty_day_count < 1, TRUE, FALSE) AS is_currently_involuntary
+        CASE
+            WHEN is_currently_paying AND workflow_run_success_rolling_thirty_day_count < 1
+                THEN TRUE
+            WHEN is_currently_paying
+                THEN FALSE
+        END AS is_currently_involuntary
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
