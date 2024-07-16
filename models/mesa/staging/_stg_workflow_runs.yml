@@ -4,6 +4,13 @@ models:
     description:
       a intermediate model that isolates the very first step executed of
       each workflow run.
+    data_tests:
+      - dbt_expectations.expect_table_row_count_to_equal:
+          value: 0
+          row_condition: "(child_failure_count > 0 OR child_stop_count > 0) AND run_status = 'success'"
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 10000
+          row_condition: "run_status = 'success'"
     columns:
       - name: workflow_run_id
         data_tests:
