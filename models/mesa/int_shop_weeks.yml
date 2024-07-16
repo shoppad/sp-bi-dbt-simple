@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: int_shop_weeks
+    columns:
+      - name: week
+      - name: shop_subdomain
+      - name: inc_amount
+      - name: first_week

@@ -1,0 +1,24 @@
+version: 2
+models:
+  - name: stg_ga_session_starts
+    columns:
+      - name: user_pseudo_id
+      - name: page_location
+      - name: event_timestamp_pt
+      - name: page_url
+      - name: page_host
+      - name: page_path
+      - name: page_query
+      - name: utm_campaign
+      - name: utm_medium
+      - name: utm_source
+      - name: device_category
+      - name: utm_content
+      - name: utm_term
+      - name: app_store_surface_detail
+      - name: app_store_surface_type
+      - name: app_store_surface_intra_position
+      - name: app_store_surface_inter_position
+      - name: app_store_locale
+      - name: shopify_id
+      - name: shop_subdomain

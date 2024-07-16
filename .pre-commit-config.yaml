@@ -6,6 +6,8 @@ repos:
       - id: check-script-semicolon
         files: ^models
       - id: check-model-has-properties-file
+        files: ^models
+        exclude: ^custom_tests
       - id: check-script-has-no-table-name
         files: ^models
       - id: generate-model-properties-file

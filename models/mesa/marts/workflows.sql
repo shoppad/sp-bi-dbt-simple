@@ -92,7 +92,7 @@ workflow_saves AS (
     SELECT
         workflow_id,
         COALESCE(
-            COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND properties_workflow_id = workflow_id),
+            COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND workflow_id IN (properties_workflow_id, properties_id)),
             0)
             AS save_count,
         save_count > 0 AS has_edited_or_saved_workflow
@@ -106,7 +106,7 @@ workflow_enables AS (
 
     SELECT
         workflow_id,
-        COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id = properties_workflow_id), 0) AS enable_count,
+        COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id IN (properties_workflow_id, properties_id)), 0) AS enable_count,
         enable_count > 0 AS has_enabled_workflow
     FROM workflows
     LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
@@ -153,3 +153,5 @@ final AS (
 
 SELECT *
 FROM final
+WHERE created_at_pt > '2024-05-01'
+AND save_count > 0
