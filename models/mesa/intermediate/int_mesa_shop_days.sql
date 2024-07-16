@@ -170,4 +170,3 @@ final AS (
 
 SELECT *
 FROM final
-ORDER BY shop_subdomain, dt

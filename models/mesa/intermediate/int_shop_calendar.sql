@@ -50,4 +50,3 @@ WITH
 
 SELECT *
 FROM shop_calendar
-ORDER BY shop_subdomain, dt

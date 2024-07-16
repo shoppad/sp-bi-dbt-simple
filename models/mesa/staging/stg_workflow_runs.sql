@@ -9,15 +9,25 @@ workflows AS (
     FROM {{ ref('stg_workflows') }}
 ),
 
-first_step_runs AS (
+trigger_runs AS (
+    SELECT *
+        RENAME (_id AS workflow_run_id, uuid AS shop_subdomain, _created_at AS workflow_run_at_utc, status AS run_status)
+    FROM {{ source('mongo_sync', 'tasks') }}
+    WHERE
+        NOT (__hevo__marked_deleted)
+        AND metadata:trigger:trigger_type = 'input'
+        AND status IN ('fail', 'success', 'replayed', 'stop', 'error')
+
+),
+
+formatted_trigger_runs AS (
     SELECT
-        _id AS workflow_run_id,
+        workflow_run_id,
         metadata:automation:_id::VARCHAR AS workflow_id,
-        uuid AS shop_subdomain,
-        _created_at AS workflow_run_at_utc,
-        {{ pacific_timestamp("_created_at") }} AS workflow_run_at_pt,
+        shop_subdomain,
+        workflow_run_at_utc,
+        {{ pacific_timestamp("workflow_run_at_utc") }} AS workflow_run_at_pt,
         DATE_TRUNC('day', workflow_run_at_pt)::DATE AS workflow_run_on_pt,
-        status AS run_status, {# TODO: Status "stop" is not put on the trigger. #}
         NULLIF(metadata:unbillable_reason::STRING, '') AS unbillable_reason,
         unbillable_reason IS NOT NULL AS is_free_workflow,
         unbillable_reason IS NULL AS is_billable,
@@ -27,16 +37,23 @@ first_step_runs AS (
         metadata:child_fails::NUMERIC AS child_failure_count,
         metadata:child_stops::NUMERIC AS child_stop_count,
         metadata:child_completes::NUMERIC AS child_complete_count,
+        case
+            WHEN child_failure_count > 0
+                THEN 'fail'
+            WHEN child_stop_count > 0
+                THEN 'stop'
+            ELSE
+                run_status
+            end AS run_status,
         updated_at,
         metadata:is_test AS is_test_run,
         COALESCE(NOT IS_NULL_VALUE(metadata:backfill_id), FALSE) AS is_time_travel
-    FROM {{ source('mongo_sync', 'tasks') }}
+    FROM trigger_runs
     WHERE
-        NOT (__hevo__marked_deleted)
-        AND metadata:trigger:trigger_type = 'input'
-        AND workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's
-        AND run_status IN ('fail', 'success', 'replayed', 'stop', 'error')
+        workflow_id IS NOT NULL -- ~3,000 triggers don't have automation:id's which is workflow_id
         AND NOT (integration_key ILIKE '%delay%' OR integration_key ILIKE '%-vo%')
+
+
 ),
 
 final AS (
@@ -44,7 +61,7 @@ final AS (
     SELECT
         *,
         workflows.workflow_id IS NULL AS is_workflow_hard_deleted
-    FROM first_step_runs
+    FROM formatted_trigger_runs
     INNER JOIN shops USING (shop_subdomain)
     LEFT JOIN workflows USING (workflow_id)
 
