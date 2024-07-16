@@ -927,7 +927,7 @@ models:
           The total number of days without billing, including a 7-day detection period for each break.
           This accounts for the rolling 7-day window used to determine revenue periods.
           NULL if the shop has never been billed or has no billing breaks.
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
               min_value: 8
               inclusive: true
