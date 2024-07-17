@@ -490,7 +490,7 @@ churn_types AS (
 churn_dates AS (
     SELECT
         shop_subdomain,
-        MAX_BY(dt, is_involuntary) AS has_churned_paid_as_involuntary,
+        MAX_BY(is_involuntary, dt) AS has_churned_paid_as_involuntary,
         MAX(dt) AS churned_on_pt
     FROM shops
     LEFT JOIN inc_amount_days_and_day_befores USING (shop_subdomain)
@@ -812,5 +812,5 @@ final AS (
 
 )
 
-SELECT *
+SELECT shop_subdomain, has_churned_paid_as_involuntary
 FROM final
