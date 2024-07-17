@@ -17,6 +17,7 @@ trigger_runs AS (
         NOT (__hevo__marked_deleted)
         AND metadata:trigger:trigger_type = 'input'
         AND status IN ('fail', 'success', 'replayed', 'stop', 'error')
+        AND _created_at < '{{ run_started_at }}'
 
 ),
 

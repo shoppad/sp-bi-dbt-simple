@@ -53,7 +53,7 @@ decorated_step_runs AS (
         NOT (__hevo__marked_deleted)
         AND status NOT IN ('ready', 'skip', 'skip-ignore', 'skip-retry')
         AND COALESCE(NOT (metadata:parents[0].trigger_key ILIKE '%delay%' OR metadata:parents[0].trigger_key ILIKE '%-vo%'), TRUE)
-
+        AND _created_at < '{{ run_started_at }}'
     {% if is_incremental() %}
     -- this filter will only be applied on an incremental run
         AND updated_at > '{{ get_max_updated_at() }}'

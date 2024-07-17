@@ -2,7 +2,7 @@ WITH
 source_workflows as (
 
     select * from {{ source('mongo_sync', 'workflows') }}
-
+    WHERE created_at < '{{ run_started_at }}'
 ),
 
 shops AS (

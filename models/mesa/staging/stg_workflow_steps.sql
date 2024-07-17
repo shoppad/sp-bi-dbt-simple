@@ -9,6 +9,7 @@ WITH workflow_steps AS (
             weight AS step_weight,
             "TYPE" AS integration_app
     FROM {{ source('mongo_sync', 'workflow_steps') }}
+    WHERE created_at < '{{ run_started_at }}'
 ),
 
 workflows AS (
