@@ -812,5 +812,5 @@ final AS (
 
 )
 
-SELECT shop_subdomain, has_churned_paid_as_involuntary
+SELECT *
 FROM final

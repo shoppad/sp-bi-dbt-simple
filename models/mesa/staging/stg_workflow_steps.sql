@@ -52,7 +52,3 @@ SELECT
     END AS step_name
     )
 FROM final
-{# WHERE
- (workflow_id = '60e4a1f6ee72cb0ba93fa5a4'
- OR workflow_id = '61de013cf0259f354243b582')
- AND step_type = 'input' #}

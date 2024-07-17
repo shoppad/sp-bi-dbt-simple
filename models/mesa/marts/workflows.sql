@@ -153,5 +153,3 @@ final AS (
 
 SELECT *
 FROM final
-WHERE created_at_pt > '2024-05-01'
-AND save_count > 0

@@ -11,6 +11,9 @@ models:
       - name: traffic_source_source
       - name: device_category
       - name: event_id
+        test:
+          - not_null
+          - unique
       - name: param_campaign
       - name: param_source
       - name: param_medium

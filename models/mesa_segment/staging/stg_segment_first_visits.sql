@@ -32,7 +32,13 @@ with
         select * exclude first_installed_at_pt
         from shops
         left join segment_sessions using (shop_subdomain)
-        where session_start_tstamp_pt <= shops.first_installed_at_pt + interval '1 hour'
+        where
+            session_start_tstamp_pt <= shops.first_installed_at_pt + interval '1 hour'
+            {% if is_incremental() %}
+            -- this filter will only be applied on an incremental run
+            AND session_start_tstamp_pt > '{{ get_max_updated_at() }}'
+            {% endif %}
+
         qualify
             row_number() over (
                 partition by shop_subdomain order by session_start_tstamp_pt asc

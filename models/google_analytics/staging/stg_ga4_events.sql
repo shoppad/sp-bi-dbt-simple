@@ -194,3 +194,7 @@ final AS (
 )
 
 SELECT * FROM final
+{% if is_incremental() %}
+-- this filter will only be applied on an incremental run
+    WHERE event_timestamp_pt > '{{ get_max_updated_at() }}'
+{% endif %}
