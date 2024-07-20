@@ -2,21 +2,30 @@
 {% set lookback_window_days = 30 %}
 {% set min_save_percent = 0.05 %}
 
-WITH filtered_data AS (
+WITH
+recent_workflows AS (
     SELECT
         *
     FROM
         {{ ref('workflows') }}
     WHERE
         created_at_pt >= CURRENT_DATE - INTERVAL '{{ lookback_window_days }} days'
-        AND save_count >= 1
+
+),
+
+filtered_data AS (
+    SELECT
+        *
+    FROM
+        recent_workflows
+    WHERE save_count >= 1
 ),
 
 total_count AS (
     SELECT
         COUNT(*) AS total
     FROM
-        {{ ref('workflows') }}
+        recent_workflows
 ),
 
 filtered_count AS (

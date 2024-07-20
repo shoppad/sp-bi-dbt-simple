@@ -36,7 +36,7 @@ with
             session_start_tstamp_pt <= shops.first_installed_at_pt + interval '1 hour'
             {% if is_incremental() %}
             -- this filter will only be applied on an incremental run
-            AND session_start_tstamp_pt > '{{ get_max_updated_at() }}'
+            AND session_start_tstamp_pt > '{{ get_max_updated_at('first_touch_at_pt') }}'
             {% endif %}
 
         qualify

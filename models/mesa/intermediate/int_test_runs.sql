@@ -9,6 +9,7 @@ SELECT
     run_status = 'success' AND child_failure_count = 0 AS is_successful
 FROM {{ source_table }}
 WHERE is_test_run = TRUE
+AND test_run_id = '66944e2118cf6789c509a2cb'
 
 {% if is_incremental() %}
 -- this filter will only be applied on an incremental run

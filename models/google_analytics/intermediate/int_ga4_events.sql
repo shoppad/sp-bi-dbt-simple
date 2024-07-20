@@ -7,6 +7,11 @@ staged_ga4_events AS (
         user_pseudo_id::STRING AS user_pseudo_id
 
     FROM {{ ref("stg_ga4_events") }}
+
+    {% if is_incremental() %}
+    -- this filter will only be applied on an incremental run
+        WHERE event_timestamp_pt > '{{ get_max_updated_at('event_timestamp_pt') }}'
+    {% endif %}
 ),
 
 reformatted AS (

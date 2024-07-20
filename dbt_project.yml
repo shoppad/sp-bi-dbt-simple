@@ -16,7 +16,7 @@ dbt-cloud:
 # found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
-#test-paths: ["custom_tests"]
+test-paths: ["custom_tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
@@ -166,8 +166,12 @@ models:
           +cluster_by: ["workflow_run_id"]
         int_test_step_runs:
           +materialized: incremental
+          +on_schema_change: "sync_all_columns"
+          +unique_key: test_step_run_id
         int_test_runs:
           +materialized: incremental
+          +on_schema_change: "sync_all_columns"
+          +unique_key: test_run_id
         int_workflow_runs:
           +on_schema_change: "sync_all_columns"
           +unique_key: workflow_run_id
@@ -201,6 +205,8 @@ models:
         +schema: support
         stg_segment_first_visits:
           +materialized: incremental
+          +on_schema_change: "sync_all_columns"
+          +unique_key: shop_subdomain
 
     google_analytics:
       staging:
@@ -208,8 +214,14 @@ models:
         +materialized: view
         stg_ga4_events:
           +materialized: incremental
+          +unique_key: event_id
+          +on_schema_change: "sync_all_columns"
       intermediate:
         +schema: support
+        int_ga4_events:
+          +materialized: incremental
+          +unique_key: event_id
+          +on_schema_change: "sync_all_columns"
 
     customer_io:
       staging:

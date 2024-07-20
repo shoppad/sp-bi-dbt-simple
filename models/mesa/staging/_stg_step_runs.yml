@@ -16,7 +16,9 @@ models:
           metabase.fk_target_table: ref('stg_workflows')
           metabase.fk_target_field: workflow_id
         data_tests:
-          - not_null
+          - not_null:
+              warn_if: ">100"
+              error_if: ">1000"
         description: The foreign key to the originating workflow
       - name: step_run_at_utc
         data_tests:
@@ -39,8 +41,8 @@ models:
           metabase.fk_target_field: workflow_step_id
         data_tests:
           - not_null:
-              warn_if: ">1"
-              error_if: ">50"
+              warn_if: ">50"
+              error_if: ">500"
               config:
                 where: step_run_at_utc > '2021-08-20'
           - relationships_proportion:

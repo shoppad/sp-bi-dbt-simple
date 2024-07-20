@@ -17,6 +17,11 @@ with
         {# TODO: Use the above only for everything after the first ga_session_id is present.  #}
         {# TODO: Then create another condition that looks to all the UA (pre-GA4 events) before that date. #}
 
+        {% if is_incremental() %}
+        -- this filter will only be applied on an incremental run
+            AND {{ pacific_timestamp("TO_TIMESTAMP(event_timestamp)") }} > '{{ get_max_updated_at('event_timestamp_pt') }}'
+        {% endif %}
+
         {# We still get duplicates sometimes. #}
         QUALIFY ROW_NUMBER() OVER (PARTITION BY user_pseudo_id, event_name, event_timestamp ORDER BY source) = 1
     ),
@@ -194,7 +199,3 @@ final AS (
 )
 
 SELECT * FROM final
-{% if is_incremental() %}
--- this filter will only be applied on an incremental run
-    WHERE event_timestamp_pt > '{{ get_max_updated_at() }}'
-{% endif %}

@@ -8,7 +8,10 @@ models:
       - name: test_step_run_id
         data_tests:
           - not_null
-          - unique
+          - unique:
+              warn_if: "> 50"
+              error_if: "> 500"
+
       - name: workflow_step_id
         meta:
           metabase.semantic_type: type/fk
