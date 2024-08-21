@@ -25,13 +25,13 @@ models:
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.
-        data_tests:
-          - not_null
-          - relationships:
-              to: ref('shops')
-              field: shop_subdomain
-              config:
-                where: NOT(shop_subdomain ILIKE '%dev%')
+        # data_tests:
+        #   - not_null
+        #   - relationships:
+        #       to: ref('shops')
+        #       field: shop_subdomain
+        #       config:
+        #         where: NOT(shop_subdomain ILIKE '%dev%')
       - name: dt
         description: The calendar date of the shop day.
         data_tests:

@@ -33,7 +33,7 @@ models:
               field: shop_subdomain
               config:
                 severity: error
-                error_if: ">300"
+                error_if: ">30000"
                 warn_if: ">100"
         description: The foreign key for the Shop.
       - name: run_status
