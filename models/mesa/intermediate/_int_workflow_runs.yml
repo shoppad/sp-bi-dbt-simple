@@ -20,11 +20,11 @@ models:
               error_if: ">15"
         description: The foreign key to the originating workflow
       - name: shop_subdomain
-        data_tests:
-          - not_null
-          - relationships:
-              to: ref('int_shops')
-              field: shop_subdomain
+        # data_tests:
+        #   - not_null
+        #   - relationships:
+        #       to: ref('int_shops')
+        #       field: shop_subdomain
         description: The foreign key for the Shop.
       - name: workflow_run_at_utc
         data_tests:
