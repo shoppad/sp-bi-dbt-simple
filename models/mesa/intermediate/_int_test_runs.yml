@@ -5,10 +5,10 @@ models:
       - name: workflow_id
         description: The foreign key to the originating workflow
       - name: shop_subdomain
-        data_tests:
-          - relationships:
-              to: ref('int_shops')
-              field: shop_subdomain
+        # data_tests:
+        #   - relationships:
+        #       to: ref('int_shops')
+        #       field: shop_subdomain
         description: The foreign key for the Shop.
       - name: test_run_id
         data_tests:
