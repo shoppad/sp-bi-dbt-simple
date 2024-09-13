@@ -34,7 +34,7 @@ sources:
         identifier: m3_mesa_triggers
         description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
 
-      - name: tasks
+      - name: tasks 
         description: individual step execution records with integration app, execution time, payload server response and more.
 
         identifier: m3_mesa_tasks1
