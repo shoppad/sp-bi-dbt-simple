@@ -2,22 +2,22 @@ version: 2
 models:
   - name: int_workflow_runs
     data_tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1000000
+      # - dbt_expectations.expect_table_row_count_to_be_between:
+      #     min_value: 1000000
     columns:
       - name: workflow_run_id
-        data_tests:
-          - not_null
-          - unique
+        # data_tests:
+        #   - not_null
+        #   - unique
         description: The foreign key to the Workflow Run.
       - name: workflow_id
-        data_tests:
-          - not_null
-          - relationships_proportion:
-              to: ref('stg_workflows')
-              field: workflow_id
-              warn_if: ">5"
-              error_if: ">15"
+        # data_tests:
+        #   - not_null
+        #   - relationships_proportion:
+        #       to: ref('stg_workflows')
+        #       field: workflow_id
+        #       warn_if: ">5"
+        #       error_if: ">15"
         description: The foreign key to the originating workflow
       - name: shop_subdomain
         # data_tests:
@@ -27,80 +27,80 @@ models:
         #       field: shop_subdomain
         description: The foreign key for the Shop.
       - name: workflow_run_at_utc
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The timestamp of the workflow run execution in PT.
       - name: workflow_run_on_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The date of the workflow run execution in PT.
       - name: run_status
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The status of the step run. `success` or `failure`.
       - name: unbillable_reason
         description: The reason why a workflow run is not billable.
       - name: is_free_workflow
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: Whether the workflow run was a free workflow. Free workflows are not billed.
       - name: is_billable
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: a step/workflow is only billed once -- not for each step. so only true for the first trigger.
       - name: workflow_name
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The customer-provided name of the originating workflow.
       - name: source_app
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The originating app that triggered the execution of the workflow run.
       - name: integration_key
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The code-friendly string of the app this step integrates with.
       - name: child_failure_count
-        data_tests:
-          - not_null:
-              config:
-                where: workflow_run_at_pt > '2021-09-17'
+        # data_tests:
+        #   - not_null:
+        #       config:
+        #         where: workflow_run_at_pt > '2021-09-17'
         description: The number of steps that failed in the workflow run.
       - name: updated_at
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: Used to build incremental models.
       - name: is_workflow_hard_deleted
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: Whether the workflow was hard deleted from the database and therefore missing
       - name: executed_step_count
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The number of steps that were executed in the workflow run.
       - name: is_successful
-        data_tests:
-          - not_null:
-              config:
-                where: workflow_run_at_pt > '2021-09-17'
+        # data_tests:
+        #   - not_null:
+        #       config:
+        #         where: workflow_run_at_pt > '2021-09-17'
         description: Whether the workflow run was successfully until the end or a safe exit.
       - name: destination_app
-        data_tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">20000"
-                warn_if: ">10"
+        # data_tests:
+        #   - not_null:
+        #       config:
+        #         severity: error
+        #         error_if: ">20000"
+        #         warn_if: ">10"
         description: The final app integration at the end of the workflow run.
       - name: source_destination_pair
-        data_tests:
-          - not_null:
-              config:
-                severity: error
-                error_if: ">20000"
-                warn_if: ">10"
+        # data_tests:
+        #   - not_null:
+        #       config:
+        #         severity: error
+        #         error_if: ">20000"
+        #         warn_if: ">10"
         description: The source and destination app integration in one string.

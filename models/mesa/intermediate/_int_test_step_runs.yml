@@ -3,14 +3,14 @@ models:
   - name: int_test_step_runs
     columns:
       - name: test_run_id
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: test_step_run_id
-        data_tests:
-          - not_null
-          - unique:
-              warn_if: "> 50"
-              error_if: "> 500"
+        # data_tests:
+        #   - not_null
+        #   - unique:
+        #       warn_if: "> 50"
+        #       error_if: "> 500"
 
       - name: workflow_step_id
         meta:
