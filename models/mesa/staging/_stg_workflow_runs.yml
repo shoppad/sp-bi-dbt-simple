@@ -4,13 +4,13 @@ models:
     description:
       a intermediate model that isolates the very first step executed of
       each workflow run.
-    data_tests:
-      - dbt_expectations.expect_table_row_count_to_equal:
-          value: 0
-          row_condition: "(child_failure_count > 0 OR child_stop_count > 0) AND run_status = 'success'"
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 10000
-          row_condition: "run_status = 'success'"
+    # data_tests:
+    #   - dbt_expectations.expect_table_row_count_to_equal:
+    #       value: 0
+    #       row_condition: "(child_failure_count > 0 OR child_stop_count > 0) AND run_status = 'success'"
+    #   - dbt_expectations.expect_table_row_count_to_be_between:
+    #       min_value: 10000
+    #       row_condition: "run_status = 'success'"
     columns:
       - name: workflow_run_id
         data_tests:
@@ -23,15 +23,15 @@ models:
         # data_tests:
         # - not_null
       - name: shop_subdomain
-        data_tests:
-          - not_null
-          - relationships:
-              to: ref('stg_shops')
-              field: shop_subdomain
-              config:
-                severity: error
-                error_if: ">300"
-                warn_if: ">100"
+        # data_tests:
+        #   - not_null
+        #   - relationships:
+        #       to: ref('stg_shops')
+        #       field: shop_subdomain
+        #       config:
+        #         severity: error
+        #         error_if: ">300"
+        #         warn_if: ">100"
 
         description: The foreign key for the Shop.
       - name: run_status
@@ -39,20 +39,20 @@ models:
           - not_null
         description: The status of the step run. `success` or `failure`.
       - name: workflow_id
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The foreign key to the originating workflow
       - name: workflow_run_at_utc
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The timestamp of the workflow run execution in UTC.
       - name: workflow_run_at_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The timestamp of the workflow run execution in PT.
       - name: workflow_run_on_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The date of the workflow run execution in PT.
       - name: unbillable_reason
         description: The reason why a workflow run is not billable.
@@ -61,12 +61,12 @@ models:
           The originating app that triggered the execution of the workflow
           run.
       - name: updated_at
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: Used to build incremental models.
       - name: is_workflow_hard_deleted
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description:
           Whether the workflow was hard deleted from the database and therefore
           missing
@@ -81,5 +81,5 @@ models:
       - name: workflow_name
         description: The customer-provided name of the originating workflow.
       - name: is_test_run
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null

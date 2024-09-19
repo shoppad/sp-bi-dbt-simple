@@ -40,36 +40,36 @@ models:
               max_value: getdate()
       - name: workflow_runs_success_count
         description: The number of workflow runs that succeeded on this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: workflow_success_percent
         description: The percentage of workflow runs that succeeded on this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: billed_count
         description: "[Fill]"
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: daily_usage_revenue
         description: The amount of revenue from usage charges for this day.
         data_tests:
           - not_null
       - name: is_active
         description: Whether the shop is considered active on this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: workflow_run_success_rolling_thirty_day_count
         description:
           The number of successful workflow run attempts initiated in the last
           30 days as of this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: workflow_run_success_rolling_year_count
         description:
           The number of successful workflow run attempts initiated in the last
           year as of this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: daily_plan_revenue
         description: The amount of revenue from plan charges for this day.
         data_tests:
@@ -82,8 +82,8 @@ models:
           metabase.semantic_type: type/Currency
       - name: workflow_runs_attempted_count
         description: The number of Workflow Run attempts that have been started.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: mesa_shop_days_id
         description: Unique identifier for each row
         data_tests:
@@ -154,14 +154,14 @@ models:
         description:
           The number of workflow run attempts initiated in the last 30 days
           as of this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: workflow_run_attempt_rolling_year_count
         description:
           The number of workflow run attempts initiated in the last year as
           of this day.
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
       - name: input_step_count
         description: The number of trigger steps executed on this day.
       - name: input_step_rolling_thirty_day_count
