@@ -214,14 +214,14 @@ models:
         +materialized: view
         stg_ga4_events:
           +materialized: incremental
-          +unique_key: event_id
-          +on_schema_change: "sync_all_columns"
+          # +unique_key: event_id
+          # +on_schema_change: "sync_all_columns"
       intermediate:
         +schema: support
         int_ga4_events:
           +materialized: incremental
-          +unique_key: event_id
-          +on_schema_change: "sync_all_columns"
+          # +unique_key: event_id
+          # +on_schema_change: "sync_all_columns"
 
     customer_io:
       staging:
