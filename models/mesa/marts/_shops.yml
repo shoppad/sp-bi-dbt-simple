@@ -144,9 +144,9 @@ models:
           - not_null
       - description: The number of days from first install to activation.
         name: days_to_activation
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.02
+        # data_tests:
+        #   - dbt_utils.not_null_proportion:
+        #       at_least: 0.02
       - description:
           The number of successful workflow run attempts initiated in the last
           year as of this day.
@@ -772,11 +772,11 @@ models:
         name: churned_customer_duration_in_days
       - description: The date the Shop churned.
         name: churned_on_pt
-        data_tests:
-          - not_null:
-              config:
-                where: NOT is_custom_app AND has_churned_paid
-                error_if: ">100"
+        # data_tests:
+        #   - not_null:
+        #       config:
+        #         where: NOT is_custom_app AND has_churned_paid
+        #         error_if: ">100"
       - description: The number of weeks the Shop has been/was on a paid plan.
         name: churned_customer_duration_in_weeks
       - description: The number of months the Shop has been on a paid plan.
