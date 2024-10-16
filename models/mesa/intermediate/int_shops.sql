@@ -74,10 +74,8 @@ decorated_shops as (
     ),
 
     activation_dates as (
-        select shop_subdomain, min(dt) as activation_date_pt
-        from {{ ref("int_mesa_shop_days") }}
-        where is_active
-        group by 1
+        select uuid as shop_subdomain, apps_mesa_meta_activatedat_value as activation_date_pt
+        from {{ source('php_segment', 'users') }}
     ),
 
     launch_session_dates as (
