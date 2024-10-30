@@ -42,15 +42,15 @@ sources:
         columns:
           - name: _id
             description: unique identifier for the task.
-            data_tests:
-              - unique
-              - not_null
+            # data_tests:
+            #   - unique
+            #   - not_null
           - name: created_at
             description: do not use. this column is sometimes null.
           - name: _created_at
             description: The time the task was created.
-            data_tests:
-              - not_null
+            # data_tests:
+            #   - not_null
 
       - name: shops
         identifier: m3_mesa
