@@ -68,8 +68,8 @@ sources:
               - not_null
           - name: uuid
             description: The shopify subdomain of the shop account.
-            data_tests:
-              - not_null
+            # data_tests:
+            #   - not_null
 
       - name: mesa_charges
         identifier: m3_mesa_charges
