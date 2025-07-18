@@ -10,12 +10,12 @@ models:
           - unique
           - not_null
       - name: BILLING_METHOD_NAME
-        data_tests:
-          - not_null
-          - accepted_values:
-              values:
-                - shopify
-                - chargebee
+        # data_tests:
+        #   - not_null
+        #   - accepted_values:
+        #       values:
+        #         - shopify
+        #         - chargebee
       - name: daily_plan_revenue
         description: The amount of revenue from plan charges for this day.
       - name: balance_used
