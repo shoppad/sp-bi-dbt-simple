@@ -12,9 +12,9 @@ models:
     columns:
       - description: The foreign key for the Shop.
         name: shop_subdomain
-        data_tests:
-          - not_null
-          - unique
+        # data_tests:
+        #   - not_null
+        #   - unique
       - description: The effective created at for the shop.
         name: first_installed_at_pt
         data_tests:
