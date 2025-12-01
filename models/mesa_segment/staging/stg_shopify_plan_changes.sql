@@ -18,6 +18,7 @@ with
             null as oldplan,
             shop_subdomain || '-current' as shopify_plan_change_id,
             shopify_plan_name as plandisplayname,
+            shopify_plan_name as name,
             shopify_last_updated_at_pt as changed_at_pt,
             cast(shopify_last_updated_at_pt as date) as changed_on_pt
         from {{ ref("stg_shops") }}
@@ -25,13 +26,13 @@ with
 
     final as (
         -- Combine the results of the original query with the new rowf
-        select *
+        select raw_shopify_plan_changes.*
         from shops
         inner join raw_shopify_plan_changes using (shop_subdomain)
 
         union all
 
-        select *
+        select manual_row.*
         from shops
         inner join manual_row using (shop_subdomain)
     )
