@@ -153,7 +153,7 @@ models:
           +unique_key: workflow_id
 
         shops:
-          +unique_key: shop_subdomain
+          # +unique_key: shop_subdomain
 
       intermediate:
         # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"

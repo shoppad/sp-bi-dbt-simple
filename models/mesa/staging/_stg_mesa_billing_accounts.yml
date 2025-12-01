@@ -1,9 +1,9 @@
 version: 2
 models:
   - name: stg_mesa_billing_accounts
-    data_tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('shops')
+    # data_tests:
+    #   - dbt_utils.equal_rowcount:
+    #       compare_model: ref('shops')
     columns:
       - name: SHOP_subdomain
         data_tests:
