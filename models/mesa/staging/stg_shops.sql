@@ -5,6 +5,7 @@ with
         where
             not __hevo__marked_deleted
             and shopify:plan_name not in ('staff', 'staff_business', 'shopify_alumni')
+            and provider != 'yedric'
             and status not in ('banned')
             AND _created_at < '{{ run_started_at }}'
 
