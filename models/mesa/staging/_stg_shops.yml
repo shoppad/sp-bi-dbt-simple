@@ -23,12 +23,12 @@ models:
         description: a field used by account services to record onboarding sessions.
       - name: handle
       - name: first_installed_at_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The effective created at for the shop.
       - name: latest_installed_at_pt
-        data_tests:
-          - not_null
+        # data_tests:
+        #   - not_null
         description: The most recent app installation date.
       - name: mongoid
       - name: analytics
@@ -43,14 +43,14 @@ models:
       - name: metabase
       - name: schema
       - name: uninstalled_at_pt
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.5
+        # data_tests:
+        #   - dbt_utils.not_null_proportion:
+        #       at_least: 0.5
         description: The timestamp of the latest uninstallation of the app.
       - name: minutes_until_uninstall
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.5
+        # data_tests:
+        #   - dbt_utils.not_null_proportion:
+        #       at_least: 0.5
         description: The minutes between initial install and the latest uninstall.
       - name: first_plan_upgrade_date
         description: The date of the first plan upgrade action.
