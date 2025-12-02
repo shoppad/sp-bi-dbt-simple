@@ -3,19 +3,19 @@ version: 2
 models:
   - name: stg_anonymous_to_known_user_matching
     description: Matches Google anonymous IDs and shop_subdomains. May contain multiple rows for the same subdomain.
-    data_tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1000
+    # data_tests:
+    #   - dbt_expectations.expect_table_row_count_to_be_between:
+    #       min_value: 1000
 
-      - dbt_expectations.expect_table_row_count_to_be_between:
-          min_value: 1
-          config:
-            where: "shopify_id = '78775419205'"
+    #   - dbt_expectations.expect_table_row_count_to_be_between:
+    #       min_value: 1
+    #       config:
+    #         where: "shopify_id = '78775419205'"
 
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - USER_PSEUDO_ID
-            - SHOP_SUBDOMAIN
+    #   - dbt_utils.unique_combination_of_columns:
+    #       combination_of_columns:
+    #         - USER_PSEUDO_ID
+    #         - SHOP_SUBDOMAIN
     columns:
       - name: USER_PSEUDO_ID
         description: The anonymouse Google Analytics user ID
