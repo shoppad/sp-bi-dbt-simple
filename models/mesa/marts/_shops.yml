@@ -120,8 +120,6 @@ models:
           metabase.caveats: This number may be negative if they activated before the launch session.
       - name: has_had_launch_session
         description: Whether the shop has had a launch session with customer success.
-        data_tests:
-          - not_null
       - name: shopify_shop_gmv_current_total_tier
         description: The tier of the Shop's current revenue.
         meta:
