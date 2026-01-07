@@ -1,8 +1,0 @@
-version: 2
-models:
-  - name: stg_mesa_uninstalls
-    columns:
-      - name: UNINSTALL_EVENT_ID
-      - name: SHOP_SUBDOMAIN
-      - name: UNINSTALLED_AT_PT
-      - name: UNINSTALL_ON_PT
