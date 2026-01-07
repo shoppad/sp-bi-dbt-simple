@@ -76,10 +76,6 @@ with
         from {{ source("php_segment", "users") }}
 
         union all
-        select shop_subdomain, uninstalled_at_pt  -- note: this timestamp is already in pst
-        from {{ ref("stg_mesa_uninstalls") }}
-
-        union all
         select shop_subdomain, last_dt as uninstalled_at_pt
         from custom_apps
     ),
