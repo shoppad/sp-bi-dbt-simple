@@ -3,28 +3,35 @@ models:
   - name: stg_workflows
     columns:
       - name: workflow_id
+        description: The foreign key to the originating workflow
         data_tests:
           - unique
           - not_null
-        description: The foreign key to the originating workflow
       - name: shop_subdomain
+        description: The foreign key for the Shop.
         data_tests:
           - not_null
           - relationships:
-              field: shop_subdomain
-              to: ref('stg_shops')
-        description: The foreign key for the Shop.
+              arguments:
+                to: ref('stg_shops')
+                field: shop_subdomain
       - name: template_name
         description: The name of the template the workflow originated from.
-      - name: SHOP_SUBDOMAIN
-        description: The foreign key of the Shop.
-      - name: TITLE
-      - name: IS_PREMIUM
-      - name: DESCRIPTION
-      - name: KEY
-      - name: TAGS
-      - name: IS_ENABLED
-      - name: UPDATED_AT_PT
-      - name: CREATED_AT_PT
+      - name: title
+        description: The title of the workflow.
+      - name: is_premium
+        description: Whether the workflow is premium.
+      - name: description
+        description: The description of the workflow.
+      - name: key
+        description: The key of the workflow.
+      - name: tags
+        description: The tags of the workflow.
+      - name: is_enabled
+        description: Whether the workflow is enabled.
+      - name: updated_at_pt
+        description: The timestamp of the last update in PT.
+      - name: created_at_pt
+        description: The timestamp of creation in PT.
       - name: is_deleted
         description: Whether the workflow has been deleted by the Shop.
