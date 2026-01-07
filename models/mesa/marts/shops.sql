@@ -201,19 +201,6 @@ final AS (
             || '%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22'
             || shop_subdomain
             || '%22%7D%7D%5D%7D' AS hotjar_url,
-        CASE
-            WHEN store_leads_estimated_monthly_sales < 1000 THEN 'A-Under $1,000'
-            WHEN store_leads_estimated_monthly_sales < 5000 THEN 'B-$1,000-$5,000'
-            WHEN store_leads_estimated_monthly_sales < 10000 THEN 'C-$5,000-$10,000'
-            WHEN store_leads_estimated_monthly_sales < 25000 THEN 'D-$10,000-$25,000'
-            WHEN store_leads_estimated_monthly_sales < 50000 THEN 'E-$25,000-$50,000'
-            WHEN store_leads_estimated_monthly_sales < 100000 THEN 'F-$50,000-$100,000'
-            WHEN store_leads_estimated_monthly_sales < 250000 THEN 'G-$100,000-$250,000'
-            WHEN store_leads_estimated_monthly_sales < 500000 THEN 'H-$250,000-$500,000'
-            WHEN store_leads_estimated_monthly_sales < 1000000 THEN 'I-$500,000-$1,000,000'
-            WHEN store_leads_estimated_monthly_sales < 2500000 THEN 'J-$1,000,000-$2,500,000'
-            ELSE 'K-$2,500,000+'
-        end AS store_leads_estimated_monthly_sales_bucket,
         COALESCE(trial_ends_pt >= current_date, FALSE) AS is_in_trial,
         CASE
             WHEN max_workflow_steps <= 2 THEN 1

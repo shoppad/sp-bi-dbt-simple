@@ -297,56 +297,8 @@ models:
         name: shopify_shop_orders_current_count
       - description: The age (in weeks) of the store at the initial install.
         name: age_of_store_at_install_in_weeks
-      - description:
-          The first full category/sub-category group of the Shop pulled in
-          from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Product Category & Subcategory (Store Leads)
-        name: store_leads_category
-      - description: The first top-level category of the Shop pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Product Top-Level Category (Store Leads)
-        name: store_leads_top_level_category
-      - description: A list of the Shop features pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Features (Store Leads)
-        name: store_leads_features
-      - description:
-          Indicates whether the Shop has Recharge listed in their Store Leads
-          features.
-        meta:
-          metabase.display_name: Has Recharge? (Store Leads)
-        name: store_leads_has_recharge
-      - description:
-          The rank of the Shop on the platform (Shopify) pulled in from Store
-          Leads.
-        meta:
-          metabase.display_name: Shopify Store Rank (Store Leads)
-        name: store_leads_platform_rank
-      - description: The percentile of the Shop's rank pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Store Rank Percentile (Store Leads)
-        name: store_leads_platform_rank_percentile
-      - description: The estimated monthly sales pulled in from Store Leads.
-        meta:
-          metabase.display_name: Estimated Shop Sales (Store Leads)
-          metabase.semantic_type: type/Currency
-        name: store_leads_estimated_monthly_sales
-      - description:
-          "The estimated amount the Shop spends on Shopify apps (pulled in\
-          \ from Store Leads).\u2020\u2264"
-        meta:
-          metabase.display_name: Monthly App Spend (Store Leads)
-          metabase.semantic_type: type/Currency
-        name: store_leads_monthly_app_spend
       - description: The country of the Shop provided by the Shopify API.
         name: shopify_shop_country
-      - description:
-          The bucket of the Shop's estimated monthly sales pulled in from Store
-          Leads.
-        meta:
-          metabase.display_name: Estimated Monthly Sales Bucket (Store Leads)
-        name: store_leads_estimated_monthly_sales_bucket
       - description:
           The ShopPad revenue attributed to the Shop from Mesa in the last
           30 days.
