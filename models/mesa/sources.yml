@@ -7,33 +7,28 @@ sources:
     schema: public
     loader: hevo
     loaded_at_field: __hevo__loaded_at::varchar::timestamp_ntz
-
-    freshness:
-      warn_after:
-        count: 36
-        period: hour
-      error_after:
-        count: 48
-        period: hour
-
+    config:
+      freshness:
+        warn_after:
+          count: 36
+          period: hour
+        error_after:
+          count: 48
+          period: hour
     quoting:
       database: false
       schema: false
       identifier: false
-
     tables:
       - name: workflows
         identifier: m3_mesa_automations
         description: individual workflow records with user-input name, description, starting time and more.
-
       - name: workflow_steps
         identifier: m3_mesa_triggers
         description: The individual steps of a workflow, including the step name, type, and the workflow it belongs to.
-
       - name: shops
         identifier: m3_mesa
         description: each installation record of a mesa merchant application install.
-
         columns:
           - name: _id
             description: unique identifier for the shop account.
@@ -46,7 +41,6 @@ sources:
               - not_null
           - name: uuid
             description: The shopify subdomain of the shop account.
-
       - name: mesa_charges
         identifier: m3_mesa_charges
         columns:
@@ -84,12 +78,10 @@ sources:
     database: MONGO
     schema: PUBLIC
     loader: Snowflake
-
     quoting:
       database: false
       schema: false
       identifier: false
-
     tables:
       - name: currency_conversion_rates
         identifier: CYBERSYN_CURRENCY_CONVERSION_RATES
@@ -100,20 +92,18 @@ sources:
     schema: getmesa
     loader: segment.com
     loaded_at_field: received_at
-
-    freshness:
-      warn_after:
-        count: 12
-        period: hour
-      error_after:
-        count: 24
-        period: hour
-
+    config:
+      freshness:
+        warn_after:
+          count: 12
+          period: hour
+        error_after:
+          count: 24
+          period: hour
     quoting:
       database: false
       schema: false
       identifier: false
-
     tables:
       - name: flow_events
         identifier: mesa_flow
@@ -132,13 +122,14 @@ sources:
     schema: php
     loader: segment.com
     loaded_at_field: received_at
-    freshness:
-      warn_after:
-        count: 36
-        period: hour
-      error_after:
-        count: 48
-        period: hour
+    config:
+      freshness:
+        warn_after:
+          count: 36
+          period: hour
+        error_after:
+          count: 48
+          period: hour
     tables:
       - name: users
         identifier: users

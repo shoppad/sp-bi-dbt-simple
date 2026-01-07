@@ -52,7 +52,7 @@ conversion_rates AS (
     SELECT currency, in_usd FROM {{ ref("currency_conversion_rates") }}
 ),
 
-shops AS (
+decorated_shops AS (
     SELECT
         {{
             groomed_column_list(source_table, except=columns_to_skip) | join(
@@ -81,14 +81,20 @@ shops AS (
             WHEN age_of_store_at_install_in_days <= 547 THEN '7-First 18 Months (After First Year)'
             WHEN age_of_store_at_install_in_days <= 730 THEN '8-First 2 Years (After 18 Months)'
             ELSE '9-2nd Year+'
-        END AS age_of_store_at_install_bucket,
+        END AS age_of_store_at_install_bucket
+    FROM stg_shops
+),
+
+shops AS (
+    SELECT
+        decorated_shops.*,
         activation_date_pt,
         launch_session_date,
         has_had_launch_session,
         1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
         1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
         COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported
-    FROM stg_shops
+    FROM decorated_shops
     LEFT JOIN activation_dates USING (shop_subdomain)
     LEFT JOIN launch_session_dates USING (shop_subdomain)
     LEFT JOIN conversion_rates USING (currency)

@@ -9,8 +9,8 @@ packages:
     version: [">=1.2.0"]
   #- git: "https://github.com/JonCrawford/dbt_segment"
   #  warn-unpinned: false
-  - package: Fleetio/dbt_segment
-    version: [">=0.3.1"]
+  #- package: Fleetio/dbt_segment
+  #  version: [">=0.3.1"]
   #- package: dbt-labs/codegen
   #  version: 0.11.0
   # - package: dbt-labs/dbt_project_evaluator
