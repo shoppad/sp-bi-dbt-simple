@@ -83,26 +83,8 @@ vars:
       "__HEVO__MARKED_DELETED",
       "__HEVO_ID",
     ]
-  activation_workflow_run_count: 1
   start_date: "2018-01-01"
-  ugly_segment_fields:
-    [
-      uuid_ts,
-      context_library_name,
-      context_library_version,
-      event,
-      event_text,
-      sent_at,
-      received_at,
-      original_timestamp,
-    ]
   zombie_store_shopify_plans: [frozen, fraudulent, paused, dormant, cancelled]
-
-  dbt_segment:
-    segment_page_views_table: "{{ source('mesa_segment', 'pages') }}"
-    segment_sessionization_trailing_window: 3
-    segment_inactivity_cutoff: 30 * 60
-    segment_pass_through_columns: []
 
 seeds:
   +schema: seed_data
@@ -115,9 +97,6 @@ seeds:
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
-# In this example config, we tell dbt to build all models in the example/ directory
-# as tables. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
 models:
   shoppad:
     +persist_docs:
@@ -126,29 +105,12 @@ models:
     +transient: true
     +materialized: table
     +dbt-osmosis: "_model.yml"
-    # Config indicated by + and applies to all files under models/example/
-    # example:
-    #   +materialized: view
 
     generic:
       +schema: support
-      #staging:
-      #  stg_shop_infos:
-      # +on_schema_change: "sync_all_columns"
-      # +unique_key: shop_subdomain
+
     mesa:
       marts:
-        step_runs:
-          +on_schema_change: "sync_all_columns"
-          +cluster_by: ["shop_subdomain"]
-          +unique_key: step_run_id
-          +materialized: incremental
-
-        workflow_runs:
-          +cluster_by: ["shop_subdomain", "workflow_id"]
-          +unique_key: workflow_run_id
-          +materialized: incremental
-
         workflows:
           +unique_key: workflow_id
 
@@ -156,75 +118,16 @@ models:
           # +unique_key: shop_subdomain
 
       intermediate:
-        # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
         int_shop_calendar:
-        int_step_runs:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: step_run_id
-          +cluster_by: ["workflow_run_id"]
-        int_test_step_runs:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: test_step_run_id
-        int_test_runs:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: test_run_id
-        int_workflow_runs:
-          +on_schema_change: "sync_all_columns"
-          +unique_key: workflow_run_id
-          +cluster_by: ["shop_subdomain"]
-          +materialized: incremental
         int_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
 
       staging:
-        # +materialized: "{{ 'view' if target.name in ['prod', 'default'] else 'table' }}"
         +schema: support
-        stg_step_runs:
-          +materialized: view
-          # +on_schema_change: "sync_all_columns"
-          # +unique_key: step_run_id
-          # +cluster_by: ["workflow_run_id"]
         stg_workflows:
           +unique_key: workflow_id
-        stg_workflow_runs:
-          +materialized: view
-          # +on_schema_change: "sync_all_columns"
-          # +unique_key: workflow_run_id
-          # +cluster_by: ["shop_subdomain"]
         stg_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
-
-    mesa_segment:
-      staging:
-        +schema: support
-        stg_segment_first_visits:
-          +materialized: incremental
-          +on_schema_change: "sync_all_columns"
-          +unique_key: shop_subdomain
-
-    google_analytics:
-      staging:
-        +schema: support
-        +materialized: view
-        stg_ga4_events:
-          +materialized: incremental
-          +unique_key: event_id
-          +on_schema_change: "sync_all_columns"
-      intermediate:
-        +schema: support
-        int_ga4_events:
-          +materialized: incremental
-          +unique_key: event_id
-          +on_schema_change: "sync_all_columns"
-
-    customer_io:
-      staging:
-        +schema: support
-      intermediate:
-        +schema: support

@@ -131,97 +131,6 @@ workflow_source_destination_pairs AS (
     GROUP BY 1
 ),
 
-plan_change_chains AS (
-    SELECT
-        shop_subdomain,
-        COUNT(distinct plan) AS plan_change_count,
-        LISTAGG(
-            CONCAT(
-                IFF(previous_price IS NULL OR previous_price <= price, '↑:', '↓:'),
-                planid,
-                ':$',
-                price
-            ),
-            ' • '
-        ) WITHIN GROUP (ORDER BY changed_at_pt asc) AS plan_change_chain
-    FROM shops
-    LEFT JOIN {{ ref("stg_mesa_plan_changes") }} USING (shop_subdomain)
-    GROUP BY 1
-),
-
-last_plan_prices AS (
-    SELECT
-        shop_subdomain,
-        round(max_by(daily_plan_revenue, dt) * 30) AS last_plan_price
-    FROM {{ ref("int_shop_calendar") }}
-    WHERE daily_plan_revenue > 0
-    GROUP BY 1
-),
-
-shop_freezes AS (
-    SELECT *
-    FROM {{ ref('int_frozen_store_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-cancelled_charge_events AS (
-    SELECT *
-    FROM {{ ref('int_charge_cancelled_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-shop_deactivated_events AS (
-    SELECT *
-    FROM {{ ref('int_shop_deactivated_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-churn_types AS (
-    SELECT
-        shop_subdomain,
-        CASE
-            WHEN has_ever_upgraded_to_paid_plan
-                THEN
-                    CASE
-                        WHEN shop_deactivated_events.occurred_at IS NOT NULL
-                            THEN 'shop-deactivated'
-                        WHEN cancelled_charge_events.occurred_at IS NOT NULL
-                            THEN IFF(is_cancelled_from_uninstall, 'uninstalled', 'downgraded')
-                        WHEN shop_freezes.occurred_at IS NOT NULL
-                            THEN 'shop-frozen'
-                        WHEN install_status = 'uninstalled'
-                            THEN 'uninstalled'
-                    END
-        END AS churn_type
-    FROM shops
-    LEFT JOIN shop_freezes USING (shop_subdomain)
-    LEFT JOIN cancelled_charge_events USING (shop_subdomain)
-    LEFT JOIN shop_deactivated_events USING (shop_subdomain)
-),
-
-paid_days_tiers AS (
-    SELECT
-        shop_subdomain,
-        CASE
-            WHEN paid_days_completed = 0 THEN NULL
-            WHEN paid_days_completed = 1 THEN 'A-1 day'
-            WHEN paid_days_completed BETWEEN 2 AND 7 THEN 'B-2-7 days'
-            WHEN paid_days_completed BETWEEN 8 AND 30 THEN 'C-8-30 days'
-            WHEN paid_days_completed BETWEEN 31 AND 60 THEN 'D-31-60 days'
-            WHEN paid_days_completed BETWEEN 61 AND 90 THEN 'E-61-90 days'
-            WHEN paid_days_completed BETWEEN 91 AND 180 THEN 'F-91-180 days'
-            WHEN paid_days_completed BETWEEN 181 AND 365 THEN 'G-181-365 days'
-            WHEN paid_days_completed > 365 THEN 'H-365+ days'
-        END AS paid_days_completed_tier
-    FROM shops
-),
-
 final AS (
     SELECT
         shops.*,
@@ -247,11 +156,6 @@ final AS (
         max_workflow_steps,
         max_workflow_steps_with_deleted,
         source_destination_pairs_list,
-        plan_change_count,
-        plan_change_chain,
-        last_plan_price,
-        churn_type,
-        paid_days_completed_tier,
         NOT activation_date_pt IS NULL AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
         {{
@@ -334,11 +238,7 @@ final AS (
     LEFT JOIN first_workflow_keys USING (shop_subdomain)
     LEFT JOIN max_workflow_steps USING (shop_subdomain)
     LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
-    LEFT JOIN plan_change_chains USING (shop_subdomain)
-    LEFT JOIN churn_types USING (shop_subdomain)
     LEFT JOIN workflow_source_destination_pairs USING (shop_subdomain)
-    LEFT JOIN last_plan_prices USING (shop_subdomain)
-    LEFT JOIN paid_days_tiers USING (shop_subdomain)
 )
 
 SELECT *
