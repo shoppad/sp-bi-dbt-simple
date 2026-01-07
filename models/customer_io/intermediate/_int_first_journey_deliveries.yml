@@ -1,8 +1,0 @@
-version: 2
-models:
-  - name: int_first_journey_deliveries
-    columns:
-      - name: first_journey_sent_at_pt
-      - name: first_journey_sent_on_pt
-      - name: shop_subdomain
-        description: The foreign key for the Shop.

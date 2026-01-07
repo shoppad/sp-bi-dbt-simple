@@ -6,11 +6,12 @@ models:
     description: Records of usage charges for Mesa Shops.
     columns:
       - name: shop_subdomain
+        description: The foreign key for the Shop.
         data_tests:
           - relationships:
-              to: ref('int_shops')
-              field: shop_subdomain
-        description: The foreign key for the Shop.
+              arguments:
+                to: ref('shops')
+                field: shop_subdomain
       - name: subscription_id
         description: "[Fill]"
       - name: billed_count

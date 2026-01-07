@@ -1,8 +1,0 @@
-version: 2
-models:
-  - name: stg_campaigns
-    columns:
-      - name: campaign_id
-      - name: name
-      - name: type
-      - name: workspace

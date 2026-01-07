@@ -1,6 +1,106 @@
-with
+{% set source_table = ref("stg_shops") %}
+{% set columns_to_skip = [
+    "scopes",
+    "billing",
+    "status",
+    "entitlements",
+    "timestamp",
+    "shopify",
+    "usage",
+    "config",
+    "themes",
+    "webhooks",
+    "messages",
+    "analytics",
+    "schema",
+    "handle",
+    "method",
+    "account",
+    "wizard",
+    "mongoid",
+    "authtoken",
+    "metabase",
+] %}
 
-shops AS (SELECT * FROM {{ ref("int_shops") }}),
+WITH
+
+{# ========== Base Shops (from int_shops) ========== #}
+
+stg_shops AS (
+    SELECT * FROM {{ source_table }}
+),
+
+activation_dates AS (
+    SELECT uuid AS shop_subdomain, apps_mesa_meta_activatedat_value AS activation_date_pt
+    FROM {{ source('php_segment', 'users') }}
+),
+
+launch_session_dates AS (
+    SELECT
+        shop_subdomain,
+        IFF(
+            meta_attribs.value:name = 'launchsessiondate',
+            meta_attribs.value:value::date,
+            NULL
+        ) AS launch_session_date,
+        NOT launch_session_date IS NULL AS has_had_launch_session
+    FROM {{ ref("stg_shops") }}, LATERAL FLATTEN(input => meta) AS meta_attribs
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY launch_session_date DESC) = 1
+),
+
+conversion_rates AS (
+    SELECT currency, in_usd FROM {{ ref("currency_conversion_rates") }}
+),
+
+decorated_shops AS (
+    SELECT
+        {{
+            groomed_column_list(source_table, except=columns_to_skip) | join(
+                ",\n        "
+            )
+        }},
+        shopify:currency::string AS currency,
+        {{ pacific_timestamp("cast(shopify:created_at AS TIMESTAMP_LTZ)") }} AS shopify_shop_created_at_pt,
+        shopify:country::string AS shopify_shop_country,
+        status AS install_status,
+        analytics:initial:orders_count::numeric AS shopify_shop_orders_initial_count,
+        analytics:initial:orders_gmv::numeric AS shopify_shop_gmv_initial_total,
+        analytics:orders:count::numeric AS shopify_shop_orders_current_count,
+        analytics:orders:gmv::numeric AS shopify_shop_gmv_current_total,
+        analytics:initial:shopify_plan_name::string AS initial_shopify_plan_name,
+        COALESCE(wizard:builder:step = 'complete', FALSE) AS is_builder_wizard_completed,
+        {{ datediff("shopify_shop_created_at_pt", "first_installed_at_pt", "day") }} AS age_of_store_at_install_in_days,
+        {{ datediff("shopify_shop_created_at_pt", "first_installed_at_pt", "week") }} AS age_of_store_at_install_in_weeks,
+        CASE
+            WHEN age_of_store_at_install_in_days = 0 THEN '1-First Day'
+            WHEN age_of_store_at_install_in_days <= 7 THEN '2-First Week (Day 2-7)'
+            WHEN age_of_store_at_install_in_days <= 31 THEN '3-First Month (After First Week)'
+            WHEN age_of_store_at_install_in_days <= 90 THEN '4-First Quarter (After First Month)'
+            WHEN age_of_store_at_install_in_days <= 180 THEN '5-First Half (After First Quarter)'
+            WHEN age_of_store_at_install_in_days <= 365 THEN '6-First Year (After First Half)'
+            WHEN age_of_store_at_install_in_days <= 547 THEN '7-First 18 Months (After First Year)'
+            WHEN age_of_store_at_install_in_days <= 730 THEN '8-First 2 Years (After 18 Months)'
+            ELSE '9-2nd Year+'
+        END AS age_of_store_at_install_bucket
+    FROM stg_shops
+),
+
+shops AS (
+    SELECT
+        decorated_shops.*,
+        activation_date_pt,
+        launch_session_date,
+        has_had_launch_session,
+        1.0 * shopify_shop_gmv_initial_total * in_usd AS shopify_shop_gmv_initial_total_usd,
+        1.0 * shopify_shop_gmv_current_total * in_usd AS shopify_shop_gmv_current_total_usd,
+        COALESCE(in_usd IS NULL, FALSE) AS currency_not_supported
+    FROM decorated_shops
+    LEFT JOIN activation_dates USING (shop_subdomain)
+    LEFT JOIN launch_session_dates USING (shop_subdomain)
+    LEFT JOIN conversion_rates USING (currency)
+),
+
+{# ========== Billing ========== #}
 
 billing_accounts AS (SELECT * FROM {{ ref("stg_mesa_billing_accounts") }}),
 
@@ -22,140 +122,168 @@ price_per_actions AS (
     WHERE attribute_name = 'price_per_action'
 ),
 
-workflows AS (SELECT * FROM {{ ref("workflows") }} WHERE is_deleted = FALSE),
+{# ========== Workflows (from int_workflows inlined) ========== #}
+
+stg_workflows AS (
+    SELECT * FROM {{ ref('stg_workflows') }}
+),
+
+workflow_steps AS (
+    SELECT * FROM {{ ref('stg_workflow_steps') }}
+    WHERE NOT is_deleted
+),
+
+deleted_workflow_steps AS (
+    SELECT * FROM {{ ref('stg_workflow_steps') }}
+    WHERE is_deleted
+),
+
+workflow_app_chains AS (
+    SELECT
+        workflow_id,
+        LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS app_chain,
+        LISTAGG(step_name, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
+    FROM workflow_steps
+    GROUP BY 1
+),
 
 workflow_counts AS (
     SELECT
+        workflow_id,
+        COUNT_IF(workflow_steps.is_pro_app) > 0 AS has_pro_app,
+        COUNT(DISTINCT workflow_steps.workflow_step_id) AS step_count,
+        COUNT(DISTINCT deleted_workflow_steps.workflow_step_id) AS deleted_step_count,
+        COALESCE(step_count, 0) + COALESCE(deleted_step_count, 0) AS step_count_with_deleted
+    FROM stg_workflows
+    LEFT JOIN workflow_steps USING (workflow_id)
+    LEFT JOIN deleted_workflow_steps USING (workflow_id)
+    GROUP BY 1
+),
+
+workflows AS (
+    SELECT
+        stg_workflows.*,
+        workflow_counts.has_pro_app,
+        workflow_counts.step_count,
+        workflow_counts.step_count_with_deleted,
+        workflow_app_chains.app_chain,
+        workflow_app_chains.step_chain,
+        COALESCE(app_chain ILIKE ANY ('%googlesheets%', '%recharge%', '%infiniteoptions%', '%tracktor%', '%openai%', '%slack%'), FALSE) AS is_puc
+    FROM stg_workflows
+    LEFT JOIN workflow_counts USING (workflow_id)
+    LEFT JOIN workflow_app_chains USING (workflow_id)
+    WHERE is_deleted = FALSE
+),
+
+{# ========== Workflow Aggregations ========== #}
+
+shop_workflow_counts AS (
+    SELECT
         shop_subdomain,
         COUNT_IF(workflows.step_count > 1) AS workflows_current_count,
-        COUNT_IF(
-            workflows.step_count > 1 AND workflows.is_enabled
-        ) AS workflows_enabled_current_count,
+        COUNT_IF(workflows.step_count > 1 AND workflows.is_enabled) AS workflows_enabled_current_count,
         COUNT(DISTINCT workflows.template_name) AS templates_installed_count,
-        COUNT_IF(workflows.has_pro_app AND workflows.is_enabled)
-        > 0 AS is_using_pro_apps,
-        COALESCE(
-            sum(workflows.test_attempt_count) > 0, FALSE
-        ) AS has_attempted_a_test,
-        COALESCE(
-            sum(workflows.test_success_count) > 0, FALSE
-        ) AS has_successfully_run_a_test,
+        COUNT_IF(workflows.has_pro_app AND workflows.is_enabled) > 0 AS is_using_pro_apps,
         COALESCE(MAX(workflows.is_puc), FALSE) AS has_puc_workflow
     FROM shops
     LEFT JOIN workflows USING (shop_subdomain)
     GROUP BY 1
 ),
 
-int_shop_integration_app_rows AS (
+{# ========== Integration Apps (from int_shop_integration_app_rows) ========== #}
+
+enabled_workflows AS (
+    SELECT workflow_id
+    FROM {{ ref('stg_workflows') }}
+    WHERE is_enabled AND NOT is_deleted
+),
+
+enabled_workflow_steps AS (
+    SELECT shop_subdomain, integration_app, workflow_id
+    FROM {{ ref('stg_workflow_steps') }}
+    WHERE workflow_id IN (SELECT workflow_id FROM enabled_workflows)
+),
+
+shop_integration_apps AS (
     SELECT
         shop_subdomain,
-        COALESCE(
-            COUNT(distinct integration_app), 0
-        ) AS integration_apps_enabled_count,
+        integration_app,
+        integration_app IN ('{{ var("pro_apps") | join("', '") }}') AS is_pro_app
+    FROM shops
+    INNER JOIN enabled_workflow_steps USING (shop_subdomain)
+    GROUP BY 1, 2
+),
+
+shop_integration_app_counts AS (
+    SELECT
+        shop_subdomain,
+        COALESCE(COUNT(DISTINCT integration_app), 0) AS integration_apps_enabled_count,
         COALESCE(COUNT_IF(is_pro_app), 0) AS pro_apps_enabled_count
     FROM shops
-    LEFT JOIN {{ ref("int_shop_integration_app_rows") }} USING (shop_subdomain)
+    LEFT JOIN shop_integration_apps USING (shop_subdomain)
     GROUP BY 1
 ),
 
-workflow_run_counts AS (
-    SELECT
-        shop_subdomain,
-        COALESCE(
-            COUNT(distinct workflow_id), 0
-        ) AS unique_workflows_attempted_count,
-        COALESCE(
-            COUNT(workflow_runs.workflow_run_id), 0
-        ) AS workflow_runs_attempted_count,
-        COALESCE(COUNT_IF(workflow_runs.is_stop), 0) AS workflow_runs_stop_count,
-        COALESCE(COUNT_IF(workflow_runs.is_failure), 0) AS workflow_runs_fail_count
-    FROM shops
-    LEFT JOIN {{ ref("workflow_runs") }} USING (shop_subdomain)
-    GROUP BY 1
-),
+{# ========== Funnel Steps (from int_mesa_shop_funnel_achievements chain) ========== #}
 
-successful_workflow_run_counts AS (
-    SELECT
-        shops.shop_subdomain,
-        COALESCE(COUNT(workflow_run_id), 0) AS workflow_run_success_count,
-        COALESCE(
-            COUNT(distinct workflow_id), 0
-        ) AS unique_workflows_successfully_run_count
-    FROM shops
-    LEFT JOIN
-        {{ ref("workflow_runs") }}
-        on shops.shop_subdomain = workflow_runs.shop_subdomain
-        AND workflow_runs.run_status = 'success'
-    GROUP BY 1
-),
+funnel_steps AS (SELECT * FROM {{ ref("mesa_funnel_steps") }}),
 
-app_pageview_bookend_times AS (
+mesa_flow_events AS (
     SELECT
         user_id AS shop_subdomain,
-        {{ pacific_timestamp("MIN(tstamp)") }} AS first_seen_in_app_at_pt,
-        {{ pacific_timestamp("MAX(tstamp)") }} AS last_seen_in_app_at_pt,
-        sum(duration_in_s) / 60 AS minutes_using_app
-    FROM {{ ref("segment_web_page_views__sessionized") }}
-    LEFT JOIN {{ ref("segment_web_sessions") }} USING (session_id)
-    WHERE page_url_host = 'app.getmesa.com'
-    GROUP BY 1
+        event_id,
+        timestamp
+    FROM {{ source('mesa_segment', 'flow_events') }}
 ),
 
-yesterdays AS (
-    SELECT *
-    FROM {{ ref("mesa_shop_days") }}
-    WHERE dt = {{ pacific_timestamp("CURRENT_TIMESTAMP()") }}::date - interval '1 day'
+workflow_events AS (
+    SELECT * FROM {{ source('mesa_segment', 'workflow_events') }}
 ),
 
-current_rolling_counts AS (
+workflow_event_achievements AS (
+    SELECT
+        user_id AS shop_subdomain,
+        action,
+        {{ pacific_timestamp('MIN(timestamp)') }} AS achieved_at_pt
+    FROM shops
+    INNER JOIN workflow_events ON shops.shop_subdomain = workflow_events.user_id
+    GROUP BY 1, 2
+),
+
+mesa_flow_achievements AS (
     SELECT
         shop_subdomain,
-        COALESCE(
-            workflow_run_attempt_rolling_thirty_day_count, 0
-        ) AS workflow_run_attempt_rolling_thirty_day_count,
-        COALESCE(
-            workflow_run_success_rolling_thirty_day_count, 0
-        ) AS workflow_run_success_rolling_thirty_day_count,
-        COALESCE(
-            workflow_run_failure_rolling_thirty_day_count, 0
-        ) AS workflow_run_failure_rolling_thirty_day_count,
-        COALESCE(
-            workflow_run_stop_rolling_thirty_day_count, 0
-        ) AS workflow_run_stop_rolling_thirty_day_count,
-        COALESCE(
-            workflow_run_attempt_rolling_year_count, 0
-        ) AS workflow_run_attempt_rolling_year_count,
-        COALESCE(
-            workflow_run_success_rolling_year_count, 0
-        ) AS workflow_run_success_rolling_year_count,
-        COALESCE(
-            workflow_run_failure_rolling_year_count, 0
-        ) AS workflow_run_failure_rolling_year_count,
-        COALESCE(
-            workflow_run_stop_rolling_year_count, 0
-        ) AS workflow_run_stop_rolling_year_count,
-        COALESCE(
-            income_rolling_thirty_day_total, 0
-        ) AS income_rolling_thirty_day_total,
-        COALESCE(income_rolling_year_total, 0) AS income_rolling_year_total,
-        COALESCE(
-            total_workflow_steps_rolling_thirty_day_count, 0
-        ) AS total_workflow_steps_rolling_thirty_day_count,
-        COALESCE(
-            input_step_rolling_thirty_day_count, 0
-        ) AS input_step_rolling_thirty_day_count,
-        COALESCE(
-            output_step_rolling_thirty_day_count, 0
-        ) AS output_step_rolling_thirty_day_count,
-        COALESCE(inc_amount, 0) AS yesterdays_inc_amount
+        event_id AS action,
+        {{ pacific_timestamp('MIN(timestamp)') }} AS achieved_at_pt
     FROM shops
-    LEFT JOIN yesterdays USING (shop_subdomain)
+    INNER JOIN mesa_flow_events USING (shop_subdomain)
+    GROUP BY 1, 2
 ),
 
-simple_shop_attribution AS (
+all_achievements AS (
+    SELECT shop_subdomain, achieved_at_pt, action AS key, 'workflow_events' AS source
+    FROM workflow_event_achievements
+
+    UNION ALL
+
+    SELECT shop_subdomain, achieved_at_pt, action AS key, 'mesa_flow_events' AS source
+    FROM mesa_flow_achievements
+
+    UNION ALL
+
     SELECT
-        *
-    FROM {{ ref('int_simplified_shop_attribution') }}
+        shop_subdomain,
+        first_installed_at_pt AS achieved_at_pt,
+        'installed_app' AS key,
+        'hardcoded_in_dbt' AS source
+    FROM shops
+),
+
+funnel_achievements AS (
+    SELECT shop_subdomain, funnel_steps.*, achieved_at_pt
+    FROM funnel_steps
+    LEFT JOIN all_achievements USING (key, source)
+    INNER JOIN shops USING (shop_subdomain)
 ),
 
 max_funnel_steps AS (
@@ -164,29 +292,22 @@ max_funnel_steps AS (
         achieved_at_pt AS max_funnel_step_achieved_at_pt,
         step_order AS max_funnel_step,
         CASE
-            WHEN activation_date_pt IS NOT NULL
-            THEN '7-Activated'
+            WHEN activation_date_pt IS NOT NULL THEN '7-Activated'
             ELSE (step_order || '-' || name)
-        end AS max_funnel_step_name,
+        END AS max_funnel_step_name,
         COALESCE(step_order, 0) >= 3 AS has_a_workflow,
         COALESCE(step_order, 0) >= 4 AS has_saved_a_workflow,
         COALESCE(step_order, 0) >= 6 AS has_enabled_a_workflow
     FROM shops
-    LEFT JOIN {{ ref("int_mesa_shop_funnel_achievements") }} USING (shop_subdomain)
-    qualify
-        row_number() over (partition by shop_subdomain order by step_order desc) = 1
+    LEFT JOIN funnel_achievements USING (shop_subdomain)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY step_order DESC) = 1
 ),
 
-total_ltv_revenue AS (
-    SELECT shop_subdomain, COALESCE(sum(inc_amount), 0) AS total_ltv_revenue
-    FROM shops
-    LEFT JOIN {{ ref("mesa_shop_days") }} USING (shop_subdomain)
-    GROUP BY 1
-),
+{# ========== Shop Infos (from stg_constellation_users) ========== #}
 
 shop_infos AS (
     SELECT
-        * exclude (
+        * EXCLUDE (
             updated_at,
             shopify_createdat,
             analytics_gmv,
@@ -195,621 +316,217 @@ shop_infos AS (
             analytics_orders,
             shopify_planname
         )
-    FROM {{ ref("int_shop_infos") }}
+    FROM {{ ref("stg_constellation_users") }}
 ),
 
+{# ========== Cohort Averages ========== #}
+
 cohort_average_current_shop_gmv AS (
-    SELECT avg(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
-    FROM {{ ref("int_shops") }}
+    SELECT AVG(shopify_shop_gmv_current_total_usd) AS avg_current_gmv_usd
+    FROM shops
 ),
 
 cohort_average_initial_shop_gmv AS (
     SELECT
-        cohort_month, avg(shopify_shop_gmv_initial_total_usd) AS avg_initial_gmv_usd
-    FROM {{ ref("int_shops") }}
+        cohort_month,
+        AVG(shopify_shop_gmv_initial_total_usd) AS avg_initial_gmv_usd
+    FROM shops
     GROUP BY 1
 ),
 
-last_thirty_days AS (
+{# ========== First Workflow Keys (from int_first_workflow_keys) ========== #}
+
+first_workflows AS (
     SELECT *
-    FROM {{ ref("mesa_shop_days") }}
-    WHERE dt >= current_date - interval '30 day' AND inc_amount > 0
+    FROM workflows
+    WHERE step_count > 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY shop_subdomain ORDER BY created_at_pt ASC) = 1
 ),
 
-thirty_day_revenue AS (
+first_workflow_first_steps AS (
     SELECT
         shop_subdomain,
-        COALESCE(avg(daily_usage_revenue), 0) AS average_daily_usage_revenue,
-        COALESCE(avg(cast(inc_amount AS float)), 0) AS average_daily_revenue,
-        COALESCE(avg(cast(daily_plan_revenue AS float)), 0) AS average_plan_revenue,
-        (average_plan_revenue * 30) AS projected_mrr,
-        COALESCE(sum(inc_amount), 0) AS total_thirty_day_revenue
-    FROM shops
-    LEFT JOIN last_thirty_days USING (shop_subdomain)
-    GROUP BY 1
+        workflow_id AS first_workflow_id,
+        integration_app AS first_workflow_trigger_app,
+        step_key AS first_workflow_trigger_key,
+        operation_id AS first_workflow_trigger_operation_id,
+        step_name AS first_workflow_trigger_name,
+        workflow_step_id AS first_workflow_trigger_step_id,
+        title AS first_workflow_title,
+        IFF(is_deleted, 'DELETED - ' || title, title) AS first_workflow_sort_title,
+        app_chain AS first_workflow_app_chain,
+        step_chain AS first_workflow_step_chain
+    FROM first_workflows
+    LEFT JOIN workflow_steps USING (workflow_id)
+    WHERE workflow_steps.step_type = 'input'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY position_in_workflow DESC) = 1
 ),
 
-email_open_details AS (
+first_workflow_last_steps AS (
+    SELECT
+        workflow_id AS first_workflow_id,
+        integration_app AS first_workflow_destination_app,
+        step_key AS first_workflow_destination_key,
+        operation_id AS first_workflow_destination_operation_id,
+        step_name AS first_workflow_destination_name
+    FROM workflow_steps
+    WHERE
+        step_type = 'output'
+        AND workflow_step_id NOT IN (SELECT first_workflow_trigger_step_id FROM first_workflow_first_steps)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY position_in_workflow DESC) = 1
+),
+
+first_workflow_keys AS (
     SELECT
         shop_subdomain,
-        MIN(
-            CASE WHEN email_type = 'broadcast' THEN opened_at_pt END
-        ) AS first_broadcast_email_open_at_pt,
-        MAX(
-            CASE WHEN email_type = 'broadcast' THEN opened_at_pt END
-        ) AS last_broadcast_email_open_at_pt,
-        COALESCE(
-            COUNT(
-                DISTINCT CASE
-                    WHEN email_type = 'broadcast' then email_id
-                END
-            ),
-            0
-        ) AS broadcast_email_opens_count,
-        broadcast_email_opens_count > 0 AS has_opened_broadcast_email,
-
-        MIN(
-            CASE WHEN email_type = 'journey' then opened_at_pt end
-        ) AS first_journey_email_open_at_pt,
-        MAX(
-            CASE WHEN email_type = 'journey' then opened_at_pt end
-        ) AS last_journey_email_open_at_pt,
-        COALESCE(
-            COUNT(
-                distinct case
-                    when email_type = 'journey' then email_id
-                end
-            ),
-            0
-        ) AS journey_email_opens_count,
-        journey_email_opens_count > 0 AS has_opened_journey_email
-    FROM shops
-    LEFT JOIN {{ ref("stg_email_opens") }} USING (shop_subdomain)
-    GROUP BY 1
+        first_workflow_id,
+        first_workflow_trigger_app,
+        first_workflow_trigger_key,
+        first_workflow_trigger_operation_id,
+        first_workflow_trigger_name,
+        first_workflow_title,
+        first_workflow_sort_title,
+        first_workflow_app_chain,
+        first_workflow_step_chain,
+        first_workflow_destination_app,
+        first_workflow_destination_key,
+        first_workflow_destination_operation_id,
+        first_workflow_destination_name,
+        first_workflow_trigger_app || ' - ' || first_workflow_destination_app AS first_workflow_trigger_destination_app_pair,
+        first_workflow_trigger_key || ' - ' || first_workflow_destination_key AS first_workflow_trigger_destination_key_pair,
+        first_workflow_trigger_name || ' - ' || first_workflow_destination_name AS first_workflow_trigger_destination_name_pair
+    FROM first_workflow_first_steps
+    LEFT JOIN first_workflow_last_steps USING (first_workflow_id)
 ),
 
-email_click_details AS (
-    SELECT
-        shop_subdomain,
-        MIN(
-            CASE WHEN email_type = 'broadcast' THEN clicked_at_pt END
-        ) AS first_broadcast_email_clicked_at_pt,
-        MAX(
-            CASE WHEN email_type = 'broadcast' THEN clicked_at_pt END
-        ) AS last_broadcast_email_clicked_at_pt,
-        COALESCE(
-            COUNT(
-                DISTINCT CASE
-                    WHEN email_type = 'broadcast' THEN email_id
-                END
-            ),
-            0
-        ) AS broadcast_email_click_count,
-        broadcast_email_click_count > 0 AS has_clicked_broadcast_email,
-
-        MIN(
-            CASE WHEN email_type = 'journey' THEN clicked_at_pt END
-        ) AS first_journey_email_clicked_at_pt,
-        MAX(
-            CASE WHEN email_type = 'journey' THEN clicked_at_pt END
-        ) AS last_journey_email_clicked_at_pt,
-        COALESCE(
-            COUNT(
-                distinct case
-                    when email_type = 'journey' then email_id
-                end
-            ),
-            0
-        ) AS journey_email_click_count,
-        journey_email_click_count > 0 AS has_clicked_journey_email
-    FROM shops
-    LEFT JOIN {{ ref("stg_email_clicks") }} USING (shop_subdomain)
-    GROUP BY 1
-),
-
-email_conversion_details AS (
-    SELECT
-        shop_subdomain,
-        MIN(
-            CASE WHEN email_type = 'broadcast' then converted_at_pt end
-        ) AS first_broadcast_email_converted_at_pt,
-        MAX(
-            CASE WHEN email_type = 'broadcast' then converted_at_pt end
-        ) AS last_broadcast_email_converted_at_pt,
-        COALESCE(
-            COUNT(
-                distinct case
-                    when email_type = 'broadcast' then email_id
-                end
-            ),
-            0
-        ) AS broadcast_email_conversion_count,
-        broadcast_email_conversion_count > 0 AS has_converted_via_broadcast_email,
-
-        MIN(
-            CASE WHEN email_type = 'journey' then converted_at_pt end
-        ) AS first_journey_email_converted_at_pt,
-        MAX(
-            CASE WHEN email_type = 'journey' then converted_at_pt end
-        ) AS last_journey_email_converted_at_pt,
-        COALESCE(
-            COUNT(
-                distinct case
-                    when email_type = 'journey' then email_id
-                end
-            ),
-            0
-        ) AS journey_email_conversion_count,
-        journey_email_conversion_count > 0 AS has_converted_via_journey_email
-    FROM shops
-    LEFT JOIN {{ ref("stg_email_conversions") }} USING (shop_subdomain)
-    GROUP BY 1
-),
-
-email_unsubscribe_details AS (
-    SELECT
-        shop_subdomain,
-        email_unsubscribe_email_type,
-        email_unsubscribe_email_name,
-        COALESCE(
-            email_unsubscribe_email_type is not NULL, FALSE
-        ) AS has_unsubscribed_from_email
-    FROM shops
-    LEFT JOIN {{ ref("stg_email_unsubscribes") }} USING (shop_subdomain)
-    qualify
-        row_number() over (
-            partition by shop_subdomain order by __hevo__ingested_at desc
-        )
-        = 1
-),
-
-first_workflow_keys AS (SELECT * FROM {{ ref("int_first_workflow_keys") }}),
+{# ========== Max Workflow Steps ========== #}
 
 max_workflow_steps AS (
     SELECT
         shop_subdomain,
         COALESCE(MAX(step_count), 0) AS max_workflow_steps,
-        COALESCE(
-            MAX(step_count_with_deleted), 0
-        ) AS max_workflow_steps_with_deleted,
-        COALESCE(MAX(step_count) >= 2, FALSE) AS has_a_workflow
+        COALESCE(MAX(step_count_with_deleted), 0) AS max_workflow_steps_with_deleted
     FROM shops
-    LEFT JOIN {{ ref("workflows") }} USING (shop_subdomain)
+    LEFT JOIN workflows USING (shop_subdomain)
     GROUP BY 1
+),
+
+{# ========== Workflow Source/Destination Pairs ========== #}
+
+workflow_triggers AS (
+    SELECT
+        workflow_id,
+        integration_app AS trigger_app
+    FROM workflow_steps
+    WHERE step_type = 'input'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id) = 1
+),
+
+workflow_destinations AS (
+    SELECT
+        workflow_id,
+        integration_app AS destination_app
+    FROM workflow_steps
+    WHERE step_type = 'output'
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id DESC) = 1
+),
+
+workflow_pairs AS (
+    SELECT
+        workflow_id,
+        trigger_app || ' - ' || destination_app AS source_destination_pair
+    FROM workflow_triggers
+    LEFT JOIN workflow_destinations USING (workflow_id)
 ),
 
 workflow_source_destination_pairs AS (
     SELECT
         shop_subdomain,
         NULLIF(
-            LISTAGG(DISTINCT source_destination_pair, ',') WITHIN GROUP (
-                ORDER BY source_destination_pair ASC
-            ),
+            LISTAGG(DISTINCT source_destination_pair, ',') WITHIN GROUP (ORDER BY source_destination_pair ASC),
             ''
         ) AS source_destination_pairs_list
     FROM workflows
+    LEFT JOIN workflow_pairs USING (workflow_id)
     GROUP BY 1
 ),
 
-plan_change_chains AS (
-    SELECT
-        shop_subdomain,
-        COUNT(distinct plan) AS plan_change_count,
-        LISTAGG(
-            CONCAT(
-                IFF(previous_price IS NULL OR previous_price <= price, '↑:', '↓:'),
-                planid,
-                ':$',
-                price
-            ),
-            ' • '
-        ) WITHIN GROUP (ORDER BY changed_at_pt asc) AS plan_change_chain
-    FROM shops
-    LEFT JOIN {{ ref("stg_mesa_plan_changes") }} USING (shop_subdomain)
-    GROUP BY 1
-),
-
-last_plan_prices AS (
-    SELECT
-        shop_subdomain,
-        round(max_by(daily_plan_revenue, dt) * 30) AS last_plan_price
-    FROM {{ ref("int_shop_calendar") }}
-    WHERE daily_plan_revenue > 0
-    GROUP BY 1
-),
-
-first_newsletter_deliveries AS (
-    SELECT * FROM {{ ref("int_first_newsletter_deliveries") }}
-),
-
-first_journey_deliveries AS (
-    SELECT * FROM {{ ref("int_first_journey_deliveries") }}
-),
-
-inc_amount_days_and_day_befores AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        inc_amount,
-        is_shopify_zombie_plan,
-        is_involuntary,
-        COALESCE(
-            LAG(inc_amount, 1, NULL) OVER (PARTITION BY shop_subdomain ORDER BY dt),
-            0
-        ) AS day_before_inc_amount
-    FROM {{ ref("mesa_shop_days") }}
-),
-
-shop_freezes AS (
-    SELECT *
-    FROM {{ ref('int_frozen_store_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-cancelled_charge_events AS (
-    SELECT *
-    FROM {{ ref('int_charge_cancelled_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-shop_deactivated_events AS (
-    SELECT *
-    FROM {{ ref('int_shop_deactivated_events') }}
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY shop_subdomain ORDER BY occurred_at DESC
-    ) = 1
-),
-
-churn_types AS (
-    SELECT
-        shop_subdomain,
-        CASE
-            WHEN has_ever_upgraded_to_paid_plan
-                THEN
-                    CASE
-                        WHEN shop_deactivated_events.occurred_at IS NOT NULL
-                            THEN 'shop-deactivated'
-                        WHEN cancelled_charge_events.occurred_at IS NOT NULL
-                            THEN IFF(is_cancelled_from_uninstall, 'uninstalled', 'downgraded')
-                        WHEN shop_freezes.occurred_at IS NOT NULL
-                            THEN 'shop-frozen'
-                        WHEN install_status = 'uninstalled'
-                            THEN 'uninstalled'
-                    END
-        END AS churn_type
-    FROM shops
-    LEFT JOIN shop_freezes USING (shop_subdomain)
-    LEFT JOIN cancelled_charge_events USING (shop_subdomain)
-    LEFT JOIN shop_deactivated_events USING (shop_subdomain)
-),
-
-churn_dates AS (
-    SELECT
-        shop_subdomain,
-        MAX_BY(is_involuntary, dt) AS has_churned_paid_as_involuntary,
-        MAX(dt) AS churned_on_pt
-    FROM shops
-    LEFT JOIN inc_amount_days_and_day_befores USING (shop_subdomain)
-    WHERE
-        (uninstalled_at_pt::date = dt AND inc_amount > 0)
-        OR
-        (inc_amount_days_and_day_befores.is_shopify_zombie_plan AND day_before_inc_amount > 0)
-        OR
-        (inc_amount = 0 AND day_before_inc_amount > 0)
-    GROUP BY 1, uninstalled_at_pt
-),
-
-daily_revenue AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        inc_amount,
-        SUM(inc_amount) OVER (PARTITION BY shop_subdomain ORDER BY dt ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7_day_revenue
-    FROM {{ ref('int_mesa_shop_days') }}
-),
-
-revenue_periods AS (
-    SELECT
-        shop_subdomain,
-        dt,
-        inc_amount,
-        rolling_7_day_revenue,
-        CASE
-            WHEN rolling_7_day_revenue > 0 THEN 1
-            ELSE 0
-        END AS is_revenue_period,
-        SUM(CASE WHEN rolling_7_day_revenue > 0 THEN 1 ELSE 0 END) OVER (PARTITION BY shop_subdomain ORDER BY dt) AS revenue_period_group
-    FROM daily_revenue
-),
-
-billing_breaks AS (
-    SELECT
-        shop_subdomain,
-        MIN(dt) AS start_date,
-        MAX(dt) AS end_date,
-        DATEDIFF(day, MIN(dt), MAX(dt)) + 1 AS days
-    FROM revenue_periods
-    WHERE is_revenue_period = 0
-    GROUP BY shop_subdomain, revenue_period_group
-    HAVING days > 7  -- Only consider breaks longer than a week
-),
-
-shop_billing_breaks AS (
-    SELECT
-        shop_subdomain,
-        ARRAY_AGG(OBJECT_CONSTRUCT(
-            'start', DATEADD('day', -7, start_date),  -- Adjust start date
-            'end', end_date,
-            'days', days + 7  -- Add 7 days to the break duration
-        )) AS billing_breaks,
-        NULLIF(SUM(days + 7), 7) AS billing_break_days,  -- Add 7 days to each break
-        COUNT(*) > 0 AS has_taken_billing_breaks
-    FROM billing_breaks
-    GROUP BY shop_subdomain
-),
-
-paid_days_tiers AS (
-    SELECT
-        shop_subdomain,
-        CASE
-            WHEN paid_days_completed = 0 THEN NULL
-            WHEN paid_days_completed = 1 THEN 'A-1 day'
-            WHEN paid_days_completed BETWEEN 2 AND 7 THEN 'B-2-7 days'
-            WHEN paid_days_completed BETWEEN 8 AND 30 THEN 'C-8-30 days'
-            WHEN paid_days_completed BETWEEN 31 AND 60 THEN 'D-31-60 days'
-            WHEN paid_days_completed BETWEEN 61 AND 90 THEN 'E-61-90 days'
-            WHEN paid_days_completed BETWEEN 91 AND 180 THEN 'F-91-180 days'
-            WHEN paid_days_completed BETWEEN 181 AND 365 THEN 'G-181-365 days'
-            WHEN paid_days_completed > 365 THEN 'H-365+ days'
-        END AS paid_days_completed_tier
-    FROM shops
-),
+{# ========== Final ========== #}
 
 final AS (
     SELECT
-        *
-        EXCLUDE (
-            has_had_launch_session,
-            avg_current_gmv_usd,
-            avg_initial_gmv_usd,
-            churned_on_pt,
-            last_plan_price,
-            churn_type
-        )
-        REPLACE (
-            (
-                COALESCE((1.0 * shopify_shop_gmv_initial_total_usd) >= 3000, FALSE)
-                OR
-                shopify_plan_name IN ('professional', 'unlimited', 'shopify_plus')
-            ) AS is_mql,
-            COALESCE(shop_billing_breaks.has_taken_billing_breaks, FALSE) AS has_taken_billing_breaks,
-            COALESCE(shop_billing_breaks.billing_break_days, NULL) AS billing_break_days
-        ),
+        shops.*,
+        billing_accounts.plan_name,
+        price_per_action,
+        has_csm_support,
+        workflows_current_count,
+        workflows_enabled_current_count,
+        templates_installed_count,
+        is_using_pro_apps,
+        has_puc_workflow,
+        integration_apps_enabled_count,
+        pro_apps_enabled_count,
+        max_funnel_step_achieved_at_pt,
+        max_funnel_step,
+        max_funnel_step_name,
+        max_funnel_steps.has_a_workflow,
+        has_saved_a_workflow,
+        has_enabled_a_workflow,
+        shop_infos.* EXCLUDE (shop_subdomain),
+        first_workflow_keys.* EXCLUDE (shop_subdomain),
+        max_workflow_steps,
+        max_workflow_steps_with_deleted,
+        source_destination_pairs_list,
         NOT activation_date_pt IS NULL AS is_activated,
         IFF(is_activated, 'activated', 'onboarding') AS funnel_phase,
-        {{
-            dbt.datediff(
-                "first_installed_at_pt::DATE", "activation_date_pt", "days"
-            )
-        }} AS days_to_activation,
-        COALESCE(
-            has_had_launch_session, not launch_session_date is NULL
-        ) AS has_had_launch_session,
-        {{ dbt.datediff("launch_session_date", "activation_date_pt", "days") }}
-            AS days_from_launch_session_to_activation,
-        shopify_shop_gmv_current_total_usd / nullif(avg_current_gmv_usd, 0)
-            - 1 AS shopify_shop_gmv_current_cohort_avg_percent,
-        shopify_shop_gmv_initial_total_usd / nullif(avg_initial_gmv_usd, 0)
-            - 1 AS shopify_shop_gmv_initial_cohort_avg_percent,
+        {{ dbt.datediff("first_installed_at_pt::DATE", "activation_date_pt", "days") }} AS days_to_activation,
+        COALESCE(has_had_launch_session, NOT launch_session_date IS NULL) AS has_had_launch_session_final,
+        {{ dbt.datediff("launch_session_date", "activation_date_pt", "days") }} AS days_from_launch_session_to_activation,
+        shopify_shop_gmv_current_total_usd / NULLIF(avg_current_gmv_usd, 0) - 1 AS shopify_shop_gmv_current_cohort_avg_percent,
+        shopify_shop_gmv_initial_total_usd / NULLIF(avg_initial_gmv_usd, 0) - 1 AS shopify_shop_gmv_initial_cohort_avg_percent,
         CASE
-            WHEN shopify_shop_gmv_current_total_usd < 100
-            THEN 100
-            WHEN shopify_shop_gmv_current_total_usd < 1000
-            THEN 1000
-            WHEN shopify_shop_gmv_current_total_usd < 10000
-            THEN 10000
-            WHEN shopify_shop_gmv_current_total_usd < 50000
-            THEN 50000
-            WHEN shopify_shop_gmv_current_total_usd < 100000
-            THEN 100000
-            WHEN shopify_shop_gmv_current_total_usd < 250000
-            THEN 250000
-            WHEN shopify_shop_gmv_current_total_usd < 500000
-            THEN 500000
-            WHEN shopify_shop_gmv_current_total_usd < 750000
-            THEN 750000
-            WHEN shopify_shop_gmv_current_total_usd < 1000000
-            THEN 1000000
-            WHEN shopify_shop_gmv_current_total_usd < 2000000
-            THEN 2000000
-            WHEN shopify_shop_gmv_current_total_usd < 5000000
-            THEN 5000000
-            WHEN shopify_shop_gmv_current_total_usd < 10000000
-            THEN 10000000
-            WHEN shopify_shop_gmv_current_total_usd < 20000000
-            THEN 20000000
-            WHEN shopify_shop_gmv_current_total_usd < 50000000
-            THEN 50000000
-            WHEN shopify_shop_gmv_current_total_usd < 100000000
-            THEN 100000000
-            WHEN shopify_shop_gmv_current_total_usd < 200000000
-            THEN 200000000
-            WHEN shopify_shop_gmv_current_total_usd < 500000000
-            THEN 500000000
-            WHEN shopify_shop_gmv_current_total_usd < 1000000000
-            THEN 1000000000
-        end AS shopify_shop_gmv_current_total_tier,
-
-        'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/'
-            || shop_subdomain
-            || '/mesa' AS backdoor_url,
-            'https://insights.hotjar.com/sites/1547357/'
-            || 'workspaces/1288874/playbacks/list?'
-            || 'filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,'
-            || '%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22'
-            || shop_subdomain
-            || '%22%7D%7D%5D%7D' AS hotjar_url,
+            WHEN shopify_shop_gmv_current_total_usd < 100 THEN 100
+            WHEN shopify_shop_gmv_current_total_usd < 1000 THEN 1000
+            WHEN shopify_shop_gmv_current_total_usd < 10000 THEN 10000
+            WHEN shopify_shop_gmv_current_total_usd < 50000 THEN 50000
+            WHEN shopify_shop_gmv_current_total_usd < 100000 THEN 100000
+            WHEN shopify_shop_gmv_current_total_usd < 250000 THEN 250000
+            WHEN shopify_shop_gmv_current_total_usd < 500000 THEN 500000
+            WHEN shopify_shop_gmv_current_total_usd < 750000 THEN 750000
+            WHEN shopify_shop_gmv_current_total_usd < 1000000 THEN 1000000
+            WHEN shopify_shop_gmv_current_total_usd < 2000000 THEN 2000000
+            WHEN shopify_shop_gmv_current_total_usd < 5000000 THEN 5000000
+            WHEN shopify_shop_gmv_current_total_usd < 10000000 THEN 10000000
+            WHEN shopify_shop_gmv_current_total_usd < 20000000 THEN 20000000
+            WHEN shopify_shop_gmv_current_total_usd < 50000000 THEN 50000000
+            WHEN shopify_shop_gmv_current_total_usd < 100000000 THEN 100000000
+            WHEN shopify_shop_gmv_current_total_usd < 200000000 THEN 200000000
+            WHEN shopify_shop_gmv_current_total_usd < 500000000 THEN 500000000
+            WHEN shopify_shop_gmv_current_total_usd < 1000000000 THEN 1000000000
+        END AS shopify_shop_gmv_current_total_tier,
+        'https://www.theshoppad.com/homeroom.theshoppad.com/admin/backdoor/' || shop_subdomain || '/mesa' AS backdoor_url,
+        'https://insights.hotjar.com/sites/1547357/workspaces/1288874/playbacks/list?filters=%7B%22AND%22:%5B%7B%22DAYS_AGO%22:%7B%22created%22:365%7D%7D,%7B%22EQUAL%22:%7B%22user_attributes.str.user_id%22:%22' || shop_subdomain || '%22%7D%7D%5D%7D' AS hotjar_url,
+        COALESCE(trial_ends_pt >= CURRENT_DATE, FALSE) AS is_in_trial,
         CASE
-            WHEN store_leads_estimated_monthly_sales < 1000
-            THEN 'A-Under $1,000'
-            WHEN store_leads_estimated_monthly_sales < 5000
-            THEN 'B-$1,000-$5,000'
-            WHEN store_leads_estimated_monthly_sales < 10000
-            THEN 'C-$5,000-$10,000'
-            WHEN store_leads_estimated_monthly_sales < 25000
-            THEN 'D-$10,000-$25,000'
-            WHEN store_leads_estimated_monthly_sales < 50000
-            THEN 'E-$25,000-$50,000'
-            WHEN store_leads_estimated_monthly_sales < 100000
-            THEN 'F-$50,000-$100,000'
-            WHEN store_leads_estimated_monthly_sales < 250000
-            THEN 'G-$100,000-$250,000'
-            WHEN store_leads_estimated_monthly_sales < 500000
-            THEN 'H-$250,000-$500,000'
-            WHEN store_leads_estimated_monthly_sales < 1000000
-            THEN 'I-$500,000-$1,000,000'
-            WHEN store_leads_estimated_monthly_sales < 2500000
-            THEN 'J-$1,000,000-$2,500,000'
-            ELSE 'K-$2,500,000+'
-        end AS store_leads_estimated_monthly_sales_bucket,
-        COALESCE(trial_ends_pt >= current_date, FALSE) AS is_in_trial,
-
-        yesterdays_inc_amount > 0
-            AND NOT is_shopify_zombie_plan
-            AND NOT is_in_trial
-            AND billing_accounts.plan_name not ilike '%free%'
-            AND install_status = 'active' AS is_currently_paying,
-        average_daily_revenue = 0
-            AND NOT is_shopify_zombie_plan
-            AND NOT is_in_trial
-            AND billing_accounts.plan_name not ilike '%free%'
-            AND install_status = 'active' AS is_likely_shopify_plus_dev_store,
-
-        CASE
-            WHEN has_ever_upgraded_to_paid_plan
-                THEN install_status = 'uninstalled' OR NOT is_currently_paying
-        END AS has_churned_paid,
-        IFF(has_churned_paid, churn_type, NULL) AS churn_type, {# Don't provide a churn type if they haven't churned. #}
-        has_ever_upgraded_to_paid_plan AND plan_change_chain ilike '%$0' AS did_pay_and_then_downgrade_to_free,
-
-        CASE has_done_a_trial
-            WHEN install_status = 'uninstalled' or not is_in_trial
-                THEN NOT has_ever_upgraded_to_paid_plan
-        END AS has_churned_during_trial,
-
-        case
-            when not has_done_a_trial
-                then '1-Has Not Done A Trial'
-            when
-                has_churned_during_trial
-                THEN '3-Churned During Trial'
-            WHEN is_in_trial AND NOT is_currently_paying
-                THEN '2-Currently In Trial'
-            WHEN has_churned_paid or did_pay_and_then_downgrade_to_free
-                THEN '4-Paid and Then Churned'
-            WHEN is_currently_paying
-                THEN '5-Currently Paying'
-            ELSE '6-Not trial but a paid plan (should not happen)'
-        END AS plan_upgrade_funnel_status,
-
-        CASE
-            WHEN max_workflow_steps <= 2
-                THEN 1
-            WHEN max_workflow_steps between 3 AND 4
-                THEN 2
+            WHEN max_workflow_steps <= 2 THEN 1
+            WHEN max_workflow_steps BETWEEN 3 AND 4 THEN 2
             ELSE 3
         END AS virtual_plan_step_qualifier,
         IFF(is_using_pro_apps, 2, 1) AS virtual_plan_pro_app_qualifier,
-        CASE
-            WHEN workflow_run_attempt_rolling_thirty_day_count <= 500
-            THEN 1
-            WHEN workflow_run_attempt_rolling_thirty_day_count BETWEEN 501 AND 5000
-            THEN 2
-            WHEN
-                workflow_run_attempt_rolling_thirty_day_count BETWEEN 5001 AND 10000
-            THEN 3
-            ELSE 4
-        end AS virtual_plan_workflow_run_attempt_qualifier,
-        GREATEST(
-            virtual_plan_step_qualifier,
-            virtual_plan_pro_app_qualifier,
-            virtual_plan_workflow_run_attempt_qualifier
-        ) AS virtual_plan,
-        COALESCE(
-            LEAST(
-                COALESCE(first_newsletter_sent_at_pt, CURRENT_TIMESTAMP()),
-                COALESCE(first_broadcast_email_clicked_at_pt, CURRENT_TIMESTAMP()),
-                COALESCE(first_broadcast_email_open_at_pt, CURRENT_TIMESTAMP()),
-                COALESCE(
-                    first_broadcast_email_converted_at_pt, CURRENT_TIMESTAMP()
-                ),
-                COALESCE(first_journey_sent_at_pt, CURRENT_TIMESTAMP()),
-                COALESCE(first_journey_email_open_at_pt, CURRENT_TIMESTAMP()),
-                COALESCE(first_journey_email_converted_at_pt, CURRENT_TIMESTAMP())
-            )
-            < first_installed_at_pt,
-            FALSE
-        ) AS is_email_acquisition,
-        iff(
-            has_ever_upgraded_to_paid_plan AND NOT is_currently_paying,
-            churned_on_pt,
-            NULL
-        ) AS churned_on_pt,
-        floor(
-            datediff('day', first_plan_upgrade_date, churned_on_pt)
-        ) AS churned_customer_duration_in_days,
-        floor(
-            datediff('days', first_plan_upgrade_date, churned_on_pt) / 7
-        ) AS churned_customer_duration_in_weeks,
-        floor(
-            datediff('days', first_plan_upgrade_date, churned_on_pt) / 30
-        ) AS churned_customer_duration_in_months,
-        COALESCE(
-            iff(projected_mrr > 0, projected_mrr, iff(last_plan_price > 0, last_plan_price, plan_price)), 0
-        ) AS shop_value_per_month,
-        CASE
-            WHEN is_currently_paying AND workflow_run_success_rolling_thirty_day_count < 1
-                THEN TRUE
-            WHEN is_currently_paying
-                THEN FALSE
-        END AS is_currently_involuntary
+        GREATEST(virtual_plan_step_qualifier, virtual_plan_pro_app_qualifier) AS virtual_plan
     FROM shops
     LEFT JOIN billing_accounts USING (shop_subdomain)
     LEFT JOIN price_per_actions USING (shop_subdomain)
     LEFT JOIN csm_support USING (shop_subdomain)
-    LEFT JOIN workflow_counts USING (shop_subdomain)
-    LEFT JOIN workflow_run_counts USING (shop_subdomain)
-    LEFT JOIN successful_workflow_run_counts USING (shop_subdomain)
-    LEFT JOIN app_pageview_bookend_times USING (shop_subdomain)
-    LEFT JOIN current_rolling_counts USING (shop_subdomain)
-    LEFT JOIN simple_shop_attribution USING (shop_subdomain)
+    LEFT JOIN shop_workflow_counts USING (shop_subdomain)
     LEFT JOIN max_funnel_steps USING (shop_subdomain)
-    LEFT JOIN total_ltv_revenue USING (shop_subdomain)
     LEFT JOIN shop_infos USING (shop_subdomain)
     LEFT JOIN cohort_average_current_shop_gmv
     LEFT JOIN cohort_average_initial_shop_gmv USING (cohort_month)
-    LEFT JOIN email_open_details USING (shop_subdomain)
-    LEFT JOIN email_click_details USING (shop_subdomain)
-    LEFT JOIN email_conversion_details USING (shop_subdomain)
-    LEFT JOIN thirty_day_revenue USING (shop_subdomain)
     LEFT JOIN first_workflow_keys USING (shop_subdomain)
     LEFT JOIN max_workflow_steps USING (shop_subdomain)
-    LEFT JOIN int_shop_integration_app_rows USING (shop_subdomain)
-    LEFT JOIN plan_change_chains USING (shop_subdomain)
-    LEFT JOIN email_unsubscribe_details USING (shop_subdomain)
-    LEFT JOIN first_newsletter_deliveries USING (shop_subdomain)
-    LEFT JOIN first_journey_deliveries USING (shop_subdomain)
-    LEFT JOIN churn_dates USING (shop_subdomain)
-    LEFT JOIN churn_types USING (shop_subdomain)
+    LEFT JOIN shop_integration_app_counts USING (shop_subdomain)
     LEFT JOIN workflow_source_destination_pairs USING (shop_subdomain)
-    LEFT JOIN last_plan_prices USING (shop_subdomain)
-    LEFT JOIN shop_billing_breaks USING (shop_subdomain)
-    LEFT JOIN paid_days_tiers USING (shop_subdomain)
-
 )
 
 SELECT *

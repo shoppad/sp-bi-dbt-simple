@@ -1,956 +1,340 @@
 version: 2
 models:
   - name: shops
-    description: formatted, production-ready shops.
+    description: Formatted, production-ready shops with workflow and billing information.
     meta:
-      metabase.caveats:
-        this table combines all the install records of `m3_mesa` into
-        one shop record.
+      metabase.caveats: This table combines all the install records of m3_mesa into one shop record.
     data_tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
           min_value: 4000
     columns:
-      - description: The foreign key for the Shop.
-        name: shop_subdomain
-        # data_tests:
-        #   - not_null
-        #   - unique
-      - description: The effective created at for the shop.
-        name: first_installed_at_pt
+      - name: shop_subdomain
+        description: The foreign key for the Shop.
+      - name: first_installed_at_pt
+        description: The effective created at for the shop.
         data_tests:
           - not_null
-      - description: The financial currency used by the shop with its customers.
-        name: currency
+      - name: currency
+        description: The financial currency used by the shop with its customers.
         data_tests:
           - not_null
-      - description: The number of workflow runs that have completed without error.
-        name: unique_workflows_successfully_run_count
-        data_tests:
-          - not_null
-      - description: The shopify plan used by the shop.
-        name: shopify_plan_name
-      - description: The current mesa app installation status of the shop.
-        name: install_status
-      - description: The usage status of the shop.
-        name: status
-      - description: "[fill]"
-        name: referral
-      - description: a field used by account services to record onboarding sessions.
-        name: meta
-      - description: The most recent app installation date.
-        name: latest_installed_at_pt
-      - description: The method used to charge the shop for their subscription & usage.
-        name: billing_method_name
-      - description: The amount of revenue from plan charges for this day.
-        name: daily_plan_revenue
-      - description: "[fill]"
-        name: price_per_action
-      - description: The date the shop achieved the current definition of activated.
-        name: activation_date_pt
-      - description: whether the shop has achieved activation.
-        name: is_activated
-      - description: The number of templates the shop has installed as a workflow.
-        name: templates_installed_count
-      - description: "[fill]"
-        name: balance_used
-      - description: The official shopify identifier for the shop.
-        name: shopify_id
-      - description: The current mesa plan's monthly cost.
-        name: plan_price
-      - description: The number of automation runs used in the current billing bucket
-        name: plan_used
-      - description: The percent of the days in the month that have been completed
-        name: percent_complete
-      - description: "From Shopify: The date this billing period will rollover"
-        name: billing_on_pt
-      - description: The mesa plan the shop is currently subscribed to.
-        name: plan_name
-      - description: The perecent of automtions used in the current billing bucket.
-        name: percent_used
-      - description: "From: Shopify: The dollars reminaing in this billing cycle's hard_limit"
-        name: balance_remaining
-      - description: The 30-day gmv of the shop at the time of installation.
+      - name: shopify_plan_name
+        description: The Shopify plan used by the shop.
+      - name: install_status
+        description: The current mesa app installation status of the shop.
+      - name: meta
+        description: A field used by account services to record onboarding sessions.
+      - name: latest_installed_at_pt
+        description: The most recent app installation date.
+      - name: billing_method_name
+        description: The method used to charge the shop for their subscription & usage.
+      - name: price_per_action
+        description: The price per action for the shop.
+      - name: activation_date_pt
+        description: The date the shop achieved the current definition of activated.
+      - name: is_activated
+        description: Whether the shop has achieved activation.
+      - name: templates_installed_count
+        description: The number of templates the shop has installed as a workflow.
+      - name: shopify_id
+        description: The official Shopify identifier for the shop.
+      - name: plan_price
+        description: The current mesa plan's monthly cost.
+      - name: plan_name
+        description: The mesa plan the shop is currently subscribed to.
+      - name: shopify_shop_gmv_initial_total_usd
+        description: The 30-day GMV of the shop at the time of installation.
         meta:
-          metabase.display_name: initial revenue / gmv
+          metabase.display_name: Initial Revenue / GMV
           metabase.semantic_type: type/Currency
-        name: shopify_shop_gmv_initial_total_usd
-      - description: The date the initial billing trial period ends.
+      - name: trial_ends_pt
+        description: The date the initial billing trial period ends.
         meta:
           metabase.display_name: Trial End Date (PT)
-        name: trial_ends_pt
-      - description: The id of the chargebee account if used for billing.
-        name: chargebee_id
-      - description: The timestamp the billing information was updated at in pt.
-        meta:
-          metabase.display_name: Billing Updated At (PT)
-        name: billing_updated_at_pt
-      - description: "[fill]"
-        name: plan_type
-      - description: "[fill]"
-        name: days_complete
-      - description: The code-friendly shortcode of the current mesa plan.
+      - name: plan_id
+        description: The code-friendly shortcode of the current mesa plan.
         meta:
           metabase.display_name: Plan Identifier
-        name: plan_id
-      - description: The current 30-day GMV of the Shopify Shop.
+      - name: shopify_shop_gmv_current_total_usd
+        description: The current 30-day GMV of the Shopify Shop.
         meta:
           metabase.display_name: Current Shop Revenue / GMV
           metabase.semantic_type: type/Currency
-        name: shopify_shop_gmv_current_total_usd
-      - description: The frequency of the billing plan interval.
-        name: plan_interval
-      - description: The initial length of the trial period.
-        name: trial_days
-      - description: "[fill]"
-        name: is_builder_wizard_completed
-      - description: a direct link to the user's hotjar sessions.
-        name: hotjar_url
-      - description: a direct link to the Shop's backdoor ui.
-        name: backdoor_url
-      - description:
-          The total minutes between the first and last pageview inside the
-          app.
-        name: minutes_using_app
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.7
-              config:
-                where: first_installed_at_pt > '2020-12-18'
-      - description: The number of Workflow Run attempts that have been started.
-        name: workflow_runs_attempted_count
+      - name: plan_interval
+        description: The frequency of the billing plan interval.
+      - name: trial_days
+        description: The initial length of the trial period.
+      - name: is_builder_wizard_completed
+        description: Whether the builder wizard was completed.
+      - name: hotjar_url
+        description: A direct link to the user's Hotjar sessions.
+      - name: backdoor_url
+        description: A direct link to the Shop's backdoor UI.
+      - name: uninstalled_at_pt
+        description: The timestamp of the latest uninstallation of the app.
+      - name: funnel_phase
+        description: The funnel phase the Shop is in (activated or onboarding).
         data_tests:
           - not_null
-      - description: The timestamp of the last pageview inside the pap.
-        name: last_seen_in_app_at_pt
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.7
-      - description: The number of Workflow Run attempts that have completed successfully.
-        name: workflow_run_success_count
+      - name: has_a_workflow
+        description: Whether the shop has ever created a workflow or installed a template.
         data_tests:
           - not_null
-      - description: The minutes between initial install and the latest uninstall.
-        name: minutes_until_uninstall
-      - description: The timestamp of the first pageview within the app.
-        name: first_seen_in_app_at_pt
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.7
-      - description:
-          The number of successful workflow run attempts initiated in the last
-          30 days as of this day.
-        name: workflow_run_success_rolling_thirty_day_count
+      - name: max_funnel_step_achieved_at_pt
+        description: The timestamp of the latest funnel step achieved in PT.
         data_tests:
           - not_null
-      - description: The number of days from first install to activation.
-        name: days_to_activation
-        # data_tests:
-        #   - dbt_utils.not_null_proportion:
-        #       at_least: 0.02
-      - description:
-          The number of successful workflow run attempts initiated in the last
-          year as of this day.
-        name: workflow_run_success_rolling_year_count
-      - description: The timestamp of the latest uninstallation of the app.
-        name: uninstalled_at_pt
-      - description: The date of the first plan upgrade action.
-        name: first_plan_upgrade_date
-      - description: The funnel phase the Shop was in when the workflow run was executed.
-        name: funnel_phase
+      - name: has_enabled_a_workflow
+        description: Whether the shop has ever enabled a workflow.
         data_tests:
           - not_null
-      - description: whether the shop has ever created a workflow or installed a template.
-        name: has_a_workflow
+      - name: cohort_week
+        description: The week of the Shop's first app installation.
         data_tests:
           - not_null
-      - description: The timestamp of the latest funnel step achieved in pt.
-        name: max_funnel_step_achieved_at_pt
+      - name: max_funnel_step
+        description: The numeric value of latest funnel step achieved.
         data_tests:
           - not_null
-      - description: whether the shop has ever enabled a workflow.
-        name: has_enabled_a_workflow
+      - name: max_funnel_step_name
+        description: The name of the latest funnel step achieved.
         data_tests:
           - not_null
-      - description: The week of the Shop's first app installation.
-        name: cohort_week
+      - name: cohort_month
+        description: The month of the Shop's first app installation.
         data_tests:
           - not_null
-      - description: The numeric value of latest funnel step achieved.
-        name: max_funnel_step
+      - name: workflows_enabled_current_count
+        description: The number of currently enabled workflows for the shop.
         data_tests:
           - not_null
-      - description: The name of the latest funnel step achieved.
-        name: max_funnel_step_name
+      - name: workflows_current_count
+        description: The number of total workflows currently created on the shop (enabled or disabled).
         data_tests:
           - not_null
-      - description: The month of the Shop's first app installation.
-        name: cohort_month
-        data_tests:
-          - not_null
-      - description:
-          The total revenue generated by users who first installed in the given
-          week.
+      - name: launch_session_date
+        description: The date of the launch session with customer success.
+      - name: days_from_launch_session_to_activation
+        description: The number of days from launch to activation. (may be negative.)
         meta:
-          metabase.display_name: Total LTV Revenue
-          metabase.semantic_type: type/Currency
-        name: total_ltv_revenue
+          metabase.caveats: This number may be negative if they activated before the launch session.
+      - name: has_had_launch_session
+        description: Whether the shop has had a launch session with customer success.
+      - name: shopify_shop_gmv_current_total_tier
+        description: The tier of the Shop's current revenue.
+        meta:
+          metabase.display_name: Current Revenue Tier/Bucket
+      - name: shopify_shop_orders_initial_count
+        description: The 30-day order count volume at the time of app installation.
+      - name: age_of_store_at_install_bucket
+        description: The bucket of the Shop's age at install.
+      - name: age_of_store_at_install_in_days
+        description: The age (in days) of the store at the initial install.
+      - name: shopify_shop_created_at_pt
+        description: The timestamp of the Shopify Shop's creation.
+      - name: shopify_shop_orders_current_count
+        description: The current monthly order volume of the shop.
+      - name: age_of_store_at_install_in_weeks
+        description: The age (in weeks) of the store at the initial install.
+      - name: shopify_shop_country
+        description: The country of the Shop provided by the Shopify API.
+      - name: is_custom_app
+        description: Whether the Shop is a custom application with custom pricing not billed through the Shopify system.
         data_tests:
           - not_null
-      - description: The number of currently enabled workflows for the shop.
-        name: workflows_enabled_current_count
-        data_tests:
-          - not_null
-      - description:
-          The number of total workflows currently created on the shop (enabled
-          or disabled).
-        name: workflows_current_count
-        data_tests:
-          - not_null
-      - description: The date the Shop's trial ended.
-        meta:
-          metabase.display_name: Trial End Date (UTC)
-        name: trial_end_dt_utc
-      - description: The date of the launch session with customer success.
-        name: launch_session_date
-      - description: The number of days from launch to activation. (may be negative.)
-        meta:
-          metabase.caveats:
-            this number may be negative if they activated before the launch
-            session.
-        name: days_from_launch_session_to_activation
-      - description: whether the shop has had a launch session with customer success.
-        name: has_had_launch_session
-        data_tests:
-          - not_null
-      - description: The tier of the Shop's current revenue.
-        meta:
-          metabase.display_name: current revenue tier/bucket
-        name: shopify_shop_gmv_current_total_tier
-      - description: whether the shop has an account for this app.
-        name: has_uploadery
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_tracktor
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_blogstudio
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_kitkarts
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_smile
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_bouncer
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_pagestudio
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_coin
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: whether the shop has an account for this app.
-        name: has_infinite_options
-        data_tests:
-          - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description:
-          The template the Shop intended to use when they first installed the
-          app.
-        name: acq_acquisition_template
-      - description:
-          Whether the Shop was referred/entered the marketing site by a blog
-          post.
-        name: acq_is_blog_referral
-        data_tests:
-          - not_null
-      - description: The number of workflow attempts that have been started.
-        name: unique_workflows_attempted_count
-        data_tests:
-          - not_null
-      - description: The 30-day order count volume at the time of app installation.
-        name: shopify_shop_orders_initial_count
-      - description: The bucket of the Shop's age at install.
-        name: age_of_store_at_install_bucket
-      - description: The age (in days) of the store at the initial install.
-        name: age_of_store_at_install_in_days
-      - description: The timestamp of the Shopify Shop's creation.
-        name: shopify_shop_created_at_pt
-      - description: The current monthly order volume of the shop.
-        name: shopify_shop_orders_current_count
-      - description: The age (in weeks) of the store at the initial install.
-        name: age_of_store_at_install_in_weeks
-      - description:
-          The first full category/sub-category group of the Shop pulled in
-          from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Product Category & Subcategory (Store Leads)
-        name: store_leads_category
-      - description: The first top-level category of the Shop pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Product Top-Level Category (Store Leads)
-        name: store_leads_top_level_category
-      - description: A list of the Shop features pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Shop Features (Store Leads)
-        name: store_leads_features
-      - description:
-          Indicates whether the Shop has Recharge listed in their Store Leads
-          features.
-        meta:
-          metabase.display_name: Has Recharge? (Store Leads)
-        name: store_leads_has_recharge
-      - description:
-          The rank of the Shop on the platform (Shopify) pulled in from Store
-          Leads.
-        meta:
-          metabase.display_name: Shopify Store Rank (Store Leads)
-        name: store_leads_platform_rank
-      - description: The percentile of the Shop's rank pulled in from Store Leads.
-        meta:
-          metabase.display_name: Shopify Store Rank Percentile (Store Leads)
-        name: store_leads_platform_rank_percentile
-      - description: The estimated monthly sales pulled in from Store Leads.
-        meta:
-          metabase.display_name: Estimated Shop Sales (Store Leads)
-          metabase.semantic_type: type/Currency
-        name: store_leads_estimated_monthly_sales
-      - description:
-          "The estimated amount the Shop spends on Shopify apps (pulled in\
-          \ from Store Leads).\u2020\u2264"
-        meta:
-          metabase.display_name: Monthly App Spend (Store Leads)
-          metabase.semantic_type: type/Currency
-        name: store_leads_monthly_app_spend
-      - description: The country of the Shop provided by the Shopify API.
-        name: shopify_shop_country
-      - description:
-          The bucket of the Shop's estimated monthly sales pulled in from Store
-          Leads.
-        meta:
-          metabase.display_name: Estimated Monthly Sales Bucket (Store Leads)
-        name: store_leads_estimated_monthly_sales_bucket
-      - description:
-          The ShopPad revenue attributed to the Shop from Mesa in the last
-          30 days.
-        meta:
-          metabase.display_name: Last 30-Day Income
-          metabase.semantic_type: type/Currency
-        name: income_rolling_thirty_day_total
-      - description:
-          The ShopPad revenue attributed to the Shop from Mesa in the last
-          year.
-        meta:
-          metabase.display_name: Last Year Income
-          metabase.semantic_type: type/Currency
-        name: income_rolling_year_total
-      - description:
-          Whether the Shop is a custom application with custom pricing not
-          billed through the Shopify system.
-        name: is_custom_app
-        data_tests:
-          - not_null
-      - description:
-          The percent comparison of the Shop's initial revenue compared to
-          its cohort.
+      - name: shopify_shop_gmv_initial_cohort_avg_percent
+        description: The percent comparison of the Shop's initial revenue compared to its cohort.
         meta:
           metabase.display_name: Shopify Shop GMV Compared to Cohort Avg (Install)
-        name: shopify_shop_gmv_initial_cohort_avg_percent
-      - description:
-          The percent comparison of the Shop's current revenue compared to
-          all other Shops.
+      - name: shopify_shop_gmv_current_cohort_avg_percent
+        description: The percent comparison of the Shop's current revenue compared to all other Shops.
         meta:
           metabase.display_name: Shopify Shop GMV Compared to All Avg (Current)
-        name: shopify_shop_gmv_current_cohort_avg_percent
-      - description: The timestamp of the Shop's latest install in UTC.
-        name: latest_installed_at_utc
-      - description: The timestamp of the Shop's first install in UTC.
-        name: first_installed_at_utc
-      - description: Whether the Shop is an MQL.
+      - name: latest_installed_at_utc
+        description: The timestamp of the Shop's latest install in UTC.
+      - name: first_installed_at_utc
+        description: The timestamp of the Shop's first install in UTC.
+      - name: is_mql
+        description: Whether the Shop is an MQL.
         meta:
           metabase.display_name: Is MQL?
-        name: is_mql
-      - description: The name of the Shop's initial Shopify plan.
-        name: initial_shopify_plan_name
-      - description: The date of the Shop's first install.
+      - name: initial_shopify_plan_name
+        description: The name of the Shop's initial Shopify plan.
+      - name: first_installed_on_pt
+        description: The date of the Shop's first install.
         meta:
           metabase.display_name: First Installed On (PT)
-        name: first_installed_on_pt
-      - description: The timestamp of the Shop's last broadcast email open
-        name: last_broadcast_email_open_at_pt
-      - description: The number of broadcast email opens for the Shop.
-        name: broadcast_email_opens_count
-      - description: Whether the Shop has opened a Broadcast email.
-        name: has_opened_broadcast_email
-      - description: The timestamp of the Shop's first email open.
-        name: first_broadcast_email_open_at_pt
-      - description: The timestamp of the Shop's first broadcast email click.
-        name: first_broadcast_email_clicked_at_pt
-      - description: The timestamp of the Shop's first broadcast email conversion.
-        name: first_broadcast_email_converted_at_pt
-      - description: The timestamp of the Shop's last broadcast email click.
-        name: last_broadcast_email_clicked_at_pt
-      - description: The number of Broadcast email clicks for the Shop.
-        name: broadcast_email_click_count
-      - description: The number of email conversions for the Shop.
-        name: broadcast_email_conversion_count
-      - description: Whether the Shop has clicked a broadcast email.
-        name: has_clicked_broadcast_email
-      - description: The timestamp of the Shop's last broadcast email conversion.
-        name: last_broadcast_email_converted_at_pt
-      - description: The timestamp of the Shop's first install in the constellation.
-        name: first_in_constellation_at_utc
-      - description:
-          The date of the Shop's first install in the constellation apart from
-          MESA.
-        meta:
-          metabase.display_name: First In Constellation On (PT)
-        name: first_in_constellation_on_pt
-      - description:
-          The timestamp of the Shop's first install in the constellation apart
-          from MESA.
-        meta:
-          metabase.display_name: First In Constellation At (PT)
-        name: first_in_constellation_at_pt
-      - description:
-          The week of the Shop's first install in the constellation apart from
-          MESA.
-        meta:
-          metabase.display_name: Constellation Cohort Week
-        name: constellation_cohort_week
-      - description: The timestamp of the Shop's last journey email conversion.
-        name: last_journey_email_converted_at_pt
-      - description: Whether the Shop has converted via broadcast email.
-        name: has_converted_via_broadcast_email
-      - description: The number of journey email opens for the Shop.
-        name: journey_email_opens_count
-      - description: The timestamp of the Shop's first journey email conversion.
-        name: first_journey_email_converted_at_pt
-      - description: Whether the Shop has converted via journey email.
-        name: has_converted_via_journey_email
-      - description: The number of journey email conversions for the Shop.
-        name: journey_email_conversion_count
-      - description: The timestamp of the Shop's last journey email click.
-        name: last_journey_email_clicked_at_pt
-      - description: The timestamp of the Shop's last journey email open.
-        name: last_journey_email_open_at_pt
-      - description: The timestamp of the Shop's first journey email click.
-        name: first_journey_email_clicked_at_pt
-      - description: The number of journey email clicks for the Shop.
-        name: journey_email_click_count
-      - description: Whether the Shop has clicked a journey email.
-        name: has_clicked_journey_email
-      - description: The timestamp of the Shop's first journey email open.
-        name: first_journey_email_open_at_pt
-      - description: Whether the Shop has opened a journey email.
-        name: has_opened_journey_email
-      - description: Whether the Shop is in a trial.
+      - name: is_in_trial
+        description: Whether the Shop is in a trial.
         meta:
           metabase.display_name: Is In Trial?
-        name: is_in_trial
         data_tests:
           - not_null
-      - description: Whether the Shop has ever upgraded to a paid plan.
-        meta:
-          metabase.display_name: Ever Upgraded to Paid Plan?
-        name: has_ever_upgraded_to_paid_plan
-        data_tests:
-          - not_null
-      - description: The identifier of the Shop's first plan.
-        name: first_plan_identifier
-      - description: The number of days until the Shop's first plan upgrade.
-        meta:
-          metabase.display_name: Days Until First Plan Upgrade
-        name: days_until_first_plan_upgrade
-      - description: Whether the Shop is currently paying for a plan.
-        meta:
-          metabase.display_name: Is Currently Paying?
-        name: is_currently_paying
-        data_tests:
-          - not_null
-          - dbt_expectations.expect_column_distinct_count_to_equal:
-              value: 2
-      - description:
-          Whether the Shop's currency is not supported in the DBT/Snowflake
-          currency conversion data.
+      - name: currency_not_supported
+        description: Whether the Shop's currency is not supported in the DBT/Snowflake currency conversion data.
         meta:
           metabase.display_name: Currency Not Supported?
-        name: currency_not_supported
         data_tests:
           - not_null
-      - description:
-          Indicates whether the store is on a 'frozen', 'fraudulent', 'paused',
-          'dormant' or 'cancelled' Shopify plan. TRUE means they are, FALSE means they
-          are not.
+      - name: is_shopify_zombie_plan
+        description: Indicates whether the store is on a 'frozen', 'fraudulent', 'paused', 'dormant' or 'cancelled' Shopify plan.
         meta:
           metabase.display_name: Is Zombie Shopify Plan?
-        name: is_shopify_zombie_plan
         data_tests:
           - not_null
-      - description:
-          The number of workflow run attempts initiated in the last year as
-          of this day.
-        name: workflow_run_attempt_rolling_year_count
-      - description:
-          The average daily usage revenue for the Shop (calculated by the average
-          of the last 30 billable days).
-        name: average_daily_usage_revenue
-      - description:
-          The number of workflow run attempts initiated in the last 30 days
-          as of this day.
-        name: workflow_run_attempt_rolling_thirty_day_count
-      - description:
-          The total number of Workflow Steps started in the last 30 days as
-          of Yesterday.
-        name: input_step_rolling_thirty_day_count
+      - name: first_workflow_trigger_key
+        description: The key of the first step in the Shop's first workflow.
+      - name: first_workflow_trigger_app
+        description: The app of the first step in the Shop's first workflow.
+      - name: first_workflow_destination_key
+        description: The key of the last step in the Shop's first workflow.
+      - name: first_workflow_destination_app
+        description: The app of the last step in the Shop's first workflow.
+      - name: first_workflow_destination_name
+        description: The name of the last step in the Shop's first workflow.
+      - name: first_workflow_trigger_name
+        description: The name of the first step in the Shop's first workflow.
+      - name: integration_apps_enabled_count
+        description: The number of unique integration apps enabled for the Shop.
         data_tests:
           - not_null
-      - description:
-          The total number of "input" (Trigge) Workflow Steps completed in
-          the last 30 days as of Yesterday.
-        name: output_step_rolling_thirty_day_count
+      - name: pro_apps_enabled_count
+        description: The number of unique pro apps enabled in workflows for the Shop.
         data_tests:
           - not_null
-      - description:
-          The total number of Workflow Steps completed in the last 30 days
-          as of Yesterday.
-        name: total_workflow_steps_rolling_thirty_day_count
+      - name: first_workflow_sort_title
+        description: The sort title of the first workflow in the Shop.
+      - name: first_workflow_trigger_destination_app_pair
+        description: The app pair of the Shop's first workflow.
+      - name: first_workflow_trigger_destination_key_pair
+        description: The key pair of the Shop's first workflow.
+      - name: max_workflow_steps
+        description: The maximum number of steps in any workflow for the Shop.
         data_tests:
           - not_null
-      - description:
-          The key of the first step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_trigger_key
-      - description: The total revenue for the Shop in the last 30 days as of Yesterday.
-        name: total_thirty_day_revenue
+      - name: first_workflow_title
+        description: The title of the Shop's first workflow.
+      - name: is_using_pro_apps
+        description: Whether the Shop is using any pro apps.
         data_tests:
           - not_null
-      - description:
-          The app of the first step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_trigger_app
-      - description:
-          The key of the last step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_destination_key
-      - description:
-          The app of the last step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_destination_app
-      - description:
-          The name of the last step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_destination_name
-      - description:
-          The average daily revenue for the Shop (calculated by the average
-          of the last 30 billable days).
-        name: average_daily_revenue
-      - description:
-          The name of the first step in the Shop's first workflow. Gives a
-          clue to their MESA use case.
-        name: first_workflow_trigger_name
-      - description: The number of unique integration apps enabled for the Shop.
-        name: integration_apps_enabled_count
+      - name: first_workflow_trigger_destination_name_pair
+        description: The name pair of the Shop's first workflow.
+      - name: first_workflow_app_chain
+        description: The app chain of the Shop's first workflow.
+      - name: first_workflow_step_chain
+        description: The step chain of the Shop's first workflow.
+      - name: first_workflow_id
+        description: The ID of the Shop's first workflow.
+      - name: has_ever_installed_coin
+        description: Whether the Shop has ever installed Coin.
+      - name: has_shoppad_constellation_app
+        description: Whether the Shop has ever installed any Shoppad Constellation app.
+      - name: has_ever_installed_infinite_options
+        description: Whether the Shop has ever installed Infinite Options.
+      - name: has_ever_installed_kitkarts
+        description: Whether the Shop has ever installed Kit Karts.
+      - name: has_ever_installed_smile
+        description: Whether the Shop has ever installed Smile.
+      - name: has_ever_installed_bouncer
+        description: Whether the Shop has ever installed Bouncer.
+      - name: has_ever_installed_tracktor
+        description: Whether the Shop has ever installed Tracktor.
+      - name: has_ever_installed_pagestudio
+        description: Whether the Shop has ever installed Page Studio.
+      - name: has_ever_installed_blogstudio
+        description: Whether the Shop has ever installed Blog Studio.
+      - name: did_install_another_shoppad_app_first
+        description: Whether the Shop installed another Shoppad app before installing their first Shoppad Constellation app.
+      - name: has_ever_installed_uploadery
+        description: Whether the Shop has ever installed Uploadery.
+      - name: first_shoppad_app_installed
+        description: The first Shoppad app installed by the Shop.
+      - name: virtual_plan
+        description: The v10 plan the Shop's usage qualifies for.
         data_tests:
           - not_null
-      - description: The number of unique pro apps enabled in workflows for the Shop.
-        name: pro_apps_enabled_count
+      - name: virtual_plan_pro_app_qualifier
+        description: The qualifier for the Shop's virtual plan based on their pro app usage.
+      - name: virtual_plan_step_qualifier
+        description: The qualifier for the Shop's virtual plan based on their workflow step usage.
+      - name: first_shoppad_app_installed_at_pt
+        description: The date/time the Shop installed their first Shoppad app.
+      - name: first_shoppad_app_installed_at_utc
+        description: The date/time the Shop installed their first Shoppad app in UTC.
+      - name: has_saved_a_workflow
+        description: Whether the Shop has ever saved a workflow.
         data_tests:
           - not_null
-      - description:
-          The sort title of the first workflow in the Shop. (Cleaned title
-          or marked as DELETED.)
-        name: first_workflow_sort_title
-      - description:
-          The app pair of the Shop's first workflow. Gives a clue to their
-          MESA use case.
-        name: first_workflow_trigger_destination_app_pair
-      - description:
-          The key pair of the Shop's first workflow. Gives a clue to their
-          MESA use case.
-        name: first_workflow_trigger_destination_key_pair
-      - description:
-          The name of the last step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_destination_name
-      - description:
-          The name of the first step in the Shop's first workflow. Gives a
-          clue to their MESA use case.
-        name: first_workflow_trigger_name
-      - description: The maximum number of steps in any workflow for the Shop.
-        name: max_workflow_steps
+      - name: max_workflow_steps_with_deleted
+        description: The maximum number of steps in any workflow for the Shop, including deleted steps.
         data_tests:
           - not_null
-      - description:
-          The title of the Shop's first workflow. Gives a clue to their MESA
-          use case.
-        name: first_workflow_title
-      - description: Whether the Shop is using any pro apps.
-        name: is_using_pro_apps
-        data_tests:
-          - not_null
-      - description:
-          The key of the first step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_trigger_key
-      - description:
-          The app of the last step in the Shop's first workflow. Gives a clue
-          to their MESA use case.
-        name: first_workflow_destination_app
-      - description:
-          The name pair of the Shop's first workflow. Gives a clue to their
-          MESA use case.
-        name: first_workflow_trigger_destination_name_pair
-      - description:
-          The app chain of the Shop's first workflow. Gives a clue to their
-          MESA use case.
-        name: first_workflow_app_chain
-      - description:
-          The step chain of the Shop's first workflow. Gives a clue to their
-          MESA use case.
-        name: first_workflow_step_chain
-      - description:
-          The ID of the Shop's first workflow. Gives a clue to their MESA use
-          case.
-        name: first_workflow_id
-      - description: Whether the Shop has ever installed Coin.
-        name: has_ever_installed_coin
-      - description: Whether the Shop has ever installed any Shoppad Constellation app.
-        name: has_shoppad_constellation_app
-      - description: The number of times the Shop has changed plans.
-        name: plan_change_count
-        data_tests:
-          - not_null
-      - description: Whether the Shop has ever installed Infinite Options.
-        name: has_ever_installed_infinite_options
-      - description: The plan change chain of the Shop.
-        name: plan_change_chain
-      - description: Whether the Shop has ever installed Kit Karts.
-        name: has_ever_installed_kitkarts
-      - description: Whether the Shop has ever installed Smile.
-        name: has_ever_installed_smile
-      - description: Whether the Shop has ever installed Bouncer.
-        name: has_ever_installed_bouncer
-      - description: Whether the Shop has ever installed Tracktor.
-        name: has_ever_installed_tracktor
-      - description: Whether the Shop has ever installed Page Studio.
-        name: has_ever_installed_pagestudio
-      - description: Whether the Shop has ever installed Blog Studio.
-        name: has_ever_installed_blogstudio
-      - description:
-          Whether the Shop installed another Shoppad app before installing
-          their first Shoppad Constellation app.
-        name: did_install_another_shoppad_app_first
-      - description: Whether the Shop has ever installed Uploadery.
-        name: has_ever_installed_uploadery
-      - description: The first Shoppad app installed by the Shop.
-        name: first_shoppad_app_installed
-      - description:
-          Whether the Shop has ever paid for a plan and then downgraded to
-          the free plan.
-        name: did_pay_and_then_downgrade_to_free
-      - description: The v10 plan the Shop's usage qualifies for.
-        name: virtual_plan
-        data_tests:
-          - not_null
-      - description:
-          The qualifier for the Shop's virtual plan based on their workflow
-          run attempts/triggers.
-        name: virtual_plan_workflow_run_attempt_qualifier
-      - description:
-          The qualifier for the Shop's virtual plan based on their pro app
-          usage.
-        name: virtual_plan_pro_app_qualifier
-      - description:
-          The qualifier for the Shop's virtual plan based on their workflow
-          step usage.
-        name: virtual_plan_step_qualifier
-      - description: The number of workflow runs that have resulted in Stop.
-        name: workflow_runs_stop_count
-        data_tests:
-          - not_null
-      - description:
-          Whether the Shop is likely a Shopify Plus dev store and therefore
-          not valuable.
-        name: is_likely_shopify_plus_dev_store
-      - description:
-          The number of workflow runs that have resulted in Failure in the
-          last year.
-        name: workflow_run_failure_rolling_year_count
-      - description:
-          The number of workflow runs that have resulted in Stop in the last
-          year.
-        name: workflow_run_stop_rolling_year_count
-      - description:
-          The number of workflow runs that have resulted in Stop in the last
-          30 days.
-        name: workflow_run_stop_rolling_thirty_day_count
-      - description: The number of workflow runs that have resulted in Failure.
-        name: workflow_runs_fail_count
-        data_tests:
-          - not_null
-      - description:
-          The number of workflow runs that have resulted in Failure in the
-          last 30 days.
-        name: workflow_run_failure_rolling_thirty_day_count
-      - description: The name of the email the Shop unsubscribed from.
-        name: email_unsubscribe_email_name
-      - description: The date/time the Shop installed their first Shoppad app.
-        name: first_shoppad_app_installed_at_pt
-      - description:
-          Whether the Shop was acquired via email/email played a role in their
-          journey.
-        name: is_email_acquisition
-      - description: Whether the Shop has unsubscribed from email.
-        name: has_unsubscribed_from_email
-      - description: The date/time the Shop installed their first Shoppad app in UTC.
-        name: first_shoppad_app_installed_at_utc
-      - description: Their daily average MRR multiplied by 30.
-        name: projected_mrr
-        data_tests:
-          - not_null
-      - description: The date the Shop received their first newsletter.
-        name: first_newsletter_sent_on_pt
-      - description: The type of email the Shop unsubscribed from.
-        name: email_unsubscribe_email_type
-      - description: The date/time the Shop received their first newsletter.
-        name: first_newsletter_sent_at_pt
-      - description: The date the Shop received their first journey email.
-        name: first_journey_sent_on_pt
-      - description: The date/time the Shop received their first journey email.
-        name: first_journey_sent_at_pt
-      - description: Whether the Shop has churned.
-        name: has_churned_paid
-      - name: has_churned_during_trial
-        description: Whether the Shop has churned during trial.
-      - description: The identifier of the Shop's first trial plan.
-        name: first_trial_plan_identifier
-      - description:
-          The status of the Shop's plan upgrade funnel through trial, paying
-          and churn.
-        name: plan_upgrade_funnel_status
-      - description: The name of the first journey email the Shop received.
-        name: first_journey_sent_name
-      - description: The subject of the first journey email the Shop received.
-        name: first_journey_sent_subject
-      - description: The number of days the Shop has been in trial.
-        name: trial_days_completed
-      - description: Whether the Shop has contacted support.
-        name: has_contacted_support
-      - description: The subject of the first newsletter the Shop received.
-        name: first_newsletter_sent_subject
-      - description: The name of the first newsletter the Shop received.
-        name: first_newsletter_sent_name
-      - description: Whether the Shop has ever been in trial.
-        name: has_done_a_trial
-      - description: The date the Shop started their first trial.
-        name: first_trial_start_date
-      - description: The number of days the Shop has been on a paid plan.
-        name: paid_days_completed
-      - description: The timestamp of the Shop's last support reply.
-        name: support_lastreplyat
-      - description: The number of days until the Shop's first trial.
-        name: days_until_first_trial
-      - description: The number of days the Shop has been on a paid plan.
-        name: churned_customer_duration_in_days
-      - description: The date the Shop churned.
-        name: churned_on_pt
-        # data_tests:
-        #   - not_null:
-        #       config:
-        #         where: NOT is_custom_app AND has_churned_paid
-        #         error_if: ">100"
-      - description: The number of weeks the Shop has been/was on a paid plan.
-        name: churned_customer_duration_in_weeks
-      - description: The number of months the Shop has been on a paid plan.
-        name: churned_customer_duration_in_months
-      - description: Whether the Shop has ever saved a workflow.
-        name: has_saved_a_workflow
-        data_tests:
-          - not_null
-      - description:
-          The maximum number of steps in any workflow for the Shop, including
-          deleted steps.
-        name: max_workflow_steps_with_deleted
-        data_tests:
-          - not_null
-      - description: Whether the Shop has ever successfully run a test.
-        name: has_successfully_run_a_test
-        data_tests:
-          - not_null
-      - description: The number of times the Shop has been over their billing limit.
-        name: billing_overage_last_count
-      - description: The date the Shop went over their billing limit.
-        name: overlimit_date_pt
-      - description: Whether the Shop has ever attempted to run a test.
-        name: has_attempted_a_test
-        data_tests:
-          - not_null
-      - description: The Shop's income amount from yesterday.
-        name: yesterdays_inc_amount
-        data_tests:
-          - not_null
-      - description: The currency of the Shop's analytics.
-        name: analytics_currency
-      - description: Whether the Shop is a PQL.
-        name: is_pql
+      - name: analytics_currency
+        description: The currency of the Shop's analytics.
+      - name: is_pql
+        description: Whether the Shop is a PQL.
         data_tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.9
-      - description: The apps used by the Shop.
-        name: apps_used
-      - description:
-          The apps used by the Shop, excluding glue apps such as "filter".
-          (See project var['glue_apps'])
-        name: apps_used_without_glue
-      - description: Whether the Shop has a workflow with a PUC step.
-        name: has_puc_workflow
+              arguments:
+                at_least: 0.9
+      - name: apps_used
+        description: The apps used by the Shop.
+      - name: apps_used_without_glue
+        description: The apps used by the Shop, excluding glue apps.
+      - name: has_puc_workflow
+        description: Whether the Shop has a workflow with a PUC step.
         data_tests:
           - not_null
-      - description:
-          A list of the Shop's source/destination app pairs from all workflows
-          (enabled or not).
-        name: source_destination_pairs_list
-      - description:
-          Whether the Shop has CSM support and exists in our Book-of-Business
-          (BOB)
-        name: has_csm_support
+      - name: source_destination_pairs_list
+        description: A list of the Shop's source/destination app pairs from all workflows.
+      - name: has_csm_support
+        description: Whether the Shop has CSM support and exists in our Book-of-Business (BOB).
         data_tests:
           - not_null
-      - name: shop_value_per_month
-        description:
-          The estimated monetary value of the shop on a monthly basis. Currently
-          plan price.
-      - description: The timestamp of the last update to the shop in Pacific Time.
-        name: shopify_last_updated_at_pt
-      - name: average_plan_revenue
-        description: The average revenue from the shop's plan.
-      - name: acq_is_app_store_search_ad_referral
-        description: Whether the acquisition is a referral from an app store search ad.
-      - name: acq_days_to_install
-        description: The number of days it took to install after acquisition.
-      - name: acq_app_store_has_organic_click
-        description: Whether there was an organic click in the app store during acquisition.
-      - name: acq_unified_traffic_medium
-        description: The medium of the traffic during acquisition.
-      - name: acq_unified_first_touch_at_pt
-        description: The timestamp of the first touch during acquisition in Pacific Time.
-      - name: acq_unified_app_store_surface_type
-        description: The type of surface in the app store during acquisition.
-      - name: acq_unified_traffic_campaign
-        description: The campaign of the traffic during acquisition.
-      - name: acq_unified_traffic_source
-        description: The source of the traffic during acquisition.
-      - name: acq_unified_page_referrer_host
-        description: The host of the referrer during acquisition.
-      - name: acq_unified_traffic_url
-        description: The URL of the traffic during acquisition.
-      - name: acq_unified_traffic_path
-        description: The path of the traffic during acquisition.
-      - name: acq_page_referrer_source
-        description: The source of the referrer during acquisition.
-      - name: acq_page_referrer_medium
-        description: The medium of the referrer during acquisition.
-      - name: acq_unified_traffic_page_host
-        description: The host of the traffic page during acquisition.
-      - name: acq_unified_app_store_surface_detail
-        description: The detail of the surface in the app store during acquisition.
-      - name: acq_app_store_click_type
-        description: The type of click in the app store during acquisition.
-      - name: acq_app_store_has_organic_click
-        description: Whether there was an organic click in the app store during acquisition.
-      - name: acq_app_store_has_ad_click
-        description: Whether there was an ad click in the app store during acquisition.
-      - name: acq_unified_traffic_page_type
-        description: The type of page the user first landed on during acquisition.
-      - name: acq_unified_campaign_chain
-        description: The campaign chain during acquisition.
-      - name: acq_unified_url_chain
-        description: The URL chain during acquisition.
-      - name: acq_unified_medium_chain
-        description: The medium chain during acquisition.
-      - name: acq_unified_source_chain
-        description: The source chain during acquisition.
-      - name: acq_unified_app_store_surface_type_chain
-        description: The chain of surface_types in the app store during acquisition.
-      - name: acq_unified_app_store_surface_detail_chain
-        description: The chain of surface_details in the app store during acquisition.
-      - name: acq_unified_path_chain
-        description: The URL path chain of important touch points during acquisition.
-      - name: acq_unified_page_host_chain
-        description: The host chain of important touch points during acquisition.
-      - name: acq_unified_page_referrer_host_chain
-        description: The referrer host chain of important touch points during acquisition.
+      - name: shopify_last_updated_at_pt
+        description: The timestamp of the last update to the shop in Pacific Time.
       - name: first_workflow_destination_operation_id
         description: The operation ID of the first workflow destination.
-      - name: acq_unified_traffic_page_type
-        description: The type of page the user first landed on during acquisition.
       - name: first_workflow_trigger_operation_id
         description: The operation ID of the first workflow trigger.
-      - name: shop_name
-        description: The name of the shop.
-      - name: churn_type
-        description: The type of churn event.
-      - name: acq_unified_landing_page_type
-        description: The type of landing page during acquisition.
+      - name: days_to_activation
+        description: The number of days from first install to activation.
+      - name: has_had_launch_session_final
+        description: Whether the shop has had a launch session (final computed value).
+      - name: has_contacted_support
+        description: Whether the Shop has contacted support.
+      - name: support_lastreplyat
+        description: The timestamp of the Shop's last support reply.
       - name: app_store_reviewed_at_pt
         description: The timestamp of the Shop's review of MESA in the app store in Pacific Time.
       - name: app_store_review_requested_at_pt
         description: The timestamp of when we sent the Shop a request to review MESA in the app store in Pacific Time.
       - name: has_app_store_reviewed
         description: Whether the Shop has reviewed MESA in the app store.
-      - name: has_taken_billing_breaks
-        description: Indicates if there's been a gap between days that the merchant has been billed, usually meaning they uninstalled and later reinstalled the app.
-        data_tests:
-          - not_null
-          - accepted_values:
-              values: [true, false]
-      - name: billing_break_days
-        description: >
-          The total number of days without billing, including a 7-day detection period for each break.
-          This accounts for the rolling 7-day window used to determine revenue periods.
-          NULL if the shop has never been billed or has no billing breaks.
-        data_tests:
-          - dbt_utils.accepted_range:
-              min_value: 8
-              inclusive: true
-              where: "billing_break_days is not null"
-      - name: billing_breaks
-        description: A JSON array representation of all billing breaks, including start date, end date, and duration of each break. NULL if the shop has never been billed.
-      - name: paid_days_completed_tier
-        description: A categorization of the number of paid days completed, providing insight into customer retention at different stages. NULL if the shop has never been billed.
-        data_tests:
-          - accepted_values:
-              values:
-                [
-                  NULL,
-                  "A-1 day",
-                  "B-2-7 days",
-                  "C-8-30 days",
-                  "D-31-60 days",
-                  "E-61-90 days",
-                  "F-91-180 days",
-                  "G-181-365 days",
-                  "H-365+ days",
-                ]
-      - name: has_churned_paid_as_involuntary
-        description: The Shop paid and no longer pays and never activated.
-      - name: is_currently_involuntary
-        description: The shop has not run a successful workflow in 30+ days
+      - name: has_uploadery
+        description: Whether the shop has an account for Uploadery.
+      - name: has_tracktor
+        description: Whether the shop has an account for Tracktor.
+      - name: has_blogstudio
+        description: Whether the shop has an account for Blog Studio.
+      - name: has_kitkarts
+        description: Whether the shop has an account for Kit Karts.
+      - name: has_smile
+        description: Whether the shop has an account for Smile.
+      - name: has_bouncer
+        description: Whether the shop has an account for Bouncer.
+      - name: has_pagestudio
+        description: Whether the shop has an account for Page Studio.
+      - name: has_coin
+        description: Whether the shop has an account for Coin.
+      - name: has_infinite_options
+        description: Whether the shop has an account for Infinite Options.
+      - name: first_in_constellation_at_utc
+        description: The timestamp of the Shop's first install in the constellation.
+      - name: first_in_constellation_on_pt
+        description: The date of the Shop's first install in the constellation.
+      - name: first_in_constellation_at_pt
+        description: The timestamp of the Shop's first install in the constellation in PT.
+      - name: constellation_cohort_week
+        description: The week of the Shop's first install in the constellation.

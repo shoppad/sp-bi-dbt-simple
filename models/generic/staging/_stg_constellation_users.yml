@@ -1,11 +1,10 @@
 version: 2
 models:
   - name: stg_constellation_users
-    description: "This table contains all users in the ShopPad ecosystem.
-
-      "
-    tags:
-      - staging
+    description: "This table contains all users in the ShopPad ecosystem."
+    config:
+      tags:
+        - staging
     columns:
       - name: shop_subdomain
         description: The foreign key for the Shop.

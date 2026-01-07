@@ -1,117 +1,67 @@
-WITH workflows AS (
+WITH
 
-    SELECT *
-    FROM {{ ref('int_workflows') }}
+{# ========== Base Data ========== #}
 
+stg_workflows AS (
+    SELECT * FROM {{ ref('stg_workflows') }}
 ),
 
 workflow_steps AS (
-
-    SELECT *
-    FROM {{ ref('stg_workflow_steps') }}
+    SELECT * FROM {{ ref('stg_workflow_steps') }}
     WHERE NOT is_deleted
 ),
 
-thirty_day_workflow_runs AS (
-    SELECT *
-    FROM {{ ref('int_workflow_runs') }}
-    WHERE workflow_run_at_pt >= CURRENT_DATE - INTERVAL '30 days'
+deleted_workflow_steps AS (
+    SELECT * FROM {{ ref('stg_workflow_steps') }}
+    WHERE is_deleted
 ),
 
-thirty_day_workflow_counts AS (
+{# ========== App Chains ========== #}
+
+app_chains AS (
     SELECT
         workflow_id,
-        SUM(executed_step_count) AS thirty_day_step_count,
-        COUNT(
-            DISTINCT IFF(thirty_day_workflow_runs.is_billable, thirty_day_workflow_runs.workflow_run_id, NULL)
-        ) AS thirty_day_trigger_count,
-        COUNT(
-            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.is_successful), thirty_day_workflow_runs.workflow_run_id, NULL)
-            {# ?: is is_successful appropriate here? Do failed filter runs result in something besides success? #}
-        ) AS thirty_day_run_success_count,
-        thirty_day_run_success_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_success_percent,
+        LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS app_chain,
+        LISTAGG(step_name, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS step_chain
+    FROM workflow_steps
+    GROUP BY 1
+),
 
-        COUNT(
-            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.did_move_data), thirty_day_workflow_runs.workflow_run_id, NULL)
-        ) AS thirty_day_run_did_move_data_count,
-        1.0 * thirty_day_run_did_move_data_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_moved_data_percent,
+deleted_app_chains AS (
+    SELECT
+        workflow_id,
+        LISTAGG(integration_app, ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS deleted_app_chain,
+        LISTAGG(CONCAT(integration_app, ' → ', step_name), ' • ') WITHIN GROUP (ORDER BY step_type ASC, position_in_workflow ASC) AS deleted_step_chain
+    FROM deleted_workflow_steps
+    GROUP BY 1
+),
 
-        COUNT(
-            DISTINCT IFF((thirty_day_workflow_runs.is_billable AND thirty_day_workflow_runs.was_filter_stopped), thirty_day_workflow_runs.workflow_run_id, NULL)
-        ) AS thirty_day_run_was_filter_stopped_count,
-        1.0 * thirty_day_run_was_filter_stopped_count / NULLIF(thirty_day_trigger_count, 0) AS thirty_day_run_was_filter_stopped_percent
-    FROM workflows
+{# ========== Workflow Counts ========== #}
+
+workflow_counts AS (
+    SELECT
+        workflow_id,
+        COUNT_IF(workflow_steps.is_pro_app) > 0 AS has_pro_app,
+        COUNT(DISTINCT workflow_steps.workflow_step_id) AS step_count,
+        COUNT(DISTINCT deleted_workflow_steps.workflow_step_id) AS deleted_step_count,
+        COALESCE(step_count, 0) + COALESCE(deleted_step_count, 0) AS step_count_with_deleted
+    FROM stg_workflows
     LEFT JOIN workflow_steps USING (workflow_id)
-    LEFT JOIN thirty_day_workflow_runs USING (workflow_id)
-    GROUP BY
-        1
-),
-
-
-test_runs AS (
-
-    SELECT *
-    FROM {{ ref('int_test_runs') }}
-
-),
-
-test_counts AS (
-
-    SELECT
-        workflow_id,
-        MIN(test_run_at_pt) AS first_test_at_pt,
-        MIN(
-            IFF(is_successful, test_run_at_pt, NULL)
-        ) AS first_successful_test_at_pt,
-        COALESCE(COUNT(DISTINCT test_runs.test_run_id), 0) AS test_attempt_count,
-        COALESCE(COUNT_IF(test_runs.is_successful), 0) AS test_success_count,
-        test_success_count / NULLIF(test_attempt_count, 0) AS test_success_percent,
-        test_attempt_count > 0 AS has_test_attempted_workflow,
-        test_success_count > 0 AS has_test_succeeded_workflow
-    FROM workflows
-    LEFT JOIN test_runs USING (workflow_id)
-    GROUP BY 1
-
-),
-
-page_views AS (
-
-    SELECT
-        shop_subdomain,
-        workflow_id,
-        COALESCE(COUNT_IF(page_url_path LIKE 'automations/%' AND user_id = shop_subdomain), 0) AS page_view_count,
-        page_view_count > 0 AS has_viewed_workflow
-    FROM workflows
-    LEFT JOIN {{ ref('segment_web_page_views__sessionized') }}
-    GROUP BY 1, 2
-
-),
-
-workflow_saves AS (
-
-    SELECT
-        workflow_id,
-        COALESCE(
-            COUNT_IF(event_id IN ('workflow_save', 'dashboard_workflow_edit') AND workflow_id IN (properties_workflow_id, properties_id)),
-            0)
-            AS save_count,
-        save_count > 0 AS has_edited_or_saved_workflow
-    FROM workflows
-    LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
-    GROUP BY 1
-
-),
-
-workflow_enables AS (
-
-    SELECT
-        workflow_id,
-        COALESCE(COUNT_IF(event_id = 'workflow_enable' AND workflow_id IN (properties_workflow_id, properties_id)), 0) AS enable_count,
-        enable_count > 0 AS has_enabled_workflow
-    FROM workflows
-    LEFT JOIN {{ ref('int_mesa_flow_events') }} USING (shop_subdomain)
+    LEFT JOIN deleted_workflow_steps USING (workflow_id)
     GROUP BY 1
 ),
+
+{# ========== Step Descriptions ========== #}
+
+workflow_step_descriptions AS (
+    SELECT
+        workflow_id,
+        LISTAGG(description, ' • ') WITHIN GROUP (ORDER BY step_type, step_weight, position_in_workflow) AS step_descriptions
+    FROM workflow_steps
+    GROUP BY 1
+),
+
+{# ========== Triggers & Destinations ========== #}
 
 workflow_triggers AS (
     SELECT
@@ -135,18 +85,34 @@ workflow_destinations AS (
     QUALIFY ROW_NUMBER() OVER (PARTITION BY workflow_id ORDER BY workflow_step_id DESC) = 1
 ),
 
+{# ========== Final ========== #}
+
 final AS (
     SELECT
-        *,
+        stg_workflows.*,
+        workflow_counts.has_pro_app,
+        workflow_counts.step_count,
+        workflow_counts.deleted_step_count,
+        workflow_counts.step_count_with_deleted,
+        app_chains.app_chain,
+        app_chains.step_chain,
+        COALESCE(app_chains.app_chain, deleted_app_chains.deleted_app_chain) AS app_chain_with_deleted,
+        COALESCE(app_chains.step_chain, deleted_app_chains.deleted_step_chain) AS step_chain_with_deleted,
+        workflow_step_descriptions.step_descriptions,
+        trigger_app,
+        trigger_step_name,
+        trigger_operation_id,
+        destination_app,
+        destination_step_name,
+        destination_operation_id,
         trigger_app || ' - ' || destination_app AS source_destination_pair,
         COALESCE(template_name IS NOT NULL AND template_name != '', FALSE) AS is_from_template,
         COALESCE(app_chain ILIKE ANY ('%googlesheets%', '%recharge%', '%infiniteoptions%', '%tracktor%', '%openai%', '%slack%'), FALSE) AS is_puc
-    FROM workflows
-    LEFT JOIN page_views USING (shop_subdomain, workflow_id)
-    LEFT JOIN test_counts USING (workflow_id)
-    LEFT JOIN workflow_saves USING (workflow_id)
-    LEFT JOIN workflow_enables USING (workflow_id)
-    LEFT JOIN thirty_day_workflow_counts USING (workflow_id)
+    FROM stg_workflows
+    LEFT JOIN workflow_counts USING (workflow_id)
+    LEFT JOIN app_chains USING (workflow_id)
+    LEFT JOIN deleted_app_chains USING (workflow_id)
+    LEFT JOIN workflow_step_descriptions USING (workflow_id)
     LEFT JOIN workflow_triggers USING (workflow_id)
     LEFT JOIN workflow_destinations USING (workflow_id)
 )
