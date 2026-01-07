@@ -276,7 +276,8 @@ models:
         description: Whether the Shop is a PQL.
         data_tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.9
+              arguments:
+                at_least: 0.9
       - name: apps_used
         description: The apps used by the Shop.
       - name: apps_used_without_glue

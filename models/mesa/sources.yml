@@ -6,8 +6,8 @@ sources:
     database: mongo
     schema: public
     loader: hevo
-    loaded_at_field: __hevo__loaded_at::varchar::timestamp_ntz
     config:
+      loaded_at_field: __hevo__loaded_at::varchar::timestamp_ntz
       freshness:
         warn_after:
           count: 36
@@ -91,8 +91,8 @@ sources:
     database: mongo
     schema: getmesa
     loader: segment.com
-    loaded_at_field: received_at
     config:
+      loaded_at_field: received_at
       freshness:
         warn_after:
           count: 12
@@ -121,8 +121,8 @@ sources:
     description: identified users via the getmesa segment app.
     schema: php
     loader: segment.com
-    loaded_at_field: received_at
     config:
+      loaded_at_field: received_at
       freshness:
         warn_after:
           count: 36
