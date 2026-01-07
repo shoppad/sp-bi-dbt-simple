@@ -113,14 +113,7 @@ models:
       marts:
         workflows:
           +unique_key: workflow_id
-
         shops:
-          # +unique_key: shop_subdomain
-
-      intermediate:
-        +schema: support
-        int_shop_calendar:
-        int_shops:
           +cluster_by: ["date_trunc('day', first_installed_at_pt)"]
           +unique_key: shop_subdomain
 

@@ -8,7 +8,7 @@ models:
       - name: shop_subdomain
         data_tests:
           - relationships:
-              to: ref('int_shops')
+              to: ref('shops')
               field: shop_subdomain
         description: The foreign key for the Shop.
       - name: subscription_id
